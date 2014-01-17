@@ -1,0 +1,74 @@
+
+simpleReplayer = {
+  // songId: null,
+  notes: [],
+  timeout: null,
+  offset: 0,
+  firstNoteTime: 0,
+  firstNoteStartTime: 0,
+
+  init: function(notes) {
+    // this.songId = song._id;
+    this.notes = notes;
+    this.reset();
+  },
+
+  destroy: function() {
+    this.pause();
+    this.notes = [];
+  },
+
+  reset: function() {
+    this.pause();
+    Session.set('replayerIndex', 0);
+  },
+
+  play: function() {
+    Monotrome.pause(); // TODO: pause and recalculate if monotrome is running; integrate monotrome with replayer
+
+    Session.set('isReplaying', true);
+    if (Session.get('replayerIndex') >= this.notes.length - 1) {
+      Session.set('replayerIndex', 0)
+    }
+
+    // notify recorder of the offset
+    this.firstNoteTime = this.notes[Session.get('replayerIndex')].time;
+    this.firstNoteStartTime = (new Date).getTime();
+    simpleRecorder.updateOffset(this.firstNoteStartTime - this.firstNoteTime);
+
+    this._play();
+  },
+
+  pause: function() {
+    window.clearTimeout(this.timeout);
+    Session.set('isReplaying', false);
+  },
+
+  _play: function() {
+    var self = this;
+    var currIndex = Session.get('replayerIndex');
+    var note = this.notes[currIndex];
+
+    // updated note's info
+    note.isFromReplayer = true;
+
+    if (note.isKeyboardDown === true) {
+      $(window).trigger('keyboardDown', note);
+    } else {
+      $(window).trigger('keyboardUp', note);
+    }
+
+    if (currIndex >= this.notes.length - 1) {
+      Session.set('isReplaying', false);
+    } else {
+      var nextNote = self.notes[currIndex + 1];
+      var lag = ((new Date).getTime() - this.firstNoteStartTime) - (note.time - this.firstNoteTime);
+
+      this.timeout = window.setTimeout(function() {
+        Session.set('replayerIndex', currIndex + 1);
+        self._play();
+      },  nextNote.time - note.time - lag);
+    }
+  },
+  
+};

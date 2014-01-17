@@ -1,0 +1,20 @@
+<template name='playerControl'>
+  <div class='you-player-control'>
+    <div id='correct-stat' class='stat'>
+      {{numCorrect}}
+    </div>
+    {{#if isDemoing}}
+      <div>
+        <a id='pause-demo'><i class='icon-pause'></i> Pause</a>  
+      </div>
+    {{else}}
+      <div>
+        <a id='demo'><i class='icon-play'></i> Demo</a>  
+      </div>
+    {{/if}}
+      
+    <div id='wrong-stat' class='stat {{#if isWrong}}big-stat{{/if}}'>
+      {{numWrong}}
+    </div>
+  </div>
+</template>

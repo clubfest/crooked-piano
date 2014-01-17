@@ -1,0 +1,33 @@
+
+.keyboard .key.first-cluster {
+  background: #FAA;
+}
+
+.keyboard .key.computer-note {
+  background: #AFA;
+}
+
+.you-player-control {
+  text-align: center;
+}
+
+.you-player-control > div {
+  display: inline-block;
+  padding: 9px;
+}
+
+.you-player-control a {
+  cursor: pointer;
+}
+
+#correct-stat {
+  color: green;
+}
+
+#wrong-stat {
+  color: red;
+}
+
+.big-stat {
+  font-size: 20px;
+}

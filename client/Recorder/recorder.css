@@ -1,0 +1,9 @@
+
+.recorder {
+  list-style: none;
+}
+
+.recorder li {
+  display: inline-block;
+  margin: 10px;
+}

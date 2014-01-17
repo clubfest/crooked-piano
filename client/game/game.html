@@ -1,0 +1,28 @@
+<template name='game'>
+
+{{#isolate}}
+  {{#if hasScore}}
+    {{> result}}
+  {{/if}}
+{{/isolate}}
+
+{{#isolate}}
+  {{> playerControl}}
+{{/isolate}}
+
+{{#isolate}}
+  {{#if levelZero}}
+    {{> oneHandPlayer}}
+  {{/if}}
+
+  {{#if levelOne}}
+    {{> leadPlayer}}
+  {{/if}}
+  
+  {{#if levelTwo}}
+    {{> accompanyingPlayer}}
+  {{/if}}
+{{/isolate}}
+
+{{> editIntro}}
+</template>
