@@ -1,4 +1,3 @@
-var frequency;
 
 Template.monotrome.created = function() {
   Monotrome.init();
@@ -6,15 +5,17 @@ Template.monotrome.created = function() {
 
 Template.monotrome.rendered = function() {
   $('.monotrome-slider').slider({
-    min: 0.2,
-    max: 2.4,
+    min: 0,
+    max: 2.5,
     step: 0.1,
     value: Session.get('monotromeFrequency'),
 
     slide: function(evt, ui) {
       Session.set('monotromeFrequency', ui.value);
       Monotrome.pause();
-      Monotrome.play();
+      if (ui.value > 0) {
+        Monotrome.play();
+      }
     },
   });
 }

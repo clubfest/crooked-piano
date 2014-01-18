@@ -1,22 +1,16 @@
 <template name='segmentRecorder'>
-  <ul class='recorder'>
-    {{#if isRecording}}
-      <li>
-        <button id='recorder-stop'>Stop Recording</button>
-      </li>
-    {{else}}
-      <li>
-        <button id='recorder-start'>Start Recording</button>
-      </li>
-    {{/if}}
-
-    {{#if hasRecordedNotes}}
-      <li>
-        <button id='recorder-save'>Save Recording</button>
-      </li>
-      <li>
-        <button id='recorder-clear'>Clear Recording</button>
-      </li>
-    {{/if}}
-  </ul>
+  {{#if hasRecordedNotes}}
+    <div class='panel'>
+      <div>
+        <button class='recorder-restart'>
+          <i class='icon-repeat'></i> Restart
+        </button>      
+      </div>
+      <div>
+        <button class='recorder-save'>
+          <i class='icon-briefcase'></i> save
+        </button>      
+      </div>
+    </div>
+  {{/if}}
 </template>

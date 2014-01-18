@@ -1,0 +1,15 @@
+<template name='segmentMonotrome'>
+  {{#if hasMonotrome}}
+    <div>
+      {{#if monotromeIsSet}}
+        <button id='monotrome-unset'>
+            <i class='icon-volume-off'></i> Off
+        </button>
+      {{else}}
+        <button id='monotrome-set'>
+          <i class='icon-volume-up'></i> On
+        </button>
+      {{/if}}
+    </div>
+  {{/if}}
+</template>

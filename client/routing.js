@@ -14,8 +14,6 @@ Router.map(function() {
     },
   });
 
-  this.route('youPlayer');
-
   this.route('game', {
     path: '/game/:_id',
     data: function() {

@@ -21,7 +21,7 @@ Monotrome = {
   },
 
   init: function() {
-    Session.set('monotromeFrequency', 1.5);
+    Session.set('monotromeFrequency', 0);
     Session.set('monotromeOn', false);
   },
 
@@ -40,10 +40,25 @@ Monotrome = {
     var self = this;
 
     MIDI.noteOn(MONOTROME_CHANNEL, 98, 20);
-    // MIDI.noteOff(MONOTROME_CHANNEL, 25);
-    
     this.timeout = window.setTimeout(function(){
       self._play();
     }, 1000 / Session.get('monotromeFrequency'));
   },
+
+  syncMonotromeWithSong: function() {
+    $(window).on('keyboardDown.monotrome', function(evt, data) {
+      var freq = Monotrome.getFrequency();
+      if (data.isFromReplayer === true) {
+
+        window.setTimeout(function() {
+        }, (1 - fractionalPart((data.time - Session.get('song').monotromeTime) * freq)) * 1000 / freq);
+        
+        $(window).off('keyboardDown.monotrome');
+      }
+    });
+  },
+}
+
+function fractionalPart(num) {
+  return num - Math.floor(num);
 }

@@ -24,7 +24,11 @@ simpleReplayer = {
   },
 
   play: function() {
-    Monotrome.pause(); // TODO: pause and recalculate if monotrome is running; integrate monotrome with replayer
+    if (Session.get('monotromeIsSet')) {
+      Monotrome.pause(); // TODO: pause and recalculate if monotrome is running; integrate monotrome with replayer
+      console.log('hi')
+      Monotrome.syncMonotromeWithSong();
+    }
 
     Session.set('isReplaying', true);
     if (Session.get('replayerIndex') >= this.notes.length - 1) {

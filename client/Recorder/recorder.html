@@ -1,22 +1,10 @@
 <template name='recorder'>
-  <ul class='recorder'>
-    {{#if isRecording}}
-      <li>
-        <button id='recorder-stop'>Stop Recording</button>
-      </li>
-    {{else}}
-      <li>
-        <button id='recorder-start'>Start Recording</button>
-      </li>
-    {{/if}}
-
-    {{#if hasRecordedNotes}}
-      <li>
-        <button id='recorder-save'>Save Recording</button>
-      </li>
-      <li>
-        <button id='recorder-clear'>Clear Recording</button>
-      </li>
-    {{/if}}
-  </ul>
+  {{#if hasRecordedNotes}}
+    <div>
+      <a class='recorder-restart'>Restart</a>      
+    </div>
+    <div>
+      <a class='recorder-save'>Save</a>      
+    </div>
+  {{/if}}
 </template>

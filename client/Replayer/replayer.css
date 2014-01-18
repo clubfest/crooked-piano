@@ -1,3 +1,7 @@
+.slider {
+  max-width: 794px;
+  margin: 0 auto;
+}
 /* Overlays */
 .ui-widget-overlay {
   position: fixed;

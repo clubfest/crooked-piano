@@ -1,5 +1,5 @@
 
-Template.editIntro.rendered = function() {
+Template.intro.rendered = function() {
   var songId = Session.get('song')._id;
 
   $(function(){
