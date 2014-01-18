@@ -1,14 +1,19 @@
 
 Template.oneHandPlayer.created = function() {
-  OneHandPlayer.create();
   
 }
 
 Template.oneHandPlayer.rendered = function() {
+  if (!this.rendered) {
+    this.rendered = true;
+
+    OneHandPlayer.create();
+  }
   OneHandPlayer.redisplayNotes();
 }
 
 Template.oneHandPlayer.destroyed = function() {
+  console.log('hi')
   OneHandPlayer.destroy();
 }
 

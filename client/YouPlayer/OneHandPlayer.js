@@ -34,12 +34,13 @@ OneHandPlayer = {
 
   destroy: function() {
     $(window).off('keyboardDown.youPlayer');
+    $(window).off('keyboardUp.youPlayer');
   },
 
   loadPlayNotes: function() {
     for (var i = 0; i < this.song.notes.length; i++) {
       var note = this.song.notes[i];
-      if (note.segmentId === this.segmentId) {
+      if (note.segmentId === this.segmentId) {        
         this.playNotes.push(note);        
       }
     }

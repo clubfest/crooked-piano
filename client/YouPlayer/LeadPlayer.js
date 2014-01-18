@@ -39,10 +39,22 @@ LeadPlayer = {
   },
 
   loadPlayNotes: function() {
-    for (var i = 0; i < this.song.notes.length; i++) {
+    var i;
+    for (i = 0; i < this.song.notes.length; i++) {
+      if (!this.isComputerNote(this.song.notes[i])) {
+        break ;
+      } 
+    }
+
+    for (; i < this.song.notes.length; i++) {
       var note = this.song.notes[i];
       this.playNotes.push(note);        
+
+      if (note.isEnd === true && !this.isComputerNote(note)) {
+        break ;
+      } 
     }
+      
   },
 
   judge: function(data) {
@@ -127,8 +139,10 @@ LeadPlayer = {
       this.incrementPlayIndex();
       if (proximateNote.isKeyboardDown === true) {
         this.proximateNotes.push(proximateNote);
+
         if (this.isComputerNote(proximateNote)) {          
           proximateNote.isComputerNote = true;
+
           this.displayComputerNote(proximateNote);
         } else {
           this.displayNote(proximateNote);
@@ -145,6 +159,7 @@ LeadPlayer = {
         if (note.isKeyboardDown === true) {
           if (this.isComputerNote(note)) {
             note.isComputerNote = true;
+
             this.proximateNotes.push(note);
             this.displayComputerNote(note);
           } else {
@@ -185,6 +200,7 @@ LeadPlayer = {
   },
 
   displayNote: function(note) {
+
     $('[data-key-code='+note.keyCode+']').addClass('first-cluster');
   },
 
@@ -194,13 +210,21 @@ LeadPlayer = {
 
   redisplayNotes: function() {
     for (var i = 0; i < this.proximateNotes.length; i++) {
-      this.displayNote(this.proximateNotes[i])
+      var note = this.proximateNotes[i];
+      if (this.isComputerNote(note)) {
+        this.displayComputerNote(note);
+      } else {
+        this.displayNote(note);
+      }
     }
   },
 
   undisplayNote: function(note) {
-    $('[data-key-code='+note.keyCode+']').removeClass('computer-note');
-    $('[data-key-code='+note.keyCode+']').removeClass('first-cluster');
+    window.setTimeout(function() {
+      $('[data-key-code='+note.keyCode+']').removeClass('computer-note');
+      $('[data-key-code='+note.keyCode+']').removeClass('first-cluster');
+    }, 300);
+      
   },
 
   incrementScore: function() {

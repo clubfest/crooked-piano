@@ -14,7 +14,6 @@ simpleKeyboard = {
 
       if (typeof note !== "undefined") {
         note = self.adjustShift(note);
-        console.log((new Date).getTime())
         $(window).trigger('keyboardDown', {
           time: new Date().getTime(),
           keyCode: keyCode,

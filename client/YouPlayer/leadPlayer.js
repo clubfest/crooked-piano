@@ -1,10 +1,13 @@
 
 Template.leadPlayer.created = function() {
-  LeadPlayer.create();
-  
 }
 
 Template.leadPlayer.rendered = function() {
+  if (!this.rendered) {
+    this.rendered = true;
+
+    LeadPlayer.create();
+  }
   LeadPlayer.redisplayNotes();
 }
 
