@@ -17,10 +17,10 @@ simpleRecorder = {
   },
 
   reset: function() {
-    Session.set('isRecording', false);
     Session.set('hasRecordedNotes', false);
     this.notes = [];
     this.offset = 0;
+    this.start();
   },
 
   start: function() {

@@ -57,7 +57,9 @@ LeadPlayer = {
     }
 
     if (matchIdx > -1) {
-      this.incrementScore();
+      if (!this.isComputerNote(note)) {
+        this.incrementScore();
+      }
       this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
       this.prevNoteTime = note.time;

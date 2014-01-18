@@ -1,10 +1,15 @@
 <template name='recorder'>
   {{#if hasRecordedNotes}}
     <div>
-      <a class='recorder-restart'>Restart</a>      
+      <button class='recorder-save'>
+        <i class='icon-briefcase'></i> Save
+      </button>      
     </div>
+
     <div>
-      <a class='recorder-save'>Save</a>      
+      <button class='recorder-restart'>
+        <i class='icon-trash'></i> Clear
+      </button>      
     </div>
   {{/if}}
 </template>

@@ -1,13 +1,17 @@
 <template name='replayer'>
   <div class='panel'>
     <div class='replayer-control'>
-      <button class='start-replayer'>
-        {{#if isReplaying}}
+      {{#if isReplaying}}
+        <button class='replayer-pause'>
           <i class='icon-pause'></i> Pause
-        {{else}}
+        </button>
+          
+      {{else}}
+        <button class='replayer-start'>
           <i class='icon-play'></i> Play
-        {{/if}}
-      </button>
+        </button>
+
+      {{/if}}
     </div>
     <div class='monotrome-control'>
       {{> segmentMonotrome}}

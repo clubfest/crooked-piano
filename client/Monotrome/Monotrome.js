@@ -28,6 +28,7 @@ Monotrome = {
   play: function() {
     Session.set('monotromeOn', true);
     this.time = (new Date).getTime();
+    console.log('monotromeOn ' + this.time);
     this._play();
   },
 
@@ -48,10 +49,11 @@ Monotrome = {
   syncMonotromeWithSong: function() {
     $(window).on('keyboardDown.monotrome', function(evt, data) {
       var freq = Monotrome.getFrequency();
-      if (data.isFromReplayer === true) {
 
+      if (data.isFromReplayer === true) {
         window.setTimeout(function() {
-        }, (1 - fractionalPart((data.time - Session.get('song').monotromeTime) * freq)) * 1000 / freq);
+          Monotrome.play();
+        }, (1 - fractionalPart((data.time - Session.get('song').monotromeTime) * freq / 1000)) * 1000 / freq);
         
         $(window).off('keyboardDown.monotrome');
       }

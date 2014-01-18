@@ -6,7 +6,7 @@ var players = [OneHandPlayer, LeadPlayer, 'AccompanyingPlayer', 'singAlong', 'du
 
 Template.game.created = function() {
   Session.set('segmentLevel', 0);
-  Session.set('playLevel', 1);
+  Session.set('playLevel', 0);
 }
 
 Template.game.events({
@@ -25,6 +25,10 @@ Template.game.events({
       Session.set('playLevel', 1);
     } else {
       Session.set('playLevel', 0);
+      var segmentLevel = Session.get('segmentLevel');
+      if (segmentLevel < Session.get('song').segmentIds.length - 1) {
+        Session.set('segmentLevel', segmentLevel + 1);
+      }
     }
   },
 

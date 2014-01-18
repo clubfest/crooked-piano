@@ -3,11 +3,9 @@ Template.segmentMonotrome.created = function() {
   Monotrome.init();
 
   var song = Session.get('song');
-  Monotrome.setTime(song);
   Monotrome.setFrequency(song.monotromeFrequency);
 
   if (song.monotromeTime) {
-    console.log(song.monotromeTime)
     Session.set('hasMonotrome', true);
     Session.set('monotromeIsSet', true);
   }

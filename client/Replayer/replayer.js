@@ -40,11 +40,11 @@ Template.replayer.destroyed = function() {
 }
 
 Template.replayer.events({
-  'click .start-replayer': function(evt, tmpl) {
+  'click .replayer-start': function(evt, tmpl) {
     simpleReplayer.play();
   },
 
-  'click .pause-replayer': function(evt, tmpl) {
+  'click .replayer-pause': function(evt, tmpl) {
     simpleReplayer.pause();
   },
 });

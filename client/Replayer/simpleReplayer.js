@@ -26,7 +26,6 @@ simpleReplayer = {
   play: function() {
     if (Session.get('monotromeIsSet')) {
       Monotrome.pause(); // TODO: pause and recalculate if monotrome is running; integrate monotrome with replayer
-      console.log('hi')
       Monotrome.syncMonotromeWithSong();
     }
 
@@ -44,6 +43,7 @@ simpleReplayer = {
   },
 
   pause: function() {
+    Monotrome.pause();
     window.clearTimeout(this.timeout);
     Session.set('isReplaying', false);
   },

@@ -14,17 +14,21 @@ simpleKeyboard = {
 
       if (typeof note !== "undefined") {
         note = self.adjustShift(note);
+        console.log((new Date).getTime())
+        $(window).trigger('keyboardDown', {
+          time: new Date().getTime(),
+          keyCode: keyCode,
+          note: note,
+          channel: self.channel,
+          velocity: self.velocity + 3*note,
+        });
+
       } else {
+        //TODO
         self.adjustSettings(keyCode);
       }
 
-      $(window).trigger('keyboardDown', {
-        time: new Date().getTime(),
-        keyCode: keyCode,
-        note: note,
-        channel: self.channel,
-        velocity: self.velocity + 3*note,
-      });
+        
     });
 
     $(window).on('keyup.keyboard', function(evt) {
@@ -33,15 +37,15 @@ simpleKeyboard = {
 
       if (typeof note !== "undefined") {
         note = self.adjustShift(note);
-      }
 
-      $(window).trigger('keyboardUp', {
-        time: new Date().getTime(),
-        keyCode: keyCode,
-        note: note,
-        channel: self.channel,
-        velocity: self.velocity + note * 2,
-      });
+        $(window).trigger('keyboardUp', {
+          time: new Date().getTime(),
+          keyCode: keyCode,
+          note: note,
+          channel: self.channel,
+          velocity: self.velocity + note * 2,
+        });
+      }
     });
   },
 
