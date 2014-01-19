@@ -7,3 +7,6 @@
   background: #AFA;
 }
 
+.keyboard .key.repeated-note:before {
+  content: "+";
+}

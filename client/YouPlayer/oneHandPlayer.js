@@ -13,14 +13,7 @@ Template.oneHandPlayer.rendered = function() {
 }
 
 Template.oneHandPlayer.destroyed = function() {
-  console.log('hi')
   OneHandPlayer.destroy();
 }
 
-Handlebars.registerHelper('score', function() {
-  return Session.get('score');
-});
 
-Handlebars.registerHelper('hasScore', function() {
-  return Session.get('score') !== null;
-});

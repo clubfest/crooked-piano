@@ -1,21 +1,22 @@
 <template name='result'>
-  <div class='panel'>
-    
-    <div>
-      <button id='retry-game'>
-        <i class='icon-chevron-left'></i>
-        Retry
-      </button>
-    </div>
-    {{#if hasPassed}}
+  {{#if scoreTallied}}
+    <div class='panel'>
       <div>
-        <button id='next-game'>
-          <i class='icon-chevron-right'></i>
-          Next
+        <button id='retry-game'>
+          <i class='icon-chevron-left'></i>
+          Retry
         </button>
       </div>
-    {{/if}}
-  </div>
+      {{#if hasPassed}}
+        <div>
+          <button id='next-game'>
+            <i class='icon-chevron-right'></i>
+            Next
+          </button>
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
 
   <div id='result-panel'>
     <div id='score-panel'>

@@ -6,10 +6,6 @@ OneHandPlayer = {
       self.judge(data);
     });
 
-    $(window).on('keyboardUp.youPlayer', function() {
-      $('.stat').removeClass('big-stat');
-    });
-
     this.song = Session.get('song');
     this.playNotes = [];
     this.segmentId = this.song.segmentIds[Session.get('segmentLevel')];
@@ -26,24 +22,25 @@ OneHandPlayer = {
     Session.set('isWrong', false);
     Session.set('score', null);
     Session.set('isDemoing', false);
+    Session.set('scoreTallied', false);
 
     this.proximateNotes = [];
+    this.prevNoteTime = null;
     this.updateProximateNotes();
-
   },
 
   destroy: function() {
     $(window).off('keyboardDown.youPlayer');
-    $(window).off('keyboardUp.youPlayer');
   },
 
   loadPlayNotes: function() {
     for (var i = 0; i < this.song.notes.length; i++) {
       var note = this.song.notes[i];
-      if (note.segmentId === this.segmentId) {        
+
+      if (this.isPlayerNote(note) && note.isKeyboardDown === true) {
         this.playNotes.push(note);        
       }
-    }
+    }      
   },
 
   judge: function(data) {
@@ -51,6 +48,7 @@ OneHandPlayer = {
 
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
+
       if (data.keyCode === note.keyCode) {
         matchIdx = i;
         break ;
@@ -61,22 +59,9 @@ OneHandPlayer = {
       this.incrementScore();
       this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
+      this.prevNoteTime = note.time;
       this.updateProximateNotes();
-      if (this.proximateNotes.length === 0) {
 
-        var self = this; // give some time for the last keyup to fire in demo
-        window.setTimeout(function() {
-          if (Session.get('isDemoing')) {
-            simpleReplayer.destroy();
-            $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
-            self.reset();
-          } else {
-            tallyScore();
-          }
-        }, WAIT_TIME);
-          
-        
-      }
     } else {
       this.decrementScore();
     }
@@ -89,8 +74,22 @@ OneHandPlayer = {
 
     Session.set('isDemoing', true);
     $('.demo-message').remove();
-    
-    simpleReplayer.init(this.playNotes.slice(this.getPlayIndex()-this.proximateNotes.length, this.playNotes.length));
+
+    var notes = [];
+    var i = this.getPlayIndex() - this.proximateNotes.length;
+
+    for ( ; i < this.playNotes.length; i++) {
+      var note = this.playNotes[i];
+      notes.push(note);
+      var noteUp = $.extend(true, {}, note);
+      $.extend(noteUp, {
+        isKeyboardDown: false,
+        time: note.time + 200,
+      });
+      notes.push(noteUp);
+    }
+
+    simpleReplayer.init(notes);
     simpleReplayer.play();
   },
 
@@ -98,54 +97,91 @@ OneHandPlayer = {
     simpleReplayer.pause();
   },
 
+  isPlayerNote: function(note) {
+    return note.segmentId === this.segmentId;
+  },
+
   updateProximateNotes: function() {
-    // Add new note if proximateNotes is emtpy
-    while(this.proximateNotes.length === 0) {
-      // the end is reached
-      if (this.getPlayIndex() === this.playNotes.length) {
-        return ;
-      }
-
-      var proximateNote = this.playNotes[this.getPlayIndex()];
-
-      if (proximateNote.isKeyboardDown === true) {
-        this.proximateNotes.push(proximateNote);
-        this.displayNote(proximateNote);
-      }
-        
-      this.incrementPlayIndex();
+    if (this.getPlayIndex() >= this.playNotes.length &&
+        this.proximateNotes.length === 0) {
+      this.gameOver();
+      return;
+    }
+    
+    if (this.getPlayIndex() >= this.playNotes.length ||
+        this.proximateNotes.length > 0) {
+      return;
     }
 
-    // Add new note if the first note's time differ by less than 100 ms
-    var startTime = this.proximateNotes[0].time;
+    while(1) {
 
-    while (this.getPlayIndex() < this.playNotes.length) {
       var note = this.playNotes[this.getPlayIndex()];
-      if (note.time - startTime < 100) {
-        this.incrementPlayIndex();
+      this.incrementPlayIndex();
+      this.proximateNotes.push(note);
+      this.displayNote(note);
 
-        if (note.isKeyboardDown === true) {
-          this.proximateNotes.push(note);
-          this.displayNote(note);
-        } // ignore keyup notes
-      } else {
-        return ;
+      if (this.getPlayIndex() === this.playNotes.length ||
+          this.playNotes[this.getPlayIndex()].time - note.time > CLUSTER_TIME) {
+        break;
       }
     }
+  },
+
+  gameOver: function() {
+    var self = this; 
+
+    window.setTimeout(function() {
+      if (Session.get('isDemoing')) {
+        simpleReplayer.destroy();
+        $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
+        self.reset();
+      } else {
+        tallyScore();
+      }
+    }, WAIT_TIME);
+  },
+
+  coincidingNextNotes: function(note) {
+    /* For seeing if any proximateNotes match with next cluster of proximateNotes */
+    var idx = this.getPlayIndex();
+
+    if (idx < this.playNotes.length) {
+      var nextNote = this.playNotes[idx];
+      var nextTime = nextNote.time;
+
+      while ( idx < this.playNotes.length && nextNote.time - nextTime < CLUSTER_TIME) {
+        if (nextNote.keyCode === note.keyCode) {
+          return true;
+        } else {
+          idx++;
+          nextNote = this.playNotes[idx];
+        }
+      }
+    }
+
+    return false;
   },
 
   displayNote: function(note) {
-    $('[data-key-code='+note.keyCode+']').addClass('first-cluster');
+    var displayClass = 'first-cluster '
+
+    if (this.coincidingNextNotes(note)) {
+      displayClass += " repeated-note"
+    }
+
+    console.log(displayClass)
+    $('[data-key-code='+note.keyCode+']').addClass(displayClass);
   },
+
 
   redisplayNotes: function() {
     for (var i = 0; i < this.proximateNotes.length; i++) {
-      this.displayNote(this.proximateNotes[i])
+      this.displayNote(this.proximateNotes[i]);
     }
   },
 
   undisplayNote: function(note) {
-    $('[data-key-code='+note.keyCode+']').removeClass('first-cluster');
+    $('[data-key-code='+note.keyCode+']').removeClass('first-cluster repeated-note');      
   },
 
   incrementScore: function() {
@@ -188,5 +224,7 @@ function tallyingScore(score) {
     window.setTimeout(function() {
       tallyingScore(score);
     }, time);
+  } else {
+    Session.set('scoreTallied', true);
   }
 }

@@ -1,5 +1,20 @@
 <template name='songs'>
-  {{#each songs}}
-    {{replayer song=this}}
-  {{/each}}
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Interpreted By</th>
+    </tr>
+    {{#each songs}}
+      <tr>
+        <td>
+          <a href="{{pathFor 'game'}}">
+            {{title}}            
+          </a>
+        </td>
+        <td>
+          {{createdBy}}
+        </td>
+      </tr>
+    {{/each}}
+  </table>
 </template>

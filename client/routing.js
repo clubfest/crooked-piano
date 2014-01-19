@@ -22,4 +22,6 @@ Router.map(function() {
       return song;
     },
   });
+
+  this.route('songs')
 });

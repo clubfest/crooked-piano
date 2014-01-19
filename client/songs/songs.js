@@ -1,4 +1,4 @@
 
-Handlebars.registerHelper("songs", function (params) {
+Template.songs.songs = function() {
   return Songs.find();
-});
+}

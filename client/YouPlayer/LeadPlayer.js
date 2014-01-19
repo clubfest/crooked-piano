@@ -10,10 +10,6 @@ LeadPlayer = {
       }
     });
 
-    $(window).on('keyboardUp.youPlayer', function() {
-      $('.stat').removeClass('big-stat');
-    });
-
     this.song = Session.get('song');
     this.playNotes = [];
     this.segmentId = this.song.segmentIds[Session.get('segmentLevel')];
@@ -30,6 +26,7 @@ LeadPlayer = {
     Session.set('isWrong', false);
     Session.set('score', null);
     Session.set('isDemoing', false);
+    Session.set('scoreTallied', false);
 
     this.proximateNotes = [];
     this.computerProximateNotes = [];
@@ -217,10 +214,36 @@ LeadPlayer = {
     }, WAIT_TIME);
   },
 
+  coincidingNextNotes: function(note) {
+    /* For seeing if any proximateNotes match with next cluster of proximateNotes */
+    var idx = this.getPlayIndex();
+
+    if (idx < this.playNotes.length) {
+      var nextNote = this.playNotes[idx];
+      var nextTime = nextNote.time;
+
+      while ( idx < this.playNotes.length && nextNote.time - nextTime < CLUSTER_TIME) {
+        if (nextNote.keyCode === note.keyCode) {
+          return true;
+        } else {
+          idx++;
+          nextNote = this.playNotes[idx];
+        }
+      }
+    }
+
+    return false;
+  },
+
   displayNote: function(note) {
-    window.setTimeout(function() {
-      $('[data-key-code='+note.keyCode+']').addClass('first-cluster');
-    }, 200)
+    var displayClass = 'first-cluster '
+
+    if (this.coincidingNextNotes(note)) {
+      displayClass += " repeated-note"
+    }
+
+    console.log(displayClass)
+    $('[data-key-code='+note.keyCode+']').addClass(displayClass);
   },
 
   displayComputerNote: function(note) {
@@ -237,11 +260,7 @@ LeadPlayer = {
   },
 
   undisplayNote: function(note) {
-    window.setTimeout(function() {
-      $('[data-key-code='+note.keyCode+']').removeClass('computer-note');
-      $('[data-key-code='+note.keyCode+']').removeClass('first-cluster');
-    }, 300);
-      
+    $('[data-key-code='+note.keyCode+']').removeClass('first-cluster computer-note repeated-note');
   },
 
   incrementScore: function() {
