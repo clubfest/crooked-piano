@@ -55,8 +55,6 @@ LeadPlayer = {
       if (note.isKeyboardDown === true) {
         this.playNotes.push(note);        
       }
-      if (note.isEnd)
-        console.log(note)
 
       if (note.isEnd === true && !this.isComputerNote(note)) {
         break ;
@@ -108,11 +106,18 @@ LeadPlayer = {
     $('.demo-message').remove();
 
     var notes = [];
-    var i = this.getPlayIndex() - this.proximateNotes.length
+    var i = this.getPlayIndex() - this.proximateNotes.length - this.computerProximateNotes.length;
     for ( ; i < this.playNotes.length; i++) {
       var note = this.playNotes[i];
-      if (!this.isComputerNote(note))
-      notes.push(note);
+      if (!this.isComputerNote(note)) {
+        notes.push(note);
+        var noteUp = $.extend(true, {}, note);
+        $.extend(noteUp, {
+          isKeyboardDown: false,
+          time: note.time + 200,
+        });
+        notes.push(noteUp);
+      }
     }
     simpleReplayer.init(notes);
     simpleReplayer.play();
@@ -224,12 +229,10 @@ LeadPlayer = {
 
   redisplayNotes: function() {
     for (var i = 0; i < this.proximateNotes.length; i++) {
-      var note = this.proximateNotes[i];
-      if (this.isComputerNote(note)) {
-        this.displayComputerNote(note);
-      } else {
-        this.displayNote(note);
-      }
+      this.displayNote(this.proximateNotes[i]);
+    }
+    for (var i = 0; i < this.computerProximateNotes.length; i++) {
+      this.displayNote(this.computerProximateNotes[i]);
     }
   },
 
