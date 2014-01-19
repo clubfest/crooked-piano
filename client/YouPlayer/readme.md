@@ -5,7 +5,6 @@ youPlayer
 * Then set up the song
 
 ## What is proximateNotes
-`proximateNotes` are the next notes to be judged.
 
 `updateProximateNotes` for sparse music:
 * quit if the end has been reached
@@ -27,14 +26,27 @@ youPlayer
   * else return
 
 ## LeadPlayer 
+* `proximateNotes` are the next correct note. There can be more than 1 note if within less than 100ms
+* `computerProximateNotes` are the next notes to be played by the computer if `proximateNotes` are empty
+  * Otherwise It but must wait to play together with `proximateNotes`.
+
+* will not be played until proximateNotes is empty
+* 
+* after computerProximateNotes are played, we will need to update proximateNotes
 
 * Everytime, a note match, we check if proximateNotes are all computerNotes
   * If so, play, all those notes.
 
 We should separate proximateComputerNotes from proximateNotes with the update:
+
 * if it's a computer note, don't play it yet
   * reorder the non-computer notes are first
-  * then play the computer notes if they are at the front
+  * if they are at the front
+    * play the computer notes 
+  * else set timeout
+    * and add to the timeout if needed
+
+
 
 ## mode
 * one-hand: Play one segment.

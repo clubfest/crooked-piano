@@ -5,7 +5,9 @@ LeadPlayer = {
   create: function() {
     var self = this;
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
-      self.judge(data);
+      if (data.playedByComputer !== true) {
+        self.judge(data);
+      }
     });
 
     $(window).on('keyboardUp.youPlayer', function() {
@@ -30,6 +32,7 @@ LeadPlayer = {
     Session.set('isDemoing', false);
 
     this.proximateNotes = [];
+    this.computerProximateNotes = [];
     this.prevNoteTime = null;
     this.updateProximateNotes();
   },
@@ -48,7 +51,12 @@ LeadPlayer = {
 
     for (; i < this.song.notes.length; i++) {
       var note = this.song.notes[i];
-      this.playNotes.push(note);        
+
+      if (note.isKeyboardDown === true) {
+        this.playNotes.push(note);        
+      }
+      if (note.isEnd)
+        console.log(note)
 
       if (note.isEnd === true && !this.isComputerNote(note)) {
         break ;
@@ -62,6 +70,7 @@ LeadPlayer = {
 
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
+
       if (data.keyCode === note.keyCode) {
         matchIdx = i;
         break ;
@@ -69,37 +78,25 @@ LeadPlayer = {
     }
 
     if (matchIdx > -1) {
-      if (!this.isComputerNote(note)) {
-        this.incrementScore();
-      }
+      this.incrementScore();
       this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
       this.prevNoteTime = note.time;
-  
-      if (this.proximateNotes.length > 0 && this.proximateNotes[0].isComputerNote) {
-        this.playComputerNotes(this.proximateNotes);
-      }
 
-      this.updateProximateNotes();
-
-      //// Game over
+      // the held back computer notes can now be played
       if (this.proximateNotes.length === 0) {
-        var self = this; 
-
-        window.setTimeout(function() {
-          if (Session.get('isDemoing')) {
-            simpleReplayer.destroy();
-            $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
-            self.reset();
-          } else {
-            self.tallyScore();
-          }
-        }, WAIT_TIME);          
+        if (this.computerProximateNotes.length > 0) {          
+          this.playComputerProximateNotes();
+        } else {
+          this.updateProximateNotes();
+        }
       }
-
     } else {
-      this.decrementScore();
+      // if (data.playedByComputer !== true) {
+        this.decrementScore();
+      // }
     }
+
   },
 
   demo: function() {
@@ -130,78 +127,95 @@ LeadPlayer = {
   },
 
   updateProximateNotes: function() {
-    while(this.proximateNotes.length === 0) {
-      if (this.getPlayIndex() === this.playNotes.length) {
-        return ;
-      }
-
-      var proximateNote = this.playNotes[this.getPlayIndex()];
-      this.incrementPlayIndex();
-      if (proximateNote.isKeyboardDown === true) {
-        this.proximateNotes.push(proximateNote);
-
-        if (this.isComputerNote(proximateNote)) {          
-          proximateNote.isComputerNote = true;
-
-          this.displayComputerNote(proximateNote);
-        } else {
-          this.displayNote(proximateNote);
-        }
-      }
+    if (this.getPlayIndex() >= this.playNotes.length &&
+        this.proximateNotes.length === 0 &&
+        this.computerProximateNotes.length === 0) {
+      this.gameOver();
+      return;
+    }
+    
+    if (this.getPlayIndex() >= this.playNotes.length ||
+        this.proximateNotes.length > 0 ||
+        this.computerProximateNotes.length > 0) {
+      return;
     }
 
-    // Add new note if the first note's time differ by less than 100 ms
-    while (this.getPlayIndex() < this.playNotes.length) {
+    while(1) {
+
       var note = this.playNotes[this.getPlayIndex()];
-      if (note.time - this.proximateNotes[0].time < CLUSTER_TIME) {
-        this.incrementPlayIndex();
+      this.incrementPlayIndex();
 
-        if (note.isKeyboardDown === true) {
-          if (this.isComputerNote(note)) {
-            note.isComputerNote = true;
-
-            this.proximateNotes.push(note);
-            this.displayComputerNote(note);
-          } else {
-            this.proximateNotes.splice(0, 0, note);
-            this.displayNote(note);
-          }
-        } 
-      } else break;
-    }
-
-    if (this.proximateNotes.length > 0 && this.proximateNotes[0].isComputerNote) {
-      var wait = 0;
-      
-      if (this.prevNoteTime !== null) {
-        wait = this.proximateNotes[0].time - this.prevNoteTime;
+      if (this.isComputerNote(note)) {
+        this.displayComputerNote(note);
+        this.computerProximateNotes.push(note);
+      } else {
+        this.proximateNotes.push(note);
+        this.displayNote(note);
       }
 
-      var self = this;
-      var clone = self.proximateNotes.slice(0);
-      window.setTimeout(function() {
-        self.playComputerNotes(clone); // clone is needed
-      }, wait);
+      if (this.getPlayIndex() === this.playNotes.length ||
+          this.playNotes[this.getPlayIndex()].time - note.time > CLUSTER_TIME) {
+        break;
+      }
+    }
+
+    if (this.proximateNotes.length === 0) {
+      if (this.computerProximateNotes.length > 0) {
+        var wait = 0;
+        var self = this; 
+        
+        if (this.prevNoteTime !== null) {
+          wait = this.computerProximateNotes[0].time - this.prevNoteTime;
+        }
+
+        window.setTimeout(function() {
+          self.playComputerProximateNotes();
+        }, wait);
+      }
     }
   },
 
-  playComputerNotes: function(notes) {
+  playComputerProximateNotes: function() {    
+    var self = this;
+    var notes = this.computerProximateNotes;
+
     for (var j = 0; j < notes.length; j++) {
-      var computerNote = notes[j]
+      var computerNote = notes[j];
+
+      computerNote.playedByComputer = true;
 
       $(window).trigger('keyboardDown', computerNote);
 
-      window.setTimeout(function() {
-        $(window).trigger('keyboardUp', computerNote);
-      }, 400);
+      window.setTimeout(function(note) {        
+        $(window).trigger('keyboardUp', note); // for recording purposes
+        self.undisplayNote(note);
+      }, 100, computerNote);
 
       this.prevNoteTime = computerNote.time;
-    }         
+    }  
+    this.computerProximateNotes = []; 
+    this.updateProximateNotes();
+
+  },
+
+  gameOver: function() {
+    var self = this; 
+
+    window.setTimeout(function() {
+      if (Session.get('isDemoing')) {
+        simpleReplayer.destroy();
+        $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
+        self.reset();
+      } else {
+        tallyScore();
+      }
+    }, WAIT_TIME);
   },
 
   displayNote: function(note) {
-
-    $('[data-key-code='+note.keyCode+']').addClass('first-cluster');
+    window.setTimeout(function() {
+      $('[data-key-code='+note.keyCode+']').addClass('first-cluster');
+    }, 200)
   },
 
   displayComputerNote: function(note) {
@@ -243,14 +257,5 @@ LeadPlayer = {
 
   getPlayIndex: function() {
     return Session.get('playIndex');
-  },
-
-  tallyScore: function() {
-    var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
-
-    Session.set('score', 0);
-    window.setTimeout(function() {
-      incrementScore(score);
-    }, WAIT_TIME);
   },
 }

@@ -1,7 +1,7 @@
 
 simpleKeyboard = {
   channel: 0,
-  velocity: -90,
+  velocity: 70,
   shift: 0,
   hasPedal: true,
 
@@ -19,7 +19,7 @@ simpleKeyboard = {
           keyCode: keyCode,
           note: note,
           channel: self.channel,
-          velocity: self.velocity + 3*note,
+          velocity: self.velocity,
         });
 
       } else {
@@ -42,7 +42,7 @@ simpleKeyboard = {
           keyCode: keyCode,
           note: note,
           channel: self.channel,
-          velocity: self.velocity + note * 2,
+          velocity: self.velocity,
         });
       }
     });

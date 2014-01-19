@@ -71,7 +71,7 @@ OneHandPlayer = {
             $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
             self.reset();
           } else {
-            self.tallyScore();
+            tallyScore();
           }
         }, WAIT_TIME);
           
@@ -165,18 +165,18 @@ OneHandPlayer = {
   getPlayIndex: function() {
     return Session.get('playIndex');
   },
-
-  tallyScore: function() {
-    var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
-
-    Session.set('score', 0);
-    window.setTimeout(function() {
-      incrementScore(score);
-    }, WAIT_TIME);
-  },
 }
 
-incrementScore = function(score) {
+tallyScore = function() {
+  var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
+
+  Session.set('score', 0);
+  window.setTimeout(function() {
+    tallyingScore(score);
+  }, WAIT_TIME);
+}
+
+function tallyingScore(score) {
   var oldScore = Session.get('score');
   var time = oldScore / 2;
   if (score - oldScore < 8) {
@@ -186,7 +186,7 @@ incrementScore = function(score) {
     Session.set('score', oldScore + 1);
     MIDI.noteOn(0, Math.floor(oldScore*score % 47) + 40, oldScore / 4);
     window.setTimeout(function() {
-      incrementScore(score);
+      tallyingScore(score);
     }, time);
   }
 }

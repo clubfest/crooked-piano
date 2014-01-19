@@ -40,7 +40,7 @@ Monotrome = {
   _play: function() {
     var self = this;
 
-    MIDI.noteOn(MONOTROME_CHANNEL, 98, 20);
+    MIDI.noteOn(MONOTROME_CHANNEL, 98, 30);
     this.timeout = window.setTimeout(function(){
       self._play();
     }, 1000 / Session.get('monotromeFrequency'));

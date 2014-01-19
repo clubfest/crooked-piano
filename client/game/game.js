@@ -3,10 +3,11 @@
   Put in the keyboard and youPlayer, with a back button,
 */
 var players = [OneHandPlayer, LeadPlayer, 'AccompanyingPlayer', 'singAlong', 'duet', 'recital', 'twoHand'];
+var passingScore = [80, 90];
 
 Template.game.created = function() {
   Session.set('segmentLevel', 0);
-  Session.set('playLevel', 0);
+  Session.set('playLevel', 1);
 }
 
 Template.game.events({

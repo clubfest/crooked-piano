@@ -1,0 +1,25 @@
+.you-player-control {
+  text-align: center;
+}
+
+.you-player-control > div {
+  display: inline-block;
+  padding: 9px;
+  font-size: 20px;
+}
+
+.you-player-control a {
+  cursor: pointer;
+}
+
+#correct-stat {
+  color: green;
+}
+
+#wrong-stat {
+  color: red;
+}
+
+.big-stat {
+  font-size: 20px;
+}

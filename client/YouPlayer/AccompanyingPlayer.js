@@ -192,7 +192,7 @@ AccompanyingPlayer = {
 
     Session.set('score', 0);
     window.setTimeout(function() {
-      incrementScore(score);
+      tallyingScore(score);
     }, WAIT_TIME * 1.5);
   },
 }
