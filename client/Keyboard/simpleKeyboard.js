@@ -7,9 +7,16 @@ simpleKeyboard = {
 
   connectKeyToKeyboard: function() {
     var self = this;
+    var downKeys = {};
 
     $(window).on('keydown.keyboard', function(evt) {
       var keyCode = fixKeyCode(evt.keyCode);
+      if (downKeys[keyCode] === true) {
+        return ;
+      } else {
+        downKeys[keyCode] = true;
+      }
+
       var note = convertKeyCodeToNote(keyCode);
 
       if (typeof note !== "undefined") {
@@ -32,6 +39,9 @@ simpleKeyboard = {
 
     $(window).on('keyup.keyboard', function(evt) {
       var keyCode = fixKeyCode(evt.keyCode);
+
+      delete downKeys[keyCode];
+
       var note = convertKeyCodeToNote(keyCode);
 
       if (typeof note !== "undefined") {
@@ -70,7 +80,11 @@ simpleKeyboard = {
   },
 
   adjustSettings: function(keyCode) {
-
+    if (keyCode === 37) {
+      this.velocity -= 30;
+    } else if (keyCode === 39) {
+      this.velocity += 30;
+    }
   },
 }
 

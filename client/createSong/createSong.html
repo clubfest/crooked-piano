@@ -5,8 +5,13 @@
   {{> keyboard}}
   {{> monotrome}}
 
-  {{#unless currentUser}}
-    Before recording the song, {{loginButtons}}
-  {{/unless}}
+  <div class='panel'>
+    {{#if currentUser}} 
+      {{loginButtons}}
+    {{else}}
+      Before recording the song, {{loginButtons}}
+    {{/if}}  
+  </div>
+  
 
 </template>

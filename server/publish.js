@@ -32,4 +32,8 @@ Meteor.publish('myInfo', function() {
       'lastVisitedGame': 1,
     }
   });
+});
+
+Meteor.publish('allFeedbacks', function() {
+  return Feedbacks.find();
 })

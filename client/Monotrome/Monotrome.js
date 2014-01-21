@@ -28,7 +28,6 @@ Monotrome = {
   play: function() {
     Session.set('monotromeOn', true);
     this.time = (new Date).getTime();
-    console.log('monotromeOn ' + this.time);
     this._play();
   },
 

@@ -2,6 +2,16 @@
 Router.map(function() {
   this.route('createSong');
 
+  this.route('feedback', {
+    before: function() {
+      this.subscribe('allFeedbacks');
+    },
+
+    data: function() {
+      return Feedbacks.find({}, {sort: {createdAt: -1}});
+    }
+  });
+
   this.route('addSegment', {
     path: '/addSegment/:_id',
     before: function() {
@@ -74,7 +84,6 @@ Router.map(function() {
       // Check the user's history or pick the earliest song
       if (this.ready()) {
         var user = Meteor.user();
-        console.log(user)
         if (user && user.lastVisitedGame) {
           Router.go('game', {_id: user.lastVisitedGame});
 

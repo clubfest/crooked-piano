@@ -13,9 +13,8 @@ Template.monotrome.rendered = function() {
     slide: function(evt, ui) {
       Session.set('monotromeFrequency', ui.value);
       Monotrome.pause();
+      
       if (ui.value > 0) {
-      console.log(ui.value)
-        
         Monotrome.play();
       } else {
         Monotrome.setTime(null);
