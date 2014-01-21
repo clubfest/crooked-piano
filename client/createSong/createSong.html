@@ -5,4 +5,8 @@
   {{> keyboard}}
   {{> monotrome}}
 
+  {{#unless currentUser}}
+    Before recording the song, {{loginButtons}}
+  {{/unless}}
+
 </template>

@@ -8,7 +8,14 @@ OneHandPlayer = {
 
     this.song = Session.get('song');
     this.playNotes = [];
-    this.segmentId = this.song.segmentIds[Session.get('segmentLevel')];
+
+    var numRight = this.song.rightSegments.length;
+    
+    if (Session.get('segmentLevel') < numRight) {
+      this.segmentInfo = this.song.rightSegments[Session.get('segmentLevel')];
+    } else {
+      this.segmentInfo = this.song.leftSegments[Session.get('segmentLevel') - numRight];
+    }
 
     this.loadPlayNotes();
     this.reset();
@@ -40,7 +47,9 @@ OneHandPlayer = {
       if (this.isPlayerNote(note) && note.isKeyboardDown === true) {
         this.playNotes.push(note);        
       }
-    }      
+    }   
+
+    Session.set('playLength', this.playNotes.length);   
   },
 
   judge: function(data) {
@@ -98,7 +107,7 @@ OneHandPlayer = {
   },
 
   isPlayerNote: function(note) {
-    return note.segmentId === this.segmentId;
+    return note.segmentId === this.segmentInfo.segmentId;
   },
 
   updateProximateNotes: function() {
@@ -169,7 +178,6 @@ OneHandPlayer = {
       displayClass += " repeated-note"
     }
 
-    console.log(displayClass)
     $('[data-key-code='+note.keyCode+']').addClass(displayClass);
   },
 
@@ -201,6 +209,14 @@ OneHandPlayer = {
   getPlayIndex: function() {
     return Session.get('playIndex');
   },
+
+  getIndex: function() {
+    if (this.proximateNotes) {
+      return Session.get('playIndex') - this.proximateNotes.length;
+    } else {
+      return Session.getIndex;
+    }
+  },
 }
 
 tallyScore = function() {
@@ -209,8 +225,15 @@ tallyScore = function() {
   Session.set('score', 0);
   window.setTimeout(function() {
     tallyingScore(score);
-  }, WAIT_TIME);
+  }, 5 * WAIT_TIME);
 }
+
+// tallyScore = function() {
+//   var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
+
+//   Session.set('score', Math.floor(score));
+//   Session.set('scoreTallied', true);
+// }
 
 function tallyingScore(score) {
   var oldScore = Session.get('score');

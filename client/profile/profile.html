@@ -1,0 +1,64 @@
+<template name='profile'>
+{{progress}}
+<div id='body-wrapper'>
+  <h2>Progress</h2>
+
+  {{#if hasSong}}
+    {{> replayer}}
+  {{/if}}
+  <div class='spaced-out'>
+    {{#unless currentUser}}
+      To keep you progress, {{loginButtons}} before clicking next 
+    {{/unless}}
+    <div class='panel'>    
+      <a id='next-btn' class='btn btn-primary'>
+        Next
+        <i class='icon-chevron-right'></i>
+      </a>
+    </div>
+  </div>    
+  {{#if currentUser}}
+    <h2>Past songs</h2>
+    <table id='rounded-corner'>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Version</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+        
+      {{#each progresses}}
+        <tr>
+          <td>
+            <a href="{{pathFor 'progress'}}">
+              {{#if title}}
+                {{title}} 
+              {{else}}
+                Nameless
+              {{/if}}
+            </a>
+          </td>
+          <td class='listen-right' data-id='{{_id}}'>
+            {{version}}
+          </td>
+          <td class='listen-left' data-id='{{_id}}'>
+            {{beautifyDate createdAt}}
+          </td>
+        </tr>
+      {{/each}}
+    </table>
+  {{/if}}
+
+  <h2>Feedback</h2>
+  <div id='feedback-panel'>
+    <div>
+      <textarea id='feedback-input' class="form-control" rows="3" placeholder="What's on your mind?"></textarea>  
+    </div>
+    <div>
+      <button id='submit-feedback'>Submit</button>
+    </div>
+  </div>
+</div>
+
+</template>

@@ -1,12 +1,18 @@
 
 .keyboard .key.first-cluster {
-  background: #FAA;
+  background: #FF5;
+  font-size: 24px;
 }
 
 .keyboard .key.computer-note {
-  background: #AFA;
+  font-size: 24px;
+  background: #9F9;
 }
 
-.keyboard .key.repeated-note:before {
-  content: "+";
+.keyboard .key.repeated-note {
+  background: #CF2;
+}
+
+.song-version {
+  font-size: 16px;
 }

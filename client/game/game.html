@@ -1,24 +1,42 @@
 <template name='game'>
+<div id='body-wrapper'>
+    
+  {{#isolate}}
+      {{> result}}
+  {{/isolate}}
 
-{{#isolate}}
-  {{#if score}}
-    {{> result}}
-  {{/if}}
-{{/isolate}}
+  {{#isolate}}
+    {{> playerControl}}
+  {{/isolate}}
 
-{{#isolate}}
-  {{> playerControl}}
-{{/isolate}}
+  <div class='play-slider'></div>
 
-{{#isolate}}
-  {{#if levelZero}}
-    {{> oneHandPlayer}}
-  {{/if}}
+  {{#isolate}}
+    {{#if levelZero}}
+      {{> oneHandPlayer}}
+    {{/if}}
 
-  {{#if levelOne}}
-    {{> leadPlayer}}
-  {{/if}}
-{{/isolate}}
+    {{#if levelOne}}
+      {{> leadPlayer}}
+    {{/if}}
+  {{/isolate}}
 
-{{> intro}}
+  {{> intro}}
+
+  <div class='panel spaced-out'>
+    <div>
+      {{loginButtons}}
+    </div>
+    {{#if currentUser}}
+      <div>
+        <a href="{{pathFor 'profile'}}">Profile</a>
+      </div>
+      <div>
+        <a href="{{pathFor 'createSong'}}">Create</a>
+      </div>
+    {{/if}}
+  </div>
+
+</div>
+
 </template>

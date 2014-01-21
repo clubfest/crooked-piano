@@ -1,8 +1,8 @@
 <template name='songs'>
-  <table>
+  <table id='rounded-corner'>
     <tr>
       <th>Title</th>
-      <th>Interpreted By</th>
+      <th>Date</th>
     </tr>
     {{#each songs}}
       <tr>
@@ -12,7 +12,9 @@
           </a>
         </td>
         <td>
-          {{createdBy}}
+          <a href="{{pathFor 'addSegment'}}">
+            {{beautifyDate createdAt}}            
+          </a>
         </td>
       </tr>
     {{/each}}

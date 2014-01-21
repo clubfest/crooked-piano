@@ -4,6 +4,7 @@ simpleRecorder = {
   offset: 0,
 
   init: function() {
+    this.disconnectKeyboardToRecorder();
     this.connectKeyboardToRecorder();
     this.reset();
   },
@@ -60,19 +61,13 @@ simpleRecorder = {
       }
     });
 
-    Meteor.call('addSegmentToSong', newNotes, Session.get('song')._id, function(err) {
+    Meteor.call('addSegmentToSong', newNotes, Session.get('replayerSong')._id, function(err) {
       if (err) {
         alert(err.reason);
       } else {
         self.reset();
         simpleReplayer.reset();
       }
-    });
-  },
-
-  _extractNewNotes: function() {
-    $.each(this.notes, function(idx, note) {
-
     });
   },
 
@@ -85,8 +80,9 @@ simpleRecorder = {
 
     $(window).on('keyboardDown.recorder', function(evt, data) {
       if (Session.get('isRecording') === true) {
-        data.isKeyboardDown = true;
-        self.notes.push(data);
+        dataCopy = $.extend({}, data); // bizarre bug if I don't clone
+        dataCopy.isKeyboardDown = true;
+        self.notes.push(dataCopy);
         Session.set('hasRecordedNotes', true);
       }
     })

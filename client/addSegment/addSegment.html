@@ -3,7 +3,13 @@
 {{> segmentRecorder}}
 {{> keyboard}}
 
-<a href="/game/{{_id}}">game</a>
+<div class='panel'>
+  <input type='text' placeholder='genre' id='genre-input' />
+  <a id='gamify-song' class='btn btn-success'>
+    <i class='icon-film'></i>
+    gamify
+  </a>  
+</div>
 
 {{> intro}}
 </template>

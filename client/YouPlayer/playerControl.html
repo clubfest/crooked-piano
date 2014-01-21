@@ -4,12 +4,15 @@
       {{numCorrect}}
     </div>
     {{#if isDemoing}}
+      {{!--
       <div>
         <a id='pause-demo'><i class='icon-pause'></i> Pause</a>  
       </div>
+      --}}
+      
     {{else}}
       <div>
-        <a id='demo'><i class='icon-play'></i> Listen</a>  
+        <button id='demo'><i class='icon-play'></i> Listen</button>  
       </div>
     {{/if}}
       

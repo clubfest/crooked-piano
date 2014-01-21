@@ -2,13 +2,21 @@
 Template.segmentMonotrome.created = function() {
   Monotrome.init();
 
-  var song = Session.get('song');
-  Monotrome.setFrequency(song.monotromeFrequency);
+  Deps.autorun(function() {
+    var song = Session.get('replayerSong');
+    
+    if (song) {
+      if (song.monotromeFrequency) {
+        Monotrome.setFrequency(song.monotromeFrequency);
+      }
 
-  if (song.monotromeTime) {
-    Session.set('hasMonotrome', true);
-    Session.set('monotromeIsSet', true);
-  }
+      if (song.monotromeTime) {
+        Session.set('hasMonotrome', true);
+        Session.set('monotromeIsSet', true);
+      }
+    }
+  });
+
 }
 
 Template.segmentMonotrome.destroyed = function() {

@@ -1,8 +1,9 @@
 
 Template.replayer.created = function() {
-  // this.replayer = new Replayer;
+
   Deps.autorun(function() {
-    var song = Session.get('song');
+    var song = Session.get('replayerSong');
+    
     if (typeof song !== 'undefined') {
       simpleReplayer.init(song.notes);
     }
@@ -11,11 +12,16 @@ Template.replayer.created = function() {
 
 Template.replayer.rendered = function() {
   // update slider;
+  var song = Session.get('replayerSong');
+    
+  if (!song || !song.notes) return;
+
   Deps.autorun(function() {
+    song
     $('.slider').slider({
       range: "min",
       min: 0,
-      max: simpleReplayer.notes.length - 1,
+      max: song.notes.length - 1,
       value: Session.get('replayerIndex'),
     });
   });

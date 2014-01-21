@@ -15,3 +15,7 @@ Handlebars.registerHelper('score', function() {
 Template.result.scoreTallied = function() {
   return Session.get('scoreTallied');
 }
+
+Template.result.hasScore = function() {
+  return Session.get('score') !== null;
+}
