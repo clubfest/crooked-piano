@@ -32,13 +32,6 @@ Router.map(function() {
       this.subscribe('myInfo')
     },
 
-    //   function() {
-    //     if (this.ready()) {
-    //       var song = Songs.findOne(this.params._id);
-    //       Session.set('song', song);
-    //     }
-    //   }
-    // ],
     data: function() {
       var song = Songs.findOne(this.params._id);
       Session.set('song', song);
@@ -85,10 +78,11 @@ Router.map(function() {
       if (this.ready()) {
         var user = Meteor.user();
         if (user && user.lastVisitedGame) {
+          Songs.findOne(user.lastVisitedGame);
           Router.go('game', {_id: user.lastVisitedGame});
 
         } else {
-          var song = Songs.findOne({}, {
+          var song = Songs.findOne({isGamified: 1}, {
             sort: {createdAt: 1},
             fields: {_id: 1}
           });

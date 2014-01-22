@@ -1,8 +1,7 @@
-// var nextSong;
 
 Template.profile.events({
   'click #next-btn': function() {
-    if (Meteor.userId()) {
+    if (Meteor.userId() && TempGames.complete) {
       Meteor.call('saveTempGamesToUser', TempGames.complete, function(err){
         if (err) alert(err.reason);
       });
@@ -49,7 +48,7 @@ Template.profile.created = function() {
   var song = Session.get('song');
 
   if (typeof song !== 'undefined') {
-    nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {sort: {createdAt: 1}});
+    var nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {sort: {createdAt: 1}});
 
     if (!nextSong) {
       nextSong = Songs.findOne({}, {sort: {createdAt: 1}});
@@ -67,10 +66,11 @@ Template.profile.hasSong = function() {
 
 Template.profile.progresses = function() {
   return Progresses.find({userId: Meteor.userId()});
-  ///////////// change user's progress to an array
 }
 
 Handlebars.registerHelper('beautifyDate', function(date) {
+  if (!date) return 'T.B.A.';
+
   var current = new Date();
   var year = date.getFullYear();
   var month = date.getMonth()+1;

@@ -219,21 +219,21 @@ OneHandPlayer = {
   },
 }
 
-tallyScore = function() {
-  var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
-
-  Session.set('score', 0);
-  window.setTimeout(function() {
-    tallyingScore(score);
-  }, 5 * WAIT_TIME);
-}
-
 // tallyScore = function() {
 //   var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
 
-//   Session.set('score', Math.floor(score));
-//   Session.set('scoreTallied', true);
+//   Session.set('score', 0);
+//   window.setTimeout(function() {
+//     tallyingScore(score);
+//   }, 5 * WAIT_TIME);
 // }
+
+tallyScore = function() {
+  var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
+
+  Session.set('score', Math.floor(score));
+  Session.set('scoreTallied', true);
+}
 
 function tallyingScore(score) {
   var oldScore = Session.get('score');

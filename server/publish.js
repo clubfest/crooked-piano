@@ -8,7 +8,7 @@ Meteor.publish('song', function(songId) {
 })
 
 Meteor.publish('firstSong', function() {
-  return Songs.find({}, {
+  return Songs.find({isGamified: true}, {
     sort: {createdAt: 1},
     fields: {_id: 1}
   });

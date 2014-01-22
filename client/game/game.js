@@ -7,7 +7,7 @@ var players = [OneHandPlayer, LeadPlayer, 'AccompanyingPlayer', 'singAlong', 'du
 Template.game.created = function() {
   if (typeof Session.get('segmentLevel') === 'undefined' || typeof Session.get('playLevel') === 'undefined') {
     Session.set('segmentLevel', 0);
-    Session.set('playLevel', 1);
+    Session.set('playLevel', 0);
   }
 }
 

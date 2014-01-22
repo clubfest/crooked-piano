@@ -5,6 +5,79 @@ simpleKeyboard = {
   shift: 0,
   hasPedal: true,
 
+  connectMouseToKeyboard: function() {
+    var self = this;
+
+    $('.key').on('mousedown.keyboard', function(evt){
+      var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
+      var note = convertKeyCodeToNote(keyCode);
+
+      if (typeof note !== "undefined") {
+        note = self.adjustShift(note);
+        $(window).trigger('keyboardDown', {
+          time: new Date().getTime(),
+          keyCode: keyCode,
+          note: note,
+          channel: self.channel,
+          velocity: self.velocity,
+        });
+      }
+    });
+
+    $('.key').on('mouseup.keyboard', function(evt) {
+      var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
+      var note = convertKeyCodeToNote(keyCode);
+
+      if (typeof note !== "undefined") {
+        note = self.adjustShift(note);
+        $(window).trigger('keyboardUp', {
+          time: new Date().getTime(),
+          keyCode: keyCode,
+          note: note,
+          channel: self.channel,
+          velocity: self.velocity,
+        });
+      }
+    })
+  },
+
+  connectTouchToKeyboard: function() {
+    var self = this;
+
+    $('.key').on('touchstart.keyboard', function(evt){
+      var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
+      var note = convertKeyCodeToNote(keyCode);
+
+      if (typeof note !== "undefined") {
+        note = self.adjustShift(note);
+        $(window).trigger('keyboardDown', {
+          time: new Date().getTime(),
+          keyCode: keyCode,
+          note: note,
+          channel: self.channel,
+          velocity: self.velocity,
+        });
+      }
+    });
+
+    $('.key').on('touchend.keyboard', function(evt) {
+      var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
+      var note = convertKeyCodeToNote(keyCode);
+
+      if (typeof note !== "undefined") {
+        note = self.adjustShift(note);
+        $(window).trigger('keyboardUp', {
+          time: new Date().getTime(),
+          keyCode: keyCode,
+          note: note,
+          channel: self.channel,
+          velocity: self.velocity,
+        });
+      }
+    })
+  },
+
+
   connectKeyToKeyboard: function() {
     var self = this;
     var downKeys = {};
@@ -91,6 +164,7 @@ simpleKeyboard = {
 ///// init
 simpleKeyboard.connectKeyToKeyboard();
 simpleKeyboard.connectKeyboardToDisplay();
+
 
 
 ////// helpers

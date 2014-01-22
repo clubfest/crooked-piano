@@ -48,6 +48,11 @@ simpleReplayer = {
     Session.set('isReplaying', false);
   },
 
+  stop: function() {
+    this.pause();
+    Session.set('replayerIndex', 0);
+  },
+
   _play: function() {
     var self = this;
     var currIndex = Session.get('replayerIndex');

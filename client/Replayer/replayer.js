@@ -36,6 +36,8 @@ Template.replayer.rendered = function() {
       if (Session.get('isReplaying') == true) {
         simpleReplayer.pause();
         simpleReplayer.play();
+      } else {
+        simpleReplayer.play();
       }
     }
   });
@@ -43,6 +45,7 @@ Template.replayer.rendered = function() {
 
 Template.replayer.destroyed = function() {
   simpleReplayer.destroy();
+  Session.set('replayerSong', null);
 }
 
 Template.replayer.events({
@@ -50,8 +53,8 @@ Template.replayer.events({
     simpleReplayer.play();
   },
 
-  'click .replayer-pause': function(evt, tmpl) {
-    simpleReplayer.pause();
+  'click .replayer-stop': function(evt, tmpl) {
+    simpleReplayer.stop();
   },
 });
 

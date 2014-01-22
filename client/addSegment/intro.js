@@ -1,11 +1,20 @@
 
 Template.intro.rendered = function() {
   Deps.autorun(function() {
-    var song = Session.get('song');
+    var song = Session.get('replayerSong');
 
-    if (!song) return ;
+    // TODO: separate the use of intro in different instances
+    // if (!song) {
+    //   song = Session.get('song');
 
-    var songId = song._id
+    //   if (!song) {
+    //     return ;
+    //   }
+    // } 
+
+
+
+    var songId = song._id;
     
     $(function(){
       $('#desc-editable').editable({
@@ -15,7 +24,7 @@ Template.intro.rendered = function() {
         success: function(res, newValue) {
           Meteor.call('updateSongDesc', songId, newValue, function(err) {
             if (err) alert(err.reason);
-          })
+          });
         },
       });
 
@@ -26,10 +35,10 @@ Template.intro.rendered = function() {
         success: function(res, newValue) {
           Meteor.call('updateSongTitle', songId, newValue, function(err) {
             if (err) alert(err.reason);
-          })
+          });
         },
       });
     });
-  })
+  });
     
 }
