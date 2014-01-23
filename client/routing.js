@@ -46,7 +46,11 @@ Router.map(function() {
     }
   });
 
-  this.route('songs');
+  this.route('songs', {
+    before: function() {
+      this.subscribe('mySongs')
+    },
+  });
 
   this.route('profile', {
     before: function() {
@@ -78,21 +82,10 @@ Router.map(function() {
       if (this.ready()) {
         var user = Meteor.user();
         if (user && user.lastVisitedGame) {
-          Songs.findOne(user.lastVisitedGame);
           Router.go('game', {_id: user.lastVisitedGame});
 
-        } else {
-          var song = Songs.findOne({isGamified: 1}, {
-            sort: {createdAt: 1},
-            fields: {_id: 1}
-          });
-          
-          if (song && song._id) {
-            Router.go('game', {_id: song._id});
-          } else {
-            // all else fails
-            Router.go('createSong');
-          }
+        } else {          
+          Router.go('game', {_id: "pMGujdFmHyxWXATip"});
         }
       }
     }

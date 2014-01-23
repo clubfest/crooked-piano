@@ -153,7 +153,11 @@ simpleKeyboard = {
   },
 
   adjustSettings: function(keyCode) {
-    if (keyCode === 37) {
+    if (keyCode === 38) {
+      this.shift++;
+    } else if (keyCode === 40){
+      this.shift--;
+    } else if (keyCode === 37) {
       this.velocity -= 30;
     } else if (keyCode === 39) {
       this.velocity += 30;
