@@ -4,15 +4,19 @@ Meteor.publish('popSongs', function() {
 });
 
 Meteor.publish('song', function(songId) {
-  return Songs.find({_id: songId, isGamified: true});
-})
+  return Songs.find({_id: songId});
+});
 
-Meteor.publish('firstSong', function() {
-  return Songs.find({isGamified: true}, {
-    sort: {createdAt: 1},
-    fields: {_id: 1}
+Meteor.publish('songIds', function() {
+  return Songs.find({}, {
+    fields: {
+      title: 1,
+      creatorId: 1,
+      createdAt: 1,
+    }
   });
 });
+
 
 Meteor.publish('mySongs', function() {
   return Songs.find({creatorId: this.userId});

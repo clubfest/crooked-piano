@@ -1,11 +1,8 @@
-Template.addSegment.created = function() {
 
-    
-}
 
 Template.addSegment.events({
   'click #gamify-song': function(evt, tmpl) {
-    var songId = tmpl.data._id;
+    var songId = this.replayerSong._id;
     var genre = $('#genre-input').val();
     
     Meteor.call('gamify', songId, genre, function(err) {

@@ -19,8 +19,7 @@ Template.game.rendered = function() {
       max: Session.get('playLength'),
       value: players[Session.get('playLevel')].getIndex(),
     });
-  })
-    
+  });   
 }
 
 Template.game.events({
@@ -34,7 +33,7 @@ Template.game.events({
 
   'click #next-game': function() {
     var level = Session.get('playLevel');
-
+    
     if (level === 0) {
       Session.set('playLevel', 1);
     } else {
@@ -43,8 +42,8 @@ Template.game.events({
       var segmentLevel = Session.get('segmentLevel');
       Session.set('segmentLevel', segmentLevel + 1);
 
-      var rightLength = Session.get('song').rightSegments.length;
-      var leftLength = Session.get('song').rightSegments.length;
+      var rightLength = this.song.rightSegments.length;
+      var leftLength = this.song.leftSegments.length;
 
       if (segmentLevel + 1 === rightLength ||
           segmentLevel + 1 === rightLength + leftLength) {

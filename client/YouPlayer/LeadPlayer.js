@@ -2,7 +2,7 @@ WAIT_TIME = 300;
 CLUSTER_TIME = 100;
 
 LeadPlayer = {
-  create: function() {
+  create: function(song) {
     var self = this;
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
       if (data.playedByComputer !== true) {
@@ -10,7 +10,7 @@ LeadPlayer = {
       }
     });
 
-    this.song = Session.get('song');
+    this.song = song;
     this.playNotes = [];
 
     if (typeof this.song !== 'undefined') {

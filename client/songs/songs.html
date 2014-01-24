@@ -1,10 +1,11 @@
 <template name='songs'>
+  <h2>Games</h2>
   <table id='rounded-corner'>
     <tr>
       <th>Title</th>
       <th>Date</th>
     </tr>
-    {{#each songs}}
+    {{#each gamifiedSongs}}
       <tr>
         <td>
           <a href="{{pathFor 'game'}}">
@@ -12,9 +13,34 @@
           </a>
         </td>
         <td>
+          {{beautifyDate createdAt}}            
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+
+  <h2>My Songs</h2>
+  <table id='rounded-corner'>
+    <tr>
+      <th>Title</th>
+      <th>Date</th>
+      <th>Remove</th>
+    </tr>
+
+    {{#each mySongs}}
+      <tr>
+        <td>
           <a href="{{pathFor 'addSegment'}}">
-            {{beautifyDate createdAt}}            
+            {{title}}            
           </a>
+        </td>
+        <td>
+          {{beautifyDate createdAt}}            
+        </td>
+        <td>
+          <button class='delete-btn' data-song-id='{{_id}}'>
+            <i class='icon-remove'></i>
+          </button>
         </td>
       </tr>
     {{/each}}

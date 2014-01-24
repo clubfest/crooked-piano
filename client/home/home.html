@@ -1,8 +1,22 @@
 <template name='home'>
-<div class='panel'>
-  Please wait for the game to load. If nothing happens, go make some music on your own: 
-</div>
-<div class='panel'>
-    <a href="{{pathFor createSong}}" class='btn'>Create</a>    
+  <div class='panel'>
+    <h1>Crooked Piano</h1>
+    <p>This is a new musical instrument that is easy to learn and allows you to perform music anywhere. Let's get started.</p>
   </div>
+  <div class='panel'>
+    <a href="/game/{{songId}}" class='btn btn-primary'>Play the Game</a>    
+  </div>
+
+  <div align='center'>
+    <div>
+      {{> songs}}     
+    </div>
+
+    <div>
+      <a href="/createSong" class='btn'>Create new song</a>      
+    </div>
+
+  </div>
+
+
 </template>

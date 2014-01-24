@@ -1,6 +1,25 @@
 
+Template.profile.nextSongId = function() {
+  var song = this.song;
+
+  if (song && song.createdAt) {
+    var nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {
+      sort: {createdAt: 1}
+    });
+
+    if (!nextSong) {
+      nextSong = Songs.findOne({}, {sort: {createdAt: 1}});
+    } 
+
+    if (nextSong) {
+      return nextSong._id;
+    }
+    // else, there is no song, so just show the create button
+  }
+}
+
 Template.profile.events({
-  'click #next-btn': function() {
+  'click #next-btn': function(evt, tmpl) {
     if (Meteor.userId() && TempGames.complete) {
       Meteor.call('saveTempGamesToUser', TempGames.complete, function(err){
         if (err) alert(err.reason);
@@ -10,19 +29,15 @@ Template.profile.events({
     // if it's not the end of the song, get back to it
     // else go to the next one in date
     
-    var song = Session.get('song');
-    var nextSong = Session.get('nextSong');
-
-    if (typeof song === 'undefined') {
-      Router.go('home');
-
-    } else if (Session.get('segmentLevel') >= song.segmentIds.length) {
-      Session.set('playLevel', 0);
-      Session.set('segmentLevel', 0);
-      Router.go('game', {_id: nextSong._id})
+    var nextSongId = evt.currentTarget.dataset.nextSongId
+    
+    if (this.song && Session.get('segmentLevel') < this.song.segmentIds.length) {
+      Router.go('game', {_id: this.song._id}); 
 
     } else {
-      Router.go('game', {_id: song._id});
+      Session.set('playLevel', 0);
+      Session.set('segmentLevel', 0);
+      Router.go('game', {_id: nextSongId});
     }
   },
 
@@ -40,12 +55,8 @@ Template.profile.events({
 });
 
 Template.profile.created = function() {
-  if (TempGames.complete) {
-    Session.set('replayerSong', TempGames.complete);
-  }
-
   // find the next song if the current song is defined
-  var song = Session.get('song');
+  var song = this.data.replayerSong;
 
   if (typeof song !== 'undefined') {
     var nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {sort: {createdAt: 1}});
@@ -60,7 +71,7 @@ Template.profile.created = function() {
 }
 
 Template.profile.hasSong = function() {
-  return typeof Session.get('replayerSong') !== 'undefined';
+  return TempGames.complete;
 }
 
 

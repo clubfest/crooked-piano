@@ -3,7 +3,7 @@ Template.segmentRecorder.rendered = function() {
   if (!this.rendered) {
     this.rendered = true;
 
-    simpleRecorder.init();
+    simpleRecorder.init(this.data.replayerSong._id);
     simpleRecorder.start();
   }
 }

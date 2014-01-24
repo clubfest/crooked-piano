@@ -10,11 +10,18 @@
     {{#unless currentUser}}
       To keep you progress, {{loginButtons}} before clicking next 
     {{/unless}}
-    <div class='panel'>    
-      <a id='next-btn' class='btn btn-primary'>
-        Next
-        <i class='icon-chevron-right'></i>
-      </a>
+    <div class='panel'>  
+      {{#if nextSongId}}  
+        <a id='next-btn' class='btn btn-primary' data-next-song-id='{{nextSongId}}'>
+          Next
+          <i class='icon-chevron-right'></i>
+        </a>
+      {{else}}
+        <a class='btn' href='/createSong'>
+          Create
+          <i class='icon-chevron-right'></i>
+        </a>
+      {{/if}}
     </div>
   </div>    
   {{#if currentUser}}

@@ -1,6 +1,6 @@
+segmentsDep = new Deps.Dependency;
 
 simpleReplayer = {
-  // songId: null,
   notes: [],
   timeout: null,
   offset: 0,
@@ -8,9 +8,8 @@ simpleReplayer = {
   firstNoteStartTime: 0,
 
   init: function(notes) {
-    // this.songId = song._id;
     this.notes = notes;
-    this.reset();
+    // this.reset(); // TODO: put it back in when switching to shark
   },
 
   destroy: function() {
@@ -30,7 +29,7 @@ simpleReplayer = {
     }
 
     Session.set('isReplaying', true);
-    if (Session.get('replayerIndex') >= this.notes.length - 1) {
+    if (!Session.get('replayerIndex') ||  Session.get('replayerIndex') >= this.notes.length - 1) {
       Session.set('replayerIndex', 0)
     }
 
@@ -43,6 +42,7 @@ simpleReplayer = {
   },
 
   pause: function() {
+    console.log('paused')
     Monotrome.pause();
     window.clearTimeout(this.timeout);
     Session.set('isReplaying', false);

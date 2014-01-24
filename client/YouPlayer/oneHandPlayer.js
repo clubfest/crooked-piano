@@ -1,13 +1,9 @@
 
-Template.oneHandPlayer.created = function() {
-  
-}
-
 Template.oneHandPlayer.rendered = function() {
   if (!this.rendered) {    
     this.rendered = true;
 
-    OneHandPlayer.create();
+    OneHandPlayer.create(this.data.song);
   }
   OneHandPlayer.redisplayNotes();
 }

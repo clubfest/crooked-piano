@@ -1,9 +1,12 @@
-
+///////// TODO: init the simpleRecorder correctly with the songId
 simpleRecorder = {
   notes: [],
   offset: 0,
+  songId: null,
 
-  init: function() {
+  init: function(songId) {
+    this.songId = songId;
+
     this.disconnectKeyboardToRecorder();
     this.connectKeyboardToRecorder();
     this.reset();
@@ -61,7 +64,7 @@ simpleRecorder = {
       }
     });
 
-    Meteor.call('addSegmentToSong', newNotes, Session.get('replayerSong')._id, function(err) {
+    Meteor.call('addSegmentToSong', newNotes, this.songId, function(err) {
       if (err) {
         alert(err.reason);
       } else {

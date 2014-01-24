@@ -1,13 +1,16 @@
 <template name='game'>
 <div id='body-wrapper'>
   
-  <div id='song-desc'>
-    <h2>{{title}}</h2>
+  {{#with song}}
+    <div id='song-desc'>
+      <h2>{{title}}</h2>
 
-    <div>
-      {{{desc}}}
+      <div>
+        {{{desc}}}
+      </div>
     </div>
-  </div>
+  {{/with}}
+  <hr/>
   
   {{#isolate}}
       {{> result}}

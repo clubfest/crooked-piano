@@ -1,51 +1,57 @@
-
-Template.replayer.created = function() {
-
-  Deps.autorun(function() {
-    var song = Session.get('replayerSong');
-    
-    if (typeof song !== 'undefined') {
-      simpleReplayer.init(song.notes);
-    }
-  });
-}
+// This is a replayer that loads songs from the database once you specify the replayerSongId
 
 Template.replayer.rendered = function() {
-  // update slider;
-  var song = Session.get('replayerSong');
-    
-  if (!song || !song.notes) return;
+  var song = this.data.replayerSong;
+
+  simpleReplayer.init(song.notes);
+
+
+  if (!this.rendered) {
+    // TODO: move reset back to init when switching to shark
+    this.rendered = true;
+
+    simpleReplayer.reset();  
+  }
+
+  $('.slider').slider({
+    range: "min",
+    min: 0,
+    max: song.notes.length - 1,
+    value: 0,
+  });  
 
   Deps.autorun(function() {
-    song
+    // update slider when replayer starts
     $('.slider').slider({
       range: "min",
       min: 0,
       max: song.notes.length - 1,
       value: Session.get('replayerIndex'),
     });
-  });
+  })
+  
+  // Warning: this jquery effect causes the whole template to re-render.
+  Deps.autorun(function() {
+    // user changing the slider
+    $('.slider').slider({
+      slide: function(evt, ui) {
+        Session.set('replayerIndex', ui.value);
 
-  // user changing the slider
-  $('.slider').slider({
-    slide: function(evt, ui) {
+        // if slider is moved while we are replaying, need to restart at new position
+        if (Session.get('isReplaying') == true) {
+          simpleReplayer.pause();
+          simpleReplayer.play();
+        } else {
+          simpleReplayer.play();
 
-      Session.set('replayerIndex', ui.value);
-
-      // if slider is moved while we are replaying, need to restart at new position
-      if (Session.get('isReplaying') == true) {
-        simpleReplayer.pause();
-        simpleReplayer.play();
-      } else {
-        simpleReplayer.play();
+        }
       }
-    }
-  });
+    });  
+  })
 }
 
 Template.replayer.destroyed = function() {
   simpleReplayer.destroy();
-  Session.set('replayerSong', null);
 }
 
 Template.replayer.events({
