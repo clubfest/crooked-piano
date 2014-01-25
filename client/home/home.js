@@ -13,8 +13,12 @@ Template.home.songId = function() {
     }
   }
 
-  return Songs.findOne({isGamified: true}, {
+  var song = Songs.findOne({isGamified: true}, {
     sort: {createdAt: 1},
     fields: {_id: 1},
-  })._id; 
+  });
+
+  if (song) {
+    return song._id
+  } 
 }

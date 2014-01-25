@@ -3,9 +3,11 @@
     <h1>Crooked Piano</h1>
     <p>This is a new musical instrument that is easy to learn and allows you to perform music anywhere. Let's get started.</p>
   </div>
-  <div class='panel'>
-    <a href="/game/{{songId}}" class='btn btn-primary'>Play the Game</a>    
-  </div>
+  {{#if songId}}
+    <div class='panel'>
+      <a href="/game/{{songId}}" class='btn btn-primary'>Play the Game</a>    
+    </div>
+  {{/if}}
 
   <div align='center'>
     <div>

@@ -52,7 +52,7 @@ Monotrome = {
       if (data.isFromReplayer === true) {
         window.setTimeout(function() {
           Monotrome.play();
-        }, (1 - fractionalPart((data.time - Session.get('replayerSong').monotromeTime) * freq / 1000)) * 1000 / freq);
+        }, (1 - fractionalPart((data.time - Monotrome.getTime()) * freq / 1000)) * 1000 / freq);
         
         $(window).off('keyboardDown.monotrome');
       }
