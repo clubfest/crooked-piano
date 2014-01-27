@@ -6,7 +6,9 @@ LeadPlayer = {
     var self = this;
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
       if (data.playedByComputer !== true) {
+        tTime = new Date().getTime();
         self.judge(data);
+        console.log('finished judging: ' + (new Date().getTime() - tTime));
       }
     });
 
@@ -79,6 +81,9 @@ LeadPlayer = {
     }
 
     if (matchIdx > -1) {
+      console.log('something matched: ' + (new Date().getTime() - tTime));
+      tTime = new Date().getTime();
+
       this.incrementScore();
       this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
@@ -92,12 +97,13 @@ LeadPlayer = {
           this.updateProximateNotes();
         }
       }
+      console.log('done ' + (new Date().getTime() - tTime));
+      tTime = new Date().getTime();
     } else {
       if (data.playedByComputer !== true) {
         this.decrementScore();
       }
     }
-
   },
 
   demo: function() {
@@ -122,6 +128,7 @@ LeadPlayer = {
         notes.push(noteUp);
       }
     }
+
     simpleReplayer.init(notes);
     simpleReplayer.play();
   },
@@ -183,7 +190,7 @@ LeadPlayer = {
     }
   },
 
-  playComputerProximateNotes: function() {    
+  playComputerProximateNotes: function() { 
     var self = this;
     var notes = this.computerProximateNotes;
 
@@ -207,7 +214,6 @@ LeadPlayer = {
     }  
     this.computerProximateNotes = []; 
     this.updateProximateNotes();
-
   },
 
   gameOver: function() {

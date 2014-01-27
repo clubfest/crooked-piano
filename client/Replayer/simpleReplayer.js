@@ -13,7 +13,7 @@ simpleReplayer = {
   },
 
   destroy: function() {
-    this.pause();
+    this.stop();
     this.notes = [];
   },
 
@@ -42,7 +42,6 @@ simpleReplayer = {
   },
 
   pause: function() {
-    console.log('paused')
     Monotrome.pause();
     window.clearTimeout(this.timeout);
     Session.set('isReplaying', false);

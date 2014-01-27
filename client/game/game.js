@@ -12,14 +12,18 @@ Template.game.created = function() {
 }
 
 Template.game.rendered = function() {
-  Deps.autorun(function() {
-    $('.play-slider').slider({
-      range: "min",
-      min: 0,
-      max: Session.get('playLength'),
-      value: players[Session.get('playLevel')].getIndex(),
-    });
-  });   
+  if (!this.rendered) {
+    this.rendered = true;
+    
+    Deps.autorun(function() {
+      $('.play-slider').slider({
+        range: "min",
+        min: 0,
+        max: Session.get('playLength'),
+        value: players[Session.get('playLevel')].getIndex(),
+      });
+    });   
+  }
 }
 
 Template.game.events({

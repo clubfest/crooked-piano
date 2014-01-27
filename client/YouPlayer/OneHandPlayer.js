@@ -3,7 +3,9 @@ OneHandPlayer = {
   create: function(song) {
     var self = this;
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
+      tTime = new Date().getTime();
       self.judge(data);
+      console.log('Judged: ' + (new Date().getTime() - tTime))
     });
 
     this.song = song;
@@ -97,6 +99,7 @@ OneHandPlayer = {
       });
       notes.push(noteUp);
     }
+    
 
     simpleReplayer.init(notes);
     simpleReplayer.play();
@@ -189,7 +192,9 @@ OneHandPlayer = {
   },
 
   undisplayNote: function(note) {
-    $('[data-key-code='+note.keyCode+']').removeClass('first-cluster repeated-note');      
+    $('[data-key-code='+note.keyCode+']').removeClass('first-cluster repeated-note');
+    console.log('Undisplayed: ' + (new Date().getTime() - tTime))
+
   },
 
   incrementScore: function() {
@@ -228,26 +233,27 @@ tallyScore = function() {
   }, 5 * WAIT_TIME);
 }
 
-tallyScore = function() {
-  var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
+// tallyScore = function() {
+//   var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
 
-  Session.set('score', Math.floor(score));
-  Session.set('scoreTallied', true);
-}
-
-// function tallyingScore(score) {
-//   var oldScore = Session.get('score');
-//   var time = oldScore / 2;
-//   if (score - oldScore < 8) {
-//     time = 1000 / ((score - oldScore) + 1)
-//   }
-//   if (oldScore < score) {
-//     Session.set('score', oldScore + 1);
-//     MIDI.noteOn(0, Math.floor(oldScore*score % 47) + 40, oldScore / 4);
-//     window.setTimeout(function() {
-//       tallyingScore(score);
-//     }, time);
-//   } else {
-//     Session.set('scoreTallied', true);
-//   }
+//   Session.set('score', Math.floor(score));
+//   Session.set('scoreTallied', true);
 // }
+
+function tallyingScore(score) {
+  var oldScore = Session.get('score');
+  var time = oldScore / 2;
+  if (score - oldScore < 8) {
+    time = 1000 / ((score - oldScore) + 1)
+  }
+  if (oldScore < score) {
+    Session.set('score', oldScore + 1);
+    MIDI.noteOn(0, Math.floor(oldScore*score % 47) + 40, oldScore / 4);
+    window.setTimeout(function() {
+      tallyingScore(score);
+    }, time);
+
+  } else {
+    Session.set('scoreTallied', true);
+  }
+}

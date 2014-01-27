@@ -94,6 +94,7 @@ simpleKeyboard = {
 
       if (typeof note !== "undefined") {
         note = self.adjustShift(note);
+        
         $(window).trigger('keyboardDown', {
           time: new Date().getTime(),
           keyCode: keyCode,
