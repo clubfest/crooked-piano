@@ -36,6 +36,7 @@ Template.replayer.rendered = function() {
     $('.slider').slider({
       slide: function(evt, ui) {
         Session.set('replayerIndex', ui.value);
+        simpleRecorder.clear(); // TODO: clean up
 
         // if slider is moved while we are replaying, need to restart at new position
         if (Session.get('isReplaying') == true) {
@@ -43,7 +44,6 @@ Template.replayer.rendered = function() {
           simpleReplayer.play();
         } else {
           simpleReplayer.play();
-
         }
       }
     });  

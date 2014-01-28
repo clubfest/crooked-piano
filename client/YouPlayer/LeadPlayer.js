@@ -6,9 +6,7 @@ LeadPlayer = {
     var self = this;
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
       if (data.playedByComputer !== true) {
-        tTime = new Date().getTime();
         self.judge(data);
-        console.log('finished judging: ' + (new Date().getTime() - tTime));
       }
     });
 
@@ -81,9 +79,6 @@ LeadPlayer = {
     }
 
     if (matchIdx > -1) {
-      console.log('something matched: ' + (new Date().getTime() - tTime));
-      tTime = new Date().getTime();
-
       this.incrementScore();
       this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
@@ -97,8 +92,6 @@ LeadPlayer = {
           this.updateProximateNotes();
         }
       }
-      console.log('done ' + (new Date().getTime() - tTime));
-      tTime = new Date().getTime();
     } else {
       if (data.playedByComputer !== true) {
         this.decrementScore();
@@ -222,11 +215,11 @@ LeadPlayer = {
       simpleReplayer.destroy();
       $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
       self.reset();
+
     } else {
+      self.saveGame();
 
-      window.setTimeout(function() {
-        self.saveGame();
-
+      window.setTimeout(function() { 
         tallyScore();
       }, WAIT_TIME);
     }
@@ -249,6 +242,18 @@ LeadPlayer = {
       version = 'rightHandLead';
     }
 
+    var segmentId = this.segmentInfo.segmentId;
+    var tempLength = TempGames.incomplete.length;
+
+    if (tempLength > 0) {
+      var incomplete = TempGames.incomplete[tempLength - 1];
+      if (incomplete.songId !== this.song._id) {
+        TempGames.incomplete = []; // reset if you moved to a new song
+      } else if (TempGames.incomplete[tempLength - 1].segmentId === segmentId) {
+        TempGames.incomplete.pop();
+      }
+    }
+
     TempGames.incomplete.push({
       songId: this.song._id,
       title: this.song.title,
@@ -258,6 +263,7 @@ LeadPlayer = {
       endTime: endTime,
       originalEndTime: this.playNotes[this.playNotes.length - 1].time,
       version: version,
+      segmentId: segmentId,
     });
   },
 

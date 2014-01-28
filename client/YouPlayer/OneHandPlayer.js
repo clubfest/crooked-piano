@@ -3,9 +3,7 @@ OneHandPlayer = {
   create: function(song) {
     var self = this;
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
-      tTime = new Date().getTime();
       self.judge(data);
-      console.log('Judged: ' + (new Date().getTime() - tTime))
     });
 
     this.song = song;
@@ -193,8 +191,6 @@ OneHandPlayer = {
 
   undisplayNote: function(note) {
     $('[data-key-code='+note.keyCode+']').removeClass('first-cluster repeated-note');
-    console.log('Undisplayed: ' + (new Date().getTime() - tTime))
-
   },
 
   incrementScore: function() {

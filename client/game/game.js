@@ -5,6 +5,8 @@
 var players = [OneHandPlayer, LeadPlayer, 'AccompanyingPlayer', 'singAlong', 'duet', 'recital', 'twoHand'];
 
 Template.game.created = function() {
+  // going from left hand to right hand;
+  // TODO: find a better way to check for that or add a variable.
   if (typeof Session.get('segmentLevel') === 'undefined' || typeof Session.get('playLevel') === 'undefined') {
     Session.set('segmentLevel', 0);
     Session.set('playLevel', 0);
@@ -41,6 +43,9 @@ Template.game.events({
     if (level === 0) {
       Session.set('playLevel', 1);
     } else {
+      // level === 1, i.e. lead player
+      LeadPlayer.saveGame(); // TODO: find a better place to put this
+
       Session.set('playLevel', 0);
 
       var segmentLevel = Session.get('segmentLevel');

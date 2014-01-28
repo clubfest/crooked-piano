@@ -108,7 +108,10 @@ simpleKeyboard = {
         self.adjustSettings(keyCode);
       }
 
-        
+      // prevent backspace from navigating back in the browser
+      if (evt.which === 8) {
+        return false;
+      }
     });
 
     $(window).on('keyup.keyboard', function(evt) {
