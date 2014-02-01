@@ -58,6 +58,13 @@ simpleKeyboard = {
           velocity: self.velocity,
         });
       }
+
+      // prevent double-tap zooming
+      if (self.lastTouched && new Date().getTime() - self.lastTouched < 501) {
+        evt.preventDefault();
+      }
+
+      self.lastTouched = new Date().getTime();
     });
 
     $('.key').on('touchend.keyboard', function(evt) {
@@ -74,7 +81,9 @@ simpleKeyboard = {
           velocity: self.velocity,
         });
       }
-    })
+    });
+
+    // $(window).nodoubletapzoom();
   },
 
 
@@ -242,4 +251,25 @@ var keyCodeToNote = {
   188: 92,
   75: 93,
   55: 95,
-}
+};
+
+(function($) {
+  var IS_IOS = navigator.userAgent.match(/(iPhone|iPad|webOs|Android)/i);
+  $.fn.nodoubletapzoom = function() {
+    if (IS_IOS)
+      $(this).bind('touchstart', function preventZoom(e) {
+        var t2 = e.timeStamp
+          , t1 = $(this).data('lastTouch') || t2
+          , dt = t2 - t1
+          , fingers = e.originalEvent.touches.length;
+        $(this).data('lastTouch', t2);
+        if (!dt || dt > 500 || fingers > 1) return; // not double-tap
+ 
+        e.preventDefault(); // double tap - prevent the zoom
+        // also synthesize click events we just swallowed up
+        $(this).trigger('click').trigger('click');
+      });
+
+    return this;
+  };
+})(jQuery);

@@ -11,6 +11,17 @@ body {
   min-height: 600px;
 }
 
+@media all and (max-width: 800px){
+  #body-wrapper {
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  body {
+    padding: 0;
+  }
+}
+
 a {
   cursor: pointer;
 }

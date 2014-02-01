@@ -1,15 +1,15 @@
 <template name='home'>
   <div class='panel'>
     <h1>Crooked Piano</h1>
-    <p>This is a new musical instrument that is easy to learn and allows you to perform music anywhere. Let's get started.</p>
+    <p id='intro'>Beautiful music touches our lives. With the Crooked Piano, we can touch the beautiful music anytime, anywhere.</p>
   </div>
   {{#if songId}}
     <div class='panel'>
-      <a href="/game/{{songId}}" class='btn btn-primary'>Play the Game</a>    
+      <a href="/game/{{songId}}" class='btn btn-primary'>Let's Get Started</a>    
     </div>
   {{/if}}
 
-  <div align='center'>
+  <div align='center' style='margin-top: 50px;'>
     <div>
       {{> songs}}     
     </div>
