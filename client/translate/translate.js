@@ -38,10 +38,13 @@ var Translator = {
     for (var i = 0; i < data.length; i++) {
       var noteInfo = data[i];
       var event = noteInfo[0].event;
+
+      // TODO: debug setTempo
       if (event.subtype === 'setTempo') {
         console.log(time);
         console.log(event)
       } 
+
       if (event.subtype === "noteOn" || event.subtype === "noteOff") {
         count++;
         
@@ -81,7 +84,6 @@ var Translator = {
       if (numBlackKeys < minNumBlackKeys) {
         minNumBlackKeys = numBlackKeys;
         bestShift = j;
-        console.log(numBlackKeys)
       }
     }
 
@@ -101,6 +103,7 @@ var Translator = {
         bestShift -= 12;
       }
     }
+    console.log(bestShift)
 
     for (var i = 0; i < this.notes.length; i++) {
       this.notes[i].note += bestShift;

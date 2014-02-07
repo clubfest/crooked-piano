@@ -9,7 +9,7 @@ Template.game.created = function() {
   // TODO: find a better way to check for that or add a variable.
   if (typeof Session.get('segmentLevel') === 'undefined' || typeof Session.get('playLevel') === 'undefined') {
     Session.set('segmentLevel', 0);
-    Session.set('playLevel', 0);
+    Session.set('playLevel', 1);
   }
 }
 
@@ -40,13 +40,13 @@ Template.game.events({
   'click #next-game': function() {
     var level = Session.get('playLevel');
     
-    if (level === 0) {
-      Session.set('playLevel', 1);
-    } else {
+    // if (level === 0) {
+    //   Session.set('playLevel', 1);
+    // } else {
       // level === 1, i.e. lead player
       LeadPlayer.saveGame(); // TODO: find a better place to put this
 
-      Session.set('playLevel', 0);
+      // Session.set('playLevel', 0);
 
       var segmentLevel = Session.get('segmentLevel');
       Session.set('segmentLevel', segmentLevel + 1);
@@ -59,7 +59,7 @@ Template.game.events({
         TempGames.merge();
         Router.go('profile');
       }
-    }
+    // }
   },
 
   'click #retry-game': function() {
