@@ -1,7 +1,7 @@
 
 
 Template.result.hasPassed = function() {
-  return Session.get('score') >= 20;
+  return Session.get('score') >= -1;
 }
 
 Template.result.scoreTallied = function() {

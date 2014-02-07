@@ -1,4 +1,3 @@
-segmentsDep = new Deps.Dependency;
 
 simpleReplayer = {
   notes: [],

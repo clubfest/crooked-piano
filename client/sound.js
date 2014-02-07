@@ -39,7 +39,7 @@ function loadMidiJs() {
             $(window).on('keyboardDown.sound', function(evt, data) {
                 if (typeof data.note !== 'undefined') {
                   data.channel = data.channel || 0;
-                  MIDI.noteOn(data.channel, data.note, data.velocity  + data.note * 2);
+                  MIDI.noteOn(data.channel, data.note, data.velocity  /*+ data.note * 2 */);
                 }
             });
             // TODO: keyboardUp.sound if without pedal

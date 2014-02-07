@@ -254,6 +254,8 @@ LeadPlayer = {
       }
     }
 
+    if (this.playNotes.length < 1) return;
+
     TempGames.incomplete.push({
       songId: this.song._id,
       title: this.song.title,
