@@ -1,11 +1,11 @@
 <template name='home'>
   <div class='panel'>
     <h1>Crooked Piano</h1>
-    <p id='intro'>Beautiful music touches our lives. With the Crooked Piano, we can touch the beautiful music anytime, anywhere.</p>
+    <p id='intro'>Music takes us to places in the composer's dreams.  It's now your turn to take music to your dreams.</p>
   </div>
   {{#if songId}}
     <div class='panel'>
-      <a href="/game/{{songId}}" class='btn btn-primary'>Let's Get Started</a>    
+      <a href="/game/{{songId}}" class='btn btn-primary'>Play</a>    
     </div>
   {{/if}}
 
@@ -18,6 +18,20 @@
       <a href="/createSong" class='btn'>Create new song</a>      
     </div>
 
+  </div>
+
+  <div class='panel spaced-out'>
+    <div>
+      {{loginButtons}}
+    </div>
+    {{#if currentUser}}
+      <div>
+        <a href="{{pathFor 'profile'}}">Profile</a>
+      </div>
+    {{/if}}
+    <div>
+      <a href="/">Home</a>
+    </div>
   </div>
 
 

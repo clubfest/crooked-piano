@@ -1,6 +1,6 @@
 <head>
   <title>Crooked Piano</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 </head>
 
 <body>
@@ -20,8 +20,22 @@
 </template>
 
 <template name='layout'>
-
-  <div id='navbar'></div>
+  <div class='panel spaced-out'>
+    <div>
+      <a href="/">Home</a>
+    </div>
+    {{#if currentUser}}
+      <div>
+        <a href="{{pathFor 'profile'}}">Profile</a>
+      </div>
+      <div>
+        <a href="/upload">Upload</a>
+      </div>
+    {{/if}}      
+    <div>
+      {{loginButtons}}
+    </div>
+  </div>    
 
   {{yield}}
 

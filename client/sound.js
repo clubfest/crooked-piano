@@ -11,6 +11,9 @@ Handlebars.registerHelper('hasMidiNoteOn', function() {
 function loadMidiJs() {
   var numDone = 0;
   var files = [
+    '/MIDI.js/inc/jasmid/replayer.js',
+    '/MIDI.js/inc/jasmid/midifile.js',
+    '/MIDI.js/inc/jasmid/stream.js',
     '/MIDI.js/js/MIDI/AudioDetect.js',
     '/MIDI.js/js/MIDI/LoadPlugin.js',
     '/MIDI.js/js/MIDI/Plugin.js',

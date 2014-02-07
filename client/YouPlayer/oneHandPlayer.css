@@ -4,9 +4,10 @@
   /*font-size: 24px;*/
 }
 
-.keyboard .key.computer-note {
+.computer-note {
   font-size: 24px;
   background: #9F9;
+  z-index: -1;
 }
 
 .keyboard .key.repeated-note {
