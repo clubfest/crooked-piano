@@ -1,5 +1,4 @@
 <template name='result'>
-  {{#if scoreTallied}}
     <div class='panel'>
       <div>
         <button id='retry-game'>
@@ -7,16 +6,13 @@
           Retry
         </button>
       </div>
-      {{#if hasPassed}}
         <div>
           <button id='next-game'>
             <i class='icon-chevron-right'></i>
             Next
           </button>
         </div>
-      {{/if}}
     </div>
-  {{/if}}
 
   {{#if hasScore}}
   <div id='result-panel'>
