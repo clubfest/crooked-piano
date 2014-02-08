@@ -67,36 +67,36 @@ LeadPlayer = {
   },
 
   judge: function(data) {
-    // var matchIdx = -1;
-
-    // for (var i = 0; i < this.proximateNotes.length; i++) {
-    //   var note = this.proximateNotes[i];
-
-    //   if (data.keyCode === note.keyCode) {
-    //     matchIdx = i;
-    //     break ;
-    //   }
-    // }
-
-    // if (matchIdx > -1) {
-
-    // TODO: remove this when we have a better way to subdivide a track
-    var matchIndices = [];
+    var matchIdx = -1;
 
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
 
       if (data.keyCode === note.keyCode) {
-        matchIndices.push(i);
+        matchIdx = i;
+        break ;
       }
     }
 
-    if (matchIndices.length > 0) {
-      for (var i = matchIndices.length - 1; i >= 0; i--) {
-        this.proximateNotes.splice(matchIndices[i], 1);
-      }
+    if (matchIdx > -1) {
+
+    // // TODO: remove this when we have a better way to subdivide a track
+    // var matchIndices = [];
+
+    // for (var i = 0; i < this.proximateNotes.length; i++) {
+    //   var note = this.proximateNotes[i];
+
+    //   if (data.keyCode === note.keyCode) {
+    //     matchIndices.push(i);
+    //   }
+    // }
+
+    // if (matchIndices.length > 0) {
+    //   for (var i = matchIndices.length - 1; i >= 0; i--) {
+    //     this.proximateNotes.splice(matchIndices[i], 1);
+    //   }
       this.incrementScore();
-      // this.proximateNotes.splice(matchIdx, 1);
+      this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
       this.prevNoteTime = note.time;
 
@@ -189,7 +189,7 @@ LeadPlayer = {
         var self = this; 
         
         if (this.prevNoteTime !== null) {
-          wait = this.computerProximateNotes[0].time - this.prevNoteTime;
+          wait = (this.computerProximateNotes[0].time - this.prevNoteTime) / Session.get('playSpeed');
         }
 
         window.setTimeout(function() {
@@ -270,7 +270,7 @@ LeadPlayer = {
       }
     }
 
-    if (this.playNotes.length < 1) return;
+    if (this.playNotes.length < 1 || simpleRecorder.notes.length < 1) return;
 
     TempGames.incomplete.push({
       songId: this.song._id,

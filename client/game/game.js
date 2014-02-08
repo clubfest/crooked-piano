@@ -2,15 +2,17 @@
   Put in the intro page, with a next button: this modify the 
   Put in the keyboard and youPlayer, with a back button,
 */
-var players = [OneHandPlayer, LeadPlayer, 'AccompanyingPlayer', 'singAlong', 'duet', 'recital', 'twoHand'];
+// var players = [OneHandPlayer, LeadPlayer, 'AccompanyingPlayer', 'singAlong', 'duet', 'recital', 'twoHand'];
 
 Template.game.created = function() {
+  // segmentLevel initiation is moved to routing.js
+
   // going from left hand to right hand;
   // TODO: find a better way to check for that or add a variable.
-  if (typeof Session.get('segmentLevel') === 'undefined' || typeof Session.get('playLevel') === 'undefined') {
-    Session.set('segmentLevel', 0);
-    Session.set('playLevel', 1);
-  }
+  // if (typeof Session.get('segmentLevel') === 'undefined') {
+  //   Session.set('segmentLevel', 0);
+  //   // Session.set('playLevel', 1);
+  // }
 }
 
 Template.game.rendered = function() {
@@ -22,7 +24,8 @@ Template.game.rendered = function() {
         range: "min",
         min: 0,
         max: Session.get('playLength'),
-        value: players[Session.get('playLevel')].getIndex(),
+        value: LeadPlayer.getIndex(),
+        // value: players[Session.get('playLevel')].getIndex(),
       });
     });   
   }
@@ -30,24 +33,31 @@ Template.game.rendered = function() {
 
 Template.game.events({
   'click #demo': function() {
-    players[Session.get('playLevel')].demo();
+    // players[Session.get('playLevel')].demo();
+    LeadPlayer.demo();
   },
 
   'click #pause-demo': function() {
-    players[Session.get('playLevel')].pauseDemo();
+    // players[Session.get('playLevel')].pauseDemo();
+    LeadPlayer.pauseDemo();
   },
 
   'click #next-game': function() {
-    var level = Session.get('playLevel');
+    // var level = Session.get('playLevel');
     
-    if (level === 0) {
-      Session.set('playLevel', 1);
-    } else {
-      // level === 1, i.e. lead player
-      LeadPlayer.saveGame(); // TODO: find a better place to put this
+    // if (level === 0) {
+      // Session.set('playLevel', 1);
+    // } else {
+      // // level === 1, i.e. lead player
+      // try { 
+      //   LeadPlayer.saveGame(); // TODO: find a better place to put this
+      // } catch (e) {
+      //   // alert('')
+      // }
 
-      Session.set('playLevel', 0);
+      // Session.set('playLevel', 0);
 
+      LeadPlayer.saveGame();
       var segmentLevel = Session.get('segmentLevel');
       Session.set('segmentLevel', segmentLevel + 1);
 
@@ -58,23 +68,27 @@ Template.game.events({
           segmentLevel + 1 === rightLength + leftLength) {
         TempGames.merge();
         Router.go('profile');
+      } else {
+        LeadPlayer.destroy();
+        LeadPlayer.create(this.song);
       }
-    }
+    // }
   },
 
   'click #retry-game': function() {
-    players[Session.get('playLevel')].reset();
+    // players[Session.get('playLevel')].reset();
+    LeadPlayer.reset();
   },
 });
 
-Template.game.levelZero = function() {
-  return Session.get('playLevel') === 0;
-}
+// Template.game.levelZero = function() {
+//   return Session.get('playLevel') === 0;
+// }
 
-Template.game.levelOne = function() {
-  return Session.get('playLevel') === 1;
-}
+// Template.game.levelOne = function() {
+//   return Session.get('playLevel') === 1;
+// }
 
-Template.game.levelTwo = function() {
-  return Session.get('playLevel') === 2;
-}
+// Template.game.levelTwo = function() {
+//   return Session.get('playLevel') === 2;
+// }

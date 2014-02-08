@@ -9,7 +9,6 @@ Template.monotrome.rendered = function() {
     max: 2.5,
     step: 0.1,
     value: Session.get('monotromeFrequency'),
-
     slide: function(evt, ui) {
       Session.set('monotromeFrequency', ui.value);
       Monotrome.pause();

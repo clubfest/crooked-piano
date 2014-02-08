@@ -58,7 +58,10 @@ Router.map(function() {
 
     // caching last game's songId; todo: check elsewhere, like profile, that this is defined
     after: function() {
-      Session.set('songId', this.params._id);
+      if (Session.get('songId') !== this.params._id) {
+        Session.set('segmentLevel', 0); // reset the game
+        Session.set('songId', this.params._id);
+      }
 
       if (Meteor.userId()) {
         Meteor.call('updateLastVisitedGame', this.params._id, function(err){ 

@@ -53,22 +53,36 @@ OneHandPlayer = {
   },
 
   judge: function(data) {
-    var matchIndices = [];
+    var matchIdx = -1;
 
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
 
       if (data.keyCode === note.keyCode) {
-        matchIndices.push(i);
+        matchIdx = i;
+        break ;
       }
     }
 
-    if (matchIndices.length > 0) {
-      for (var i = matchIndices.length - 1; i >= 0; i--) {
-        this.proximateNotes.splice(matchIndices[i], 1);
-      }
+    if (matchIdx > -1) {
 
+    // // TODO: remove this when we have a better way to subdivide a track
+    // var matchIndices = [];
+
+    // for (var i = 0; i < this.proximateNotes.length; i++) {
+    //   var note = this.proximateNotes[i];
+
+    //   if (data.keyCode === note.keyCode) {
+    //     matchIndices.push(i);
+    //   }
+    // }
+
+    // if (matchIndices.length > 0) {
+    //   for (var i = matchIndices.length - 1; i >= 0; i--) {
+    //     this.proximateNotes.splice(matchIndices[i], 1);
+    //   }
       this.incrementScore();
+      this.proximateNotes.splice(matchIdx, 1);
       this.undisplayNote(note);
       this.prevNoteTime = note.time;
       this.updateProximateNotes();

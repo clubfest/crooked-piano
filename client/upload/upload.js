@@ -1,4 +1,6 @@
 
+// TODO: think about whether to store each segment individually
+// TODO: think about adding id to each note
 Template.upload.rendered = function() {
   var midiInput = document.getElementById('midi-input');
   midiInput.onchange = function(evt) {
@@ -9,10 +11,20 @@ Template.upload.rendered = function() {
 
       fileReader.onload = function() {
         var player = MIDI.Player;
-        player.loadFile(fileReader.result);
 
+        Session.set('message', 'Uploading');
+        try {
+          player.loadFile(fileReader.result);
+        } catch (e) {
+          Session.set('message', 'Upload failed');
+          return ;
+        }
+
+        Session.set('message', 'Tranlating');
         Translator.midiToNotes(player.data);
         Translator.createTranslatedSong();
+        Session.set('message', '');
+
       }
 
       fileReader.readAsDataURL(file);
@@ -22,7 +34,9 @@ Template.upload.rendered = function() {
 
 var Translator = {
   notes: [],
-
+  notesBySegmentId: {},
+  segmentStats: {},
+  
   midiToNotes: function(data) {
     this.convertToMyFormat(data);
     this.smartShift();
@@ -33,38 +47,84 @@ var Translator = {
 
   convertToMyFormat: function(data) {
     this.notes = [];
+    this.notesBySegmentId = {};
+
     var time = 0;
-    count = 0;
+    prevNote = null;
+
     for (var i = 0; i < data.length; i++) {
       var noteInfo = data[i];
       var event = noteInfo[0].event;
 
-      // TODO: debug setTempo
-      if (event.subtype === 'setTempo') {
-        console.log(time);
-        console.log(event)
-      } 
+      time += noteInfo[1];
 
       if (event.subtype === "noteOn" || event.subtype === "noteOff") {
-        count++;
-        
-        time += noteInfo[1];
-
+        var track = noteInfo[0].track;
         var note = {
           time: time,
           note: event.noteNumber,
           velocity: event.velocity,
-          segmentId: noteInfo[0].track,
-          isKeyboardDown: true,
+          segmentId: track,
+          // isKeyboardDown: true,
         };
 
-        if (event.subtype === "noteOff") {
-          note.isKeyboardDown = false;
-        }
+        var ignore = false;
+        if (event.subtype === "noteOn") {
+          note.isKeyboardDown = true;
 
-        this.notes.push(note);
+          // get rid of complicated notes
+          if (prevNote && note.time - prevNote.time < 50 && note.segmentId === prevNote.segmentId) {
+            ignore = true;
+          }
+
+          prevNote = note;
+        } 
+
+        if  (!ignore) {
+          this.notes.push(note);
+
+          if (!this.notesBySegmentId[track]) {
+            this.notesBySegmentId[track] = {notes: []};
+          }
+
+          this.notesBySegmentId[track].notes.push(note);
+        }
+      } else {
+        // todo: add instrument info
       }
     }
+    this.smartDivide();
+    this.smartSplit();
+  },
+
+  // TODO: move this to the game level
+  smartDivide: function() {
+    // analyze each segment and see if we can divide it up further at appropriate points
+    for (segmentId in this.notesBySegmentId) {
+      var notes = this.notesBySegmentId[segmentId].notes;
+      var GOOD_LENGTH = 80;
+      var currShift = 0; // TODO: remove this hack for offsetting the trackId because id may conflict
+
+      if (notes.length > GOOD_LENGTH) {
+        var count = 0;
+        var averageLength = (notes[GOOD_LENGTH].time - notes[0].time) / GOOD_LENGTH;
+
+        for (var i = 0; i < notes.length - 1; i++) {
+          var note = notes[i];
+          count++;
+
+          if (notes[i+1].time - note.time > 2 * averageLength && count > GOOD_LENGTH) {
+            currShift = new Date().getTime();
+            count = 0;
+          }
+          note.segmentId += currShift;
+        }
+      }
+    }
+  },
+
+  smartSplit: function() {
+    // Split any track that are too complicated into lower and upper tracks
   },
 
   smartShift: function() {
@@ -103,7 +163,6 @@ var Translator = {
         bestShift -= 12;
       }
     }
-    console.log(bestShift)
 
     for (var i = 0; i < this.notes.length; i++) {
       this.notes[i].note += bestShift;
@@ -133,7 +192,7 @@ var Translator = {
   },
 
   createTranslatedSong: function() {
-    Meteor.call('createTranslatedSong', this.notes, function(err, songId) {
+    Meteor.call('createTranslatedSong', this.notes, this.notesBySegmentId, function(err, songId) {
       if (err) {
         alert(err.reason);
       } else {
@@ -158,7 +217,7 @@ function isBlackKey(i) {
 function diffOfOutKeys(notes, shift) {
   // Difference of over the range vs under the range keys
   var diff = 0;
-  for (var i = 0; i < notes.length; i++) {
+  for (var i = 0; i < Math.min(notes.length, 50); i++) {
     var note = notes[i].note;
 
     if (note + shift > 86) {
