@@ -99,26 +99,49 @@ var Translator = {
 
   // TODO: move this to the game level
   smartDivide: function() {
+    var debugSegment = {};
+
     // analyze each segment and see if we can divide it up further at appropriate points
     for (segmentId in this.notesBySegmentId) {
       var notes = this.notesBySegmentId[segmentId].notes;
       var GOOD_LENGTH = 80;
-      var currShift = 0; // TODO: remove this hack for offsetting the trackId because id may conflict
+      var SAMPLE_LENGTH = 10;
+      var currShift = ''; // TODO: remove this hack for offsetting the trackId because id may conflict
 
-      if (notes.length > GOOD_LENGTH) {
-        var count = 0;
-        var averageLength = (notes[GOOD_LENGTH].time - notes[0].time) / GOOD_LENGTH;
 
-        for (var i = 0; i < notes.length - 1; i++) {
-          var note = notes[i];
-          count++;
+      if (notes.length > SAMPLE_LENGTH) {
+        var averageLength = (notes[SAMPLE_LENGTH].time - notes[0].time) / SAMPLE_LENGTH;
+      } else {
+        continue;
+      }
 
-          if (notes[i+1].time - note.time > 2 * averageLength && count > GOOD_LENGTH) {
-            currShift = new Date().getTime();
-            count = 0;
-          }
-          note.segmentId += currShift;
+      var count = 0;
+      for (var i = 0; i < notes.length; i++) {
+        var note = notes[i];
+        count++;
+
+        if (!debugSegment[note.segmentId]) {
+          debugSegment[note.segmentId] = []
         }
+        debugSegment[note.segmentId].push(note);
+
+        // If not too close to the end for a long note after a lengthy segment 
+        if (i < notes.length - GOOD_LENGTH &&
+            notes[i+1].time - note.time > 2 * averageLength && 
+            count > GOOD_LENGTH) {
+
+          notes[i].isEnd = true; // TODO: refactor. This is used when gamifying
+          console.log(i);
+          console.log(notes.length);
+          console.log("===========");
+
+          currShift += 's';
+          count = 0;
+        }
+        // update segmentId everywhere
+        note.segmentId += currShift;
+
+        
       }
     }
   },
@@ -135,7 +158,7 @@ var Translator = {
     for (var j = 0; j < 12; j++) {
       numBlackKeys = 0;
 
-      for (var i = 0; i < Math.min(this.notes.length, 50); i++) {
+      for (var i = 0; i < Math.min(this.notes.length, 200); i++) {
         if (isBlackKey(this.notes[i].note + j)) {
           numBlackKeys++;
         }
