@@ -29,6 +29,12 @@ Template.game.rendered = function() {
       });
     });   
   }
+
+  $('.play-slider').slider({
+    slide: function(evt, ui) {
+      LeadPlayer.reset(ui.value);
+    },
+  })
 }
 
 Template.game.events({
@@ -58,20 +64,21 @@ Template.game.events({
       // Session.set('playLevel', 0);
 
       LeadPlayer.saveGame();
+      
       var segmentLevel = Session.get('segmentLevel');
       Session.set('segmentLevel', segmentLevel + 1);
 
-      var rightLength = this.song.rightSegments.length;
-      var leftLength = this.song.leftSegments.length;
+      // var rightLength = this.song.rightSegments.length;
+      // var leftLength = this.song.leftSegments.length;
 
-      if (segmentLevel + 1 === rightLength ||
-          segmentLevel + 1 === rightLength + leftLength) {
-        TempGames.merge();
-        Router.go('profile');
-      } else {
-        LeadPlayer.destroy();
-        LeadPlayer.create(this.song);
-      }
+      // if (segmentLevel + 1 === rightLength ||
+          // segmentLevel + 1 === rightLength + leftLength) {
+          TempGames.merge();
+          Router.go('profile');
+      // } else {
+      //   LeadPlayer.destroy();
+      //   LeadPlayer.create(this.song);
+      // // }
     // }
   },
 

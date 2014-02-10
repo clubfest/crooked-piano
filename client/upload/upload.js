@@ -32,22 +32,20 @@ Template.upload.rendered = function() {
   }
 }
 
+// translate to gamified song by adding extra info: isStart and isEnd
 var Translator = {
   notes: [],
-  notesBySegmentId: {},
-  segmentStats: {},
+  notesByTrack: {},
   
   midiToNotes: function(data) {
     this.convertToMyFormat(data);
-    this.smartShift();
+    this.smartShift(); // TODO: remove this, once we modify the computer to play notes and display a different-octave keyCode
     this.annotateKeyCode();
-
-    return this.notes;
   },
 
   convertToMyFormat: function(data) {
     this.notes = [];
-    this.notesBySegmentId = {};
+    this.notesByTrack = {};
 
     var time = 0;
 
@@ -58,12 +56,12 @@ var Translator = {
       time += noteInfo[1];
 
       if (event.subtype === "noteOn" || event.subtype === "noteOff") {
-        var track = noteInfo[0].track;
+        var segmentId = noteInfo[0].track;
         var note = {
           time: time,
           note: event.noteNumber,
           velocity: event.velocity,
-          segmentId: track,
+          segmentId: segmentId,
         }
 
         if (event.subtype === "noteOn") {
@@ -71,14 +69,27 @@ var Translator = {
         } 
         this.notes.push(note);
 
-        if (!this.notesBySegmentId[track]) {
-          this.notesBySegmentId[track] = {notes: []};
+        if (!this.notesByTrack[segmentId]) {
+          this.notesByTrack[segmentId] = {
+            notes: [],
+            // segmentId: segmentId,
+          };
         }
 
-        this.notesBySegmentId[track].notes.push(note);
+        this.notesByTrack[segmentId].notes.push(note);
 
       } else {
         // todo: add instrument info
+      }
+    }
+
+    // annotation is needed for gamification later on
+    for (var segmentId in this.notesByTrack) {
+      var trackNotes = this.notesByTrack[segmentId].notes;
+
+      if (trackNotes.length > 0) {
+        trackNotes[0].isStart = true;
+        trackNotes[trackNotes.length - 1].isEnd = true;
       }
     }
   },
@@ -91,7 +102,7 @@ var Translator = {
     for (var j = 0; j < 12; j++) {
       numBlackKeys = 0;
 
-      for (var i = 0; i < Math.min(this.notes.length, 200); i++) {
+      for (var i = 0; i < Math.min(this.notes.length, 100); i++) {
         if (isBlackKey(this.notes[i].note + j)) {
           numBlackKeys++;
         }
@@ -148,7 +159,7 @@ var Translator = {
   },
 
   createTranslatedSong: function() {
-    Meteor.call('createTranslatedSong', this.notes, this.notesBySegmentId, function(err, songId) {
+    Meteor.call('createTranslatedSong', this.notes, this.notesByTrack, function(err, songId) {
       if (err) {
         alert(err.reason);
       } else {
@@ -177,9 +188,9 @@ function diffOfOutKeys(notes, shift) {
     var note = notes[i].note;
 
     if (note + shift > 86) {
-      diff++;
+      diff += 2; // note that I hate high notes more than low notes
     } else if (note + shift < 49) {
-      diff--;
+      diff -= 1;
     }
   }
   return diff;

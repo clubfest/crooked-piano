@@ -74,6 +74,7 @@ simpleReplayer = {
       this.timeout = window.setTimeout(function() {
         Session.set('replayerIndex', currIndex + 1);
         self._play();
+      // },  (nextNote.time - note.time) / (Session.get('playSpeed') || 1));
       },  nextNote.time - note.time - lag);
     }
   },

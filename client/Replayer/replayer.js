@@ -31,6 +31,7 @@ Template.replayer.rendered = function() {
   })
   
   // Warning: this jquery effect causes the whole template to re-render.
+  // TODO: check if it's okay to remove autorun
   Deps.autorun(function() {
     // user changing the slider
     $('.slider').slider({

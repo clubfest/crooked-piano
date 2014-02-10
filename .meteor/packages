@@ -9,7 +9,6 @@ iron-router
 jquery-ui
 bootstrap
 x-editable-bootstrap
-font-awesome
 accounts-ui
 accounts-google
-accounts-twitter
+accounts-facebook

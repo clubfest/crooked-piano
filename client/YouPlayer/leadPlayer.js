@@ -1,5 +1,5 @@
 Template.leadPlayer.created = function() {
-  Session.setDefault('playSpeed', 1);
+  Session.setDefault('playSpeed', .7);
 }
 
 Template.leadPlayer.rendered = function() {
@@ -13,9 +13,9 @@ Template.leadPlayer.rendered = function() {
 
   $('#speed-slider').slider({
     range: 'min',
-    min: .2,
+    min: .1,
     max: 1,
-    step: 0.1,
+    step: 0.05,
     value: Session.get('playSpeed'),
     slide: function(evt, ui) {
       Session.set('playSpeed', ui.value);
