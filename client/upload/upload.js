@@ -21,7 +21,14 @@ Template.upload.rendered = function() {
         }
 
         Session.set('message', 'Tranlating');
-        Translator.midiToNotes(player.data);
+
+        var shift = parseInt($('#shift-input').val());
+
+        if (shift > -40 && shift < 40) {
+          Translator.midiToNotes(player.data, shift);
+        } else {
+          Translator.midiToNotes(player.data);          
+        }
         Translator.createTranslatedSong();
         Session.set('message', '');
 
@@ -37,9 +44,9 @@ var Translator = {
   notes: [],
   notesByTrack: {},
   
-  midiToNotes: function(data) {
+  midiToNotes: function(data, shift) {
     this.convertToMyFormat(data);
-    this.smartShift(); // TODO: remove this, once we modify the computer to play notes and display a different-octave keyCode
+    this.smartShift(shift); // TODO: remove this, once we modify the computer to play notes and display a different-octave keyCode
     this.annotateKeyCode();
   },
 
@@ -94,40 +101,44 @@ var Translator = {
     }
   },
 
-  smartShift: function() {
+  smartShift: function(bestShift) {
     // Find a shift that produces the least number of sharps
-    var minNumBlackKeys = Infinity;
-    var bestShift = 0;
+    if (typeof bestShift === "undefined") {
+      var minNumBlackKeys = Infinity;
+      var bestShift = 0;
 
-    for (var j = 0; j < 12; j++) {
-      numBlackKeys = 0;
+      for (var j = 0; j < 12; j++) {
+        numBlackKeys = 0;
 
-      for (var i = 0; i < Math.min(this.notes.length, 100); i++) {
-        if (isBlackKey(this.notes[i].note + j)) {
-          numBlackKeys++;
+        for (var i = 0; i < Math.min(this.notes.length, 100); i++) {
+          if (isBlackKey(this.notes[i].note + j)) {
+            numBlackKeys++;
+          }
+        }
+
+        if (numBlackKeys < minNumBlackKeys) {
+          minNumBlackKeys = numBlackKeys;
+          bestShift = j;
         }
       }
 
-      if (numBlackKeys < minNumBlackKeys) {
-        minNumBlackKeys = numBlackKeys;
-        bestShift = j;
-      }
-    }
+      // Shift to the correct octave
+      var prevDiff = diffOfOutKeys(this.notes, bestShift);
 
-    // Shift to the correct octave
-    var prevDiff = diffOfOutKeys(this.notes, bestShift);
+      if (prevDiff < 0) {
+        var currDiff = diffOfOutKeys(this.notes, bestShift+12);
+        console.log(bestShift)
+        console.log(prevDiff);
+        console.log(currDiff);
+        if (Math.abs(currDiff) < Math.abs(prevDiff)) {
+          bestShift += 12;
+        }
+      } else {
+        var currDiff = diffOfOutKeys(this.notes, bestShift-12);
 
-    if (prevDiff < 0) {
-      var currDiff = diffOfOutKeys(this.notes, bestShift+12);
-
-      if (Math.abs(currDiff) < Math.abs(prevDiff)) {
-        bestShift += 12;
-      }
-    } else {
-      var currDiff = diffOfOutKeys(this.notes, bestShift-12);
-
-      if (Math.abs(currDiff) < Math.abs(prevDiff)) {
-        bestShift -= 12;
+        if (Math.abs(currDiff) < Math.abs(prevDiff)) {
+          bestShift -= 12;
+        }
       }
     }
 
@@ -184,12 +195,13 @@ function isBlackKey(i) {
 function diffOfOutKeys(notes, shift) {
   // Difference of over the range vs under the range keys
   var diff = 0;
-  for (var i = 0; i < Math.min(notes.length, 50); i++) {
+  for (var i = 0; i < Math.min(notes.length, 200); i++) {
     var note = notes[i].note;
+    // console.log(note + shift);
 
     if (note + shift > 86) {
       diff += 2; // note that I hate high notes more than low notes
-    } else if (note + shift < 49) {
+    } else if (note + shift < 41) {
       diff -= 1;
     }
   }
