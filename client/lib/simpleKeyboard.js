@@ -164,7 +164,10 @@ simpleKeyboard = {
     $(window).on('keyboardUp.display', function(evt, data) {
       if (data.channel === self.channel) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
-        dom.removeClass('keydown').html('<span>'+dom.data('content')+'</span>');
+        dom.removeClass('keydown')
+        if (!isIos) {
+          dom.html('<span>'+dom.data('content')+'</span>');
+        }
       }
     });
   },

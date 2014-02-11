@@ -350,7 +350,6 @@ LeadPlayer = {
 
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.addClass(displayClass);
-      // .html('<span>'+noteToName(note.note, true)+'</span>');
   },
 
   displayComputerNote: function(note) {
