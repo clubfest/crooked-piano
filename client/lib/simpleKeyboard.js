@@ -88,10 +88,17 @@ simpleKeyboard = {
 
 
   connectKeyToKeyboard: function() {
+      
+
     var self = this;
     var downKeys = {};
 
     $(window).on('keydown.keyboard', function(evt) {
+      var d = event.srcElement || event.target;
+      var inInputField = (d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE')) 
+               || d.tagName.toUpperCase() === 'TEXTAREA';
+      if (inInputField) return ;
+
       var keyCode = fixKeyCode(evt.keyCode);
       if (downKeys[keyCode] === true) {
         return ;
@@ -119,7 +126,7 @@ simpleKeyboard = {
 
       // prevent backspace from navigating back in the browser
       if (evt.which === 8) {
-        return false;
+        evt.preventDefault();
       }
     });
 
@@ -149,13 +156,15 @@ simpleKeyboard = {
 
     $(window).on('keyboardDown.display', function(evt, data) {
       if (data.channel === self.channel) {
-        $('[data-key-code="' + data.keyCode + '"]').addClass('keydown');
+        var dom = $('[data-key-code="' + data.keyCode + '"]');
+        dom.addClass('keydown').html('<span>'+noteToName(data.note, true)+'</span>');
       }
     });
 
     $(window).on('keyboardUp.display', function(evt, data) {
       if (data.channel === self.channel) {
-        $('[data-key-code="' + data.keyCode + '"]').removeClass('keydown');
+        var dom = $('[data-key-code="' + data.keyCode + '"]');
+        dom.removeClass('keydown').html('<span>'+dom.data('content')+'</span>');
       }
     });
   },
@@ -200,6 +209,50 @@ function fixKeyCode(keyCode) {
 
 function convertKeyCodeToNote(keyCode) {
   return keyCodeToNote[keyCode];
+}
+
+noteToName = function(note, letterVersion) {
+  note = (note - 60) % 12;
+
+  if (note < 0) {
+    note += 12;
+  }
+
+    
+
+  if (letterVersion) {
+    var conversion = {
+      0: 'C',
+      1: 'C#',
+      2: 'D',
+      3: 'D#',
+      4: 'E',
+      5: 'F',
+      6: 'F#',
+      7: 'G',
+      8: 'G#',
+      9: 'A',
+      10: 'A#',
+      11: 'B',
+    };
+  } else {
+    var conversion = {
+      0: 'Do',
+      1: 'Du',
+      2: 'Re',
+      3: 'Ru',
+      4: 'Mi',
+      5: 'Fa',
+      6: 'Fu',
+      7: 'So',
+      8: 'Su',
+      9: 'La',
+      10: 'Lu',
+      11: 'Ti',
+    };
+  }
+
+  return conversion[note];
 }
 
 var keyCodeToNote = {

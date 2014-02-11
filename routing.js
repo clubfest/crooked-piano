@@ -40,8 +40,18 @@ Router.map(function() {
     }
   });
 
+  // this.route('oldGame', {
+  //   path: '/game/:_id',
+  //   before: function() {
+  //     if (!Session.get('segmentLevel')) {
+  //       Session.set('segmentLevel', 0)
+  //     }
+  //     Router.go('game', {_id: this.params._id, segmentLevel: Session.get('segmentLevel')});
+  //   },
+  // });
+
   this.route('game', {
-    path: '/game/:_id',
+    path: '/game/:_id/:segmentLevel',
 
     before: function() {
       this.subscribe('song', this.params._id).wait();
@@ -61,6 +71,11 @@ Router.map(function() {
       if (Session.get('songId') !== this.params._id) {
         Session.set('segmentLevel', 0); // reset the game
         Session.set('songId', this.params._id);
+      }
+
+      var level = parseInt( this.params.segmentLevel )
+      if (!isNaN(level)) {
+        Session.set('segmentLevel', level)
       }
 
       if (Meteor.userId()) {
@@ -83,6 +98,7 @@ Router.map(function() {
     before: function() {
       this.subscribe('myProgresses');
       this.subscribe('song', Session.get('songId'));
+      this.subscribe('songIds').wait();
     },
 
     data: function() {

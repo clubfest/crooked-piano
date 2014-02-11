@@ -23,12 +23,9 @@ Template.upload.rendered = function() {
         Session.set('message', 'Tranlating');
 
         var shift = parseInt($('#shift-input').val());
+        var numTracks = parseInt($('#num-tracks-input').val());
 
-        if (shift > -40 && shift < 40) {
-          Translator.midiToNotes(player.data, shift);
-        } else {
-          Translator.midiToNotes(player.data);          
-        }
+        Translator.midiToNotes(player.data, shift, numTracks);
         Translator.createTranslatedSong();
         Session.set('message', '');
 
@@ -44,13 +41,13 @@ var Translator = {
   notes: [],
   notesByTrack: {},
   
-  midiToNotes: function(data, shift) {
-    this.convertToMyFormat(data);
+  midiToNotes: function(data, shift, numTracks) {
+    this.convertToMyFormat(data, numTracks);
     this.smartShift(shift); // TODO: remove this, once we modify the computer to play notes and display a different-octave keyCode
     this.annotateKeyCode();
   },
 
-  convertToMyFormat: function(data) {
+  convertToMyFormat: function(data, numTracks) {
     this.notes = [];
     this.notesByTrack = {};
 
@@ -64,32 +61,35 @@ var Translator = {
 
       if (event.subtype === "noteOn" || event.subtype === "noteOff") {
         var segmentId = noteInfo[0].track;
-        var note = {
-          time: time,
-          note: event.noteNumber,
-          velocity: event.velocity,
-          segmentId: segmentId,
+
+        if (isNaN(numTracks) || segmentId <= numTracks) {
+
+          var note = {
+            time: time,
+            note: event.noteNumber,
+            velocity: event.velocity,
+            segmentId: segmentId,
+          }
+
+          if (event.subtype === "noteOn") {
+            note.isKeyboardDown = true;
+          } 
+          this.notes.push(note);
+
+          if (!this.notesByTrack[segmentId]) {
+            this.notesByTrack[segmentId] = {
+              notes: [],
+              // segmentId: segmentId,
+            };
+          }
+          this.notesByTrack[segmentId].notes.push(note);
         }
 
-        if (event.subtype === "noteOn") {
-          note.isKeyboardDown = true;
-        } 
-        this.notes.push(note);
-
-        if (!this.notesByTrack[segmentId]) {
-          this.notesByTrack[segmentId] = {
-            notes: [],
-            // segmentId: segmentId,
-          };
-        }
-
-        this.notesByTrack[segmentId].notes.push(note);
 
       } else {
         // todo: add instrument info
       }
     }
-
     // annotation is needed for gamification later on
     for (var segmentId in this.notesByTrack) {
       var trackNotes = this.notesByTrack[segmentId].notes;
@@ -103,7 +103,7 @@ var Translator = {
 
   smartShift: function(bestShift) {
     // Find a shift that produces the least number of sharps
-    if (typeof bestShift === "undefined") {
+    if (isNaN(bestShift)) {
       var minNumBlackKeys = Infinity;
       var bestShift = 0;
 
@@ -127,9 +127,6 @@ var Translator = {
 
       if (prevDiff < 0) {
         var currDiff = diffOfOutKeys(this.notes, bestShift+12);
-        console.log(bestShift)
-        console.log(prevDiff);
-        console.log(currDiff);
         if (Math.abs(currDiff) < Math.abs(prevDiff)) {
           bestShift += 12;
         }

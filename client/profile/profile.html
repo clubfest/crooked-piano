@@ -3,9 +3,11 @@
 <div id='body-wrapper'>
   <h2>Progress</h2>
 
-  {{#if hasSong}}
-    {{> replayer}}
-  {{/if}}
+  {{#isolate}}
+    {{#if hasSong}}
+      {{> replayer}}
+    {{/if}}
+  {{/isolate}}
   <div class='spaced-out'>
     {{#unless currentUser}}
       To keep you progress, {{loginButtons}} before clicking next 

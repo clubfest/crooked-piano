@@ -12,11 +12,13 @@ LeadPlayer = {
 
     this.song = song;
     this.playNotes = [];
-    this.segmentId = parseInt(this.song.segmentIds[Session.get('segmentLevel')]);
 
-    if (Session.get('segmentLevel') < this.song.segmentIds.length) {
-      this.segmentInfo = this.song.segments[this.segmentId];
+    if (Session.get('segmentLevel') >= this.song.segmentIds.length) {
+      Session.set('segmentLevel', 0);
     }
+
+    this.segmentId = parseInt(this.song.segmentIds[Session.get('segmentLevel')].segmentId);
+    this.segmentInfo = this.song.segments[this.segmentId];
 
     simpleRecorder.init();
 
@@ -60,7 +62,7 @@ LeadPlayer = {
 
   loadPlayNotes: function() {
     // var goodBreak = this.segmentInfo.pauses[0].index;
-    var goodBreak = Math.min(this.segmentInfo.endIndex + 60, this.song.notes.length - 1);
+    var goodBreak = Math.min(this.segmentInfo.endIndex + 200, this.song.notes.length - 1);
 
     for (var i = this.segmentInfo.startIndex; i <= goodBreak; i++) {
       var note = this.song.notes[i];
@@ -346,11 +348,13 @@ LeadPlayer = {
       displayClass += " repeated-note"
     }
 
-    $('[data-key-code='+note.keyCode+']').addClass(displayClass);
+    var dom = $('[data-key-code='+note.keyCode+']');
+    dom.addClass(displayClass);
+      // .html('<span>'+noteToName(note.note, true)+'</span>');
   },
 
   displayComputerNote: function(note) {
-    $('[data-key-code='+note.keyCode+']').addClass('computer-note');
+    $('[data-key-code='+note.keyCode+']').addClass('computer-note').html('<span>'+noteToName(note.note, true)+'</span>');
   },
 
   undisplayNotes: function() {

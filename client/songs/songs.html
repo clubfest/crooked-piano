@@ -3,18 +3,15 @@
   <table id='rounded-corner'>
     <tr>
       <th>Title</th>
-      <th>Date</th>
     </tr>
     {{#each gamifiedSongs}}
       <tr>
         <td>
-          <a href="{{pathFor 'game'}}">
+          <a href="/game/{{_id}}/0">
             {{title}}            
           </a>
         </td>
-        <td>
-          {{beautifyDate createdAt}}            
-        </td>
+        
       </tr>
     {{/each}}
   </table>

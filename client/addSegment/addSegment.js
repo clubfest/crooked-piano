@@ -9,7 +9,7 @@ Template.addSegment.events({
       if (err) {
         alert(err.reason);
       } else {
-        Router.go('game', {_id: songId })
+        Router.go('game', {_id: songId, segmentLevel: 0})
       }
     });
   }

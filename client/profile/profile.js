@@ -3,19 +3,21 @@ Template.profile.nextSongId = function() {
   var song = this.song;
 
   if (song && song.createdAt) {
-    var nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {
-      sort: {createdAt: 1}
+    var nextSong = Songs.findOne({createdAt: {$lt: song.createdAt}}, {
+      fields: {_id: 1},
+      sort: {createdAt: -1}
     });
-
-    if (!nextSong) {
-      nextSong = Songs.findOne({}, {sort: {createdAt: 1}});
-    } 
 
     if (nextSong) {
       return nextSong._id;
     }
     // else, there is no song, so just show the create button
   }
+  return Songs.findOne({}, {
+    sort: {createdAt: -1}, 
+    fields: {_id: 1}
+  })._id;
+
 }
 
 Template.profile.events({
@@ -32,12 +34,12 @@ Template.profile.events({
     var nextSongId = evt.currentTarget.dataset.nextSongId
     
     if (this.song && Session.get('segmentLevel') < this.song.segmentIds.length) {
-      Router.go('game', {_id: this.song._id}); 
+      Router.go('game', {_id: this.song._id, segmentLevel: Session.get('segmentLevel')}); 
 
     } else {
       Session.set('playLevel', 0);
       Session.set('segmentLevel', 0);
-      Router.go('game', {_id: nextSongId});
+      Router.go('game', {_id: nextSongId, segmentLevel: Session.get('segmentLevel')});
     }
   },
 

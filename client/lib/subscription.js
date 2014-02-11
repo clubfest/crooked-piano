@@ -1,4 +1,4 @@
 
-Meteor.subscribe('popSongs');
+// Meteor.subscribe('popSongs');
 
 // Meteor.subscribe('userProgress');

@@ -1,10 +1,10 @@
 
 Template.songs.gamifiedSongs = function() {
-  return Songs.find({isGamified: true});
+  return Songs.find({isGamified: true}, {sort: {createdAt: -1}});
 }
 
 Template.songs.mySongs = function() {
-  return Songs.find({creatorId: Meteor.userId()});
+  return Songs.find({creatorId: Meteor.userId()}, {sort: {createdAt: -1}});
 }
 
 Template.songs.events({

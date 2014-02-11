@@ -1,8 +1,4 @@
 
-// Template.home.created = function() {
-//   Deps.autorun(function() {})
-// }
-
 Template.home.songId = function() {
   var user = Meteor.user();
   
@@ -14,7 +10,6 @@ Template.home.songId = function() {
   }
 
   var song = Songs.findOne({isGamified: true}, {
-    sort: {createdAt: 1},
     fields: {_id: 1},
   });
 

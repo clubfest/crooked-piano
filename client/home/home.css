@@ -1,3 +1,6 @@
 #intro {
   font-size: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 23px;
 }
