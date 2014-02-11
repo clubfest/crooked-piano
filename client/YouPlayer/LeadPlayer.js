@@ -81,7 +81,7 @@ LeadPlayer = {
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
 
-      if (data.keyCode === note.keyCode) {
+      if (data.note === note.note) {
         matchIdx = i;
         break ;
       }
@@ -350,6 +350,7 @@ LeadPlayer = {
 
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.addClass(displayClass);
+    // dom.html('<span>'+noteToName(note.note, true)+'</span>');
   },
 
   displayComputerNote: function(note) {

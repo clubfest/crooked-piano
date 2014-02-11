@@ -25,6 +25,15 @@
   {{#isolate}}
     {{> leadPlayer}}
   {{/isolate}}
+
+  <div>
+    Switch Notation: 
+      {{#if isAlphabetNotation}}
+        <button id="do-re-mi-notation">Do Re Mi</button>
+      {{else}}
+        <button id='alphabet-notation'>Music alphabet</button>      
+      {{/if}}
+  </div>
 </div>
 
 </template>

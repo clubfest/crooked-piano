@@ -86,7 +86,19 @@ Template.game.events({
     // players[Session.get('playLevel')].reset();
     LeadPlayer.reset();
   },
+
+  'click #alphabet-notation': function() {
+    Session.set('isAlphabetNotation', true);
+  },
+
+  'click #do-re-mi-notation': function() {
+    Session.set('isAlphabetNotation', false);
+  }
 });
+
+Template.game.isAlphabetNotation = function() {
+  return Session.get('isAlphabetNotation');
+}
 
 // Template.game.levelZero = function() {
 //   return Session.get('playLevel') === 0;

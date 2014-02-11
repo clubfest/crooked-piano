@@ -1,7 +1,7 @@
 
 simpleKeyboard = {
   channel: 0,
-  velocity: 70,
+  velocity: 80,
   shift: 0,
   hasPedal: true,
 
@@ -88,8 +88,6 @@ simpleKeyboard = {
 
 
   connectKeyToKeyboard: function() {
-      
-
     var self = this;
     var downKeys = {};
 
@@ -164,8 +162,9 @@ simpleKeyboard = {
     $(window).on('keyboardUp.display', function(evt, data) {
       if (data.channel === self.channel) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
-        dom.removeClass('keydown')
-        if (!isIos) {
+        dom.removeClass('keydown');
+
+        if (!isIos && !dom.hasClass('computer-note')) {
           dom.html('<span>'+dom.data('content')+'</span>');
         }
       }
@@ -182,11 +181,12 @@ simpleKeyboard = {
       this.shift++;
     } else if (keyCode === 40){
       this.shift--;
-    } else if (keyCode === 37) {
-      this.velocity -= 30;
-    } else if (keyCode === 39) {
-      this.velocity += 30;
-    }
+    } 
+    // else if (keyCode === 37) {
+    //   this.velocity -= 30;
+    // } else if (keyCode === 39) {
+    //   this.velocity += 30;
+    // }
   },
 }
 
@@ -214,7 +214,7 @@ function convertKeyCodeToNote(keyCode) {
   return keyCodeToNote[keyCode];
 }
 
-noteToName = function(note, letterVersion) {
+noteToName = function(note) {
   note = (note - 60) % 12;
 
   if (note < 0) {
@@ -223,19 +223,19 @@ noteToName = function(note, letterVersion) {
 
     
 
-  if (letterVersion) {
+  if (Session.get('isAlphabetNotation')) {
     var conversion = {
       0: 'C',
-      1: 'C#',
+      1: 'C&#9839',
       2: 'D',
-      3: 'D#',
+      3: 'E&#9837',
       4: 'E',
       5: 'F',
-      6: 'F#',
+      6: 'F&#9839',
       7: 'G',
-      8: 'G#',
+      8: 'A&#9837',
       9: 'A',
-      10: 'A#',
+      10: 'B&#9837;',
       11: 'B',
     };
   } else {
