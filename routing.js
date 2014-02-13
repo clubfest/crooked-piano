@@ -68,7 +68,7 @@ Router.map(function() {
   // });
 
   this.route('game', {
-    path: '/game/:_id/:segmentLevel',
+    path: '/game/:_id',
 
     before: function() {
       this.subscribe('song', this.params._id).wait();
@@ -86,14 +86,14 @@ Router.map(function() {
     // caching last game's songId; todo: check elsewhere, like profile, that this is defined
     after: function() {
       if (Session.get('songId') !== this.params._id) {
-        Session.set('segmentLevel', 0); // reset the game
+        // Session.set('segmentLevel', 0); // reset the game
         Session.set('songId', this.params._id);
       }
 
-      var level = parseInt( this.params.segmentLevel )
-      if (!isNaN(level)) {
-        Session.set('segmentLevel', level)
-      }
+      // var level = parseInt( this.params.segmentLevel )
+      // if (!isNaN(level)) {
+      //   Session.set('segmentLevel', level)
+      // }
 
       if (Meteor.userId()) {
         Meteor.call('updateLastVisitedGame', this.params._id, function(err){ 

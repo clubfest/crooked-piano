@@ -24,8 +24,7 @@ Template.game.rendered = function() {
         range: "min",
         min: 0,
         max: Session.get('playLength'),
-        value: LeadPlayer.getIndex(),
-        // value: players[Session.get('playLevel')].getIndex(),
+        value: LeadPlayer.getPlayIndex(),
       });
     });   
   }
@@ -69,8 +68,8 @@ Template.game.events({
 
       LeadPlayer.saveGame();
       
-      var segmentLevel = Session.get('segmentLevel');
-      Session.set('segmentLevel', segmentLevel + 1);
+      // var segmentLevel = Session.get('segmentLevel');
+      // Session.set('segmentLevel', segmentLevel + 1);
 
       // var rightLength = this.song.rightSegments.length;
       // var leftLength = this.song.leftSegments.length;

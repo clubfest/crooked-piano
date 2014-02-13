@@ -33,14 +33,14 @@ Template.profile.events({
     
     var nextSongId = evt.currentTarget.dataset.nextSongId
     
-    if (this.song && Session.get('segmentLevel') < this.song.segmentIds.length) {
-      Router.go('game', {_id: this.song._id, segmentLevel: Session.get('segmentLevel')}); 
+    // if (this.song && Session.get('segmentLevel') < this.song.segmentIds.length) {
+    //   Router.go('game', {_id: this.song._id, segmentLevel: Session.get('segmentLevel')}); 
 
-    } else {
+    // } else {
       Session.set('playLevel', 0);
       Session.set('segmentLevel', 0);
-      Router.go('game', {_id: nextSongId, segmentLevel: Session.get('segmentLevel')});
-    }
+      Router.go('game', {_id: nextSongId});//, segmentLevel: Session.get('segmentLevel')});
+    // }
   },
 
   'click #submit-feedback': function() {

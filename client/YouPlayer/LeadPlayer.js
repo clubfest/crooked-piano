@@ -15,17 +15,18 @@ LeadPlayer = {
     this.song = song;
     this.playNotes = [];
 
-    if (Session.get('segmentLevel') >= this.song.segmentIds.length) {
-      Session.set('segmentLevel', 0);
-    }
+    // if (Session.get('segmentLevel') >= this.song.segmentIds.length) {
+    //   Session.set('segmentLevel', 0);
+    // }
 
     var self = this;
 
     simpleRecorder.init();
 
     this.loadPlayNotes();
-    if (this.playNotes.length > 0) {
-      this.segmentId = this.playNotes[0].segmentId;
+    if (song.segmentIds.length > 0) {
+      this.segmentId = parseInt(song.segmentIds[0].segmentId);
+      // this.segmentId = this.playNotes[0].segmentId;
     }
 
     this.reset();
@@ -75,6 +76,8 @@ LeadPlayer = {
       }
     }
 
+    Session.set('playLength', this.playNotes.length); // for the game template
+
   },
 
   switchTrack: function() { 
@@ -115,37 +118,27 @@ LeadPlayer = {
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
 
-      this.undisplayNote(note);
-      this.prevNoteTime = note.time;
-      this.proximateNotes = [];
-
       if (data.note === note.note) {
         matchIdx = i;
-        // break ;
+        break ;
       }
     }
 
-    if (this.computerProximateNotes.length > 0) {          
-      this.playComputerProximateNotes();
-      this.updateProximateNotes();
-    } else {
-      this.updateProximateNotes();
-    }
 
     if (matchIdx > -1) {
       this.incrementScore();
-      // this.proximateNotes.splice(matchIdx, 1);
-      // this.undisplayNote(note);
-      // this.prevNoteTime = note.time;
+      this.proximateNotes.splice(matchIdx, 1);
+      this.undisplayNote(note);
+      this.prevNoteTime = note.time;
 
-      // // the held back computer notes can now be played
-      // if (this.proximateNotes.length === 0) {
-      //   if (this.computerProximateNotes.length > 0) {          
-      //     this.playComputerProximateNotes();
-      //   } else {
-      //     this.updateProximateNotes();
-      //   }
-      // }
+      // the held back computer notes can now be played
+      if (this.proximateNotes.length === 0) {
+        if (this.computerProximateNotes.length > 0) {          
+          this.playComputerProximateNotes();
+        }
+        this.updateProximateNotes();
+
+      }
     } else {
       if (data.playedByComputer !== true) {
         this.decrementScore();
@@ -278,7 +271,7 @@ LeadPlayer = {
 
       window.setTimeout(function(note) {        
         $(window).trigger('keyboardUp', note); // for recording purposes
-      }, 400, computerNote);
+      }, 200, computerNote);
 
     }  
     this.computerProximateNotes = []; 
@@ -380,11 +373,15 @@ LeadPlayer = {
 
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.addClass(displayClass);
-    // dom.html('<span>'+noteToName(note.note, true)+'</span>');
+    dom.html('<span>'+dom.data('content')+'</span>')
   },
 
   displayComputerNote: function(note) {
-    $('[data-key-code='+note.keyCode+']').addClass('computer-note').html('<span>'+noteToName(note.note, Session.get('isAlphabetNotation'))+'</span>');
+    var dom = $('[data-key-code='+note.keyCode+']');
+    dom.addClass('computer-note')
+    if (!dom.hasClass('first-cluster')) {
+      dom.html('<span>'+noteToName(note.note, Session.get('isAlphabetNotation'))+'</span>');
+    }
   },
 
   undisplayNotes: function() {

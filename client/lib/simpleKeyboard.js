@@ -154,7 +154,7 @@ simpleKeyboard = {
     var self = this;
 
     $(window).on('keyboardDown.display', function(evt, data) {
-      if (data.channel === self.channel) {
+      if (data.channel === self.channel && !data.playedByComputer) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
         dom.addClass('keydown').html('<span>'+noteToName(data.note, Session.get('isAlphabetNotation'))+'</span>');
       }
@@ -164,10 +164,6 @@ simpleKeyboard = {
       if (data.channel === self.channel) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
         dom.removeClass('keydown');
-
-        if (!IS_IOS && !dom.hasClass('computer-note')) {
-          dom.html('<span>'+dom.data('content')+'</span>');
-        }
       }
     });
   },

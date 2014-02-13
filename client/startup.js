@@ -1,4 +1,4 @@
 
 Meteor.startup(function() {
-  Session.setDefault('segmentLevel', 0);
+  // Session.setDefault('segmentLevel', 0);
 })
