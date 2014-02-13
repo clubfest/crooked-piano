@@ -1,0 +1,22 @@
+<template name='editSong'>
+<canvas id='notes-canvas'></canvas>
+<div>
+  {{#with song}}
+    {{#each segmentIds}}
+      {{#isolate}}
+        <input 
+          type='checkbox' class='segment-checkbox' 
+          data-segment-id='{{segmentId}}' value='{{segmentId}}' 
+          {{#unless isRemoved}} checked {{/unless}}
+        />
+          {{segmentId}}
+        </input>
+      {{/isolate}}
+    {{/each}}
+  {{/with}}
+</div>
+<div>
+  Warning: you may need to refresh the page to get the music sheet redrawn
+</div>
+
+</template>

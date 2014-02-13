@@ -1,15 +1,17 @@
 <template name='addSegment'>
-{{> replayer}}
-{{> segmentRecorder}}
-{{> keyboard}}
-
 <div class='panel'>
-  <input type='text' placeholder='genre' id='genre-input' />
+  <input type='text' placeholder='genre' id='genre-input' value='{{genre}}' />
   <a id='gamify-song' class='btn btn-success'>
     <i class='icon-film'></i>
     gamify
   </a>  
 </div>
-
 {{> intro}}
+{{> replayer}}
+
+
+<div class='spaced-out'>
+{{> editSong}}
+</div>
+
 </template>

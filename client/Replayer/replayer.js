@@ -61,7 +61,7 @@ Template.replayer.events({
   },
 
   'click .replayer-stop': function(evt, tmpl) {
-    simpleReplayer.stop();
+    simpleReplayer.pause();
   },
 });
 

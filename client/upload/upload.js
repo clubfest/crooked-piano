@@ -56,7 +56,7 @@ var Translator = {
     for (var i = 0; i < data.length; i++) {
       var noteInfo = data[i];
       var event = noteInfo[0].event;
-
+      
       time += noteInfo[1];
 
       if (event.subtype === "noteOn" || event.subtype === "noteOff") {

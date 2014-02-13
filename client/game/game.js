@@ -48,6 +48,10 @@ Template.game.events({
     LeadPlayer.pauseDemo();
   },
 
+  'click #switch-track': function() {
+    LeadPlayer.switchTrack();
+  },
+
   'click #next-game': function() {
     // var level = Session.get('playLevel');
     

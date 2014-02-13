@@ -1,3 +1,4 @@
+IS_IOS = navigator.userAgent.match(/(iPhone|iPad|webOs|Android)/i);
 
 simpleKeyboard = {
   channel: 0,
@@ -155,7 +156,7 @@ simpleKeyboard = {
     $(window).on('keyboardDown.display', function(evt, data) {
       if (data.channel === self.channel) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
-        dom.addClass('keydown').html('<span>'+noteToName(data.note, true)+'</span>');
+        dom.addClass('keydown').html('<span>'+noteToName(data.note, Session.get('isAlphabetNotation'))+'</span>');
       }
     });
 
@@ -164,7 +165,7 @@ simpleKeyboard = {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
         dom.removeClass('keydown');
 
-        if (!isIos && !dom.hasClass('computer-note')) {
+        if (!IS_IOS && !dom.hasClass('computer-note')) {
           dom.html('<span>'+dom.data('content')+'</span>');
         }
       }
@@ -214,7 +215,7 @@ function convertKeyCodeToNote(keyCode) {
   return keyCodeToNote[keyCode];
 }
 
-noteToName = function(note) {
+noteToName = function(note, alphabet) {
   note = (note - 60) % 12;
 
   if (note < 0) {
@@ -223,19 +224,19 @@ noteToName = function(note) {
 
     
 
-  if (Session.get('isAlphabetNotation')) {
+  if (alphabet) {
     var conversion = {
       0: 'C',
-      1: 'C&#9839',
+      1: 'C\u266F',
       2: 'D',
-      3: 'E&#9837',
+      3: 'E\u266D',
       4: 'E',
       5: 'F',
-      6: 'F&#9839',
+      6: 'F\u266F',
       7: 'G',
-      8: 'A&#9837',
+      8: 'A\u266D',
       9: 'A',
-      10: 'B&#9837;',
+      10: 'B\u266D',
       11: 'B',
     };
   } else {

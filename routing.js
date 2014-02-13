@@ -10,6 +10,23 @@ Router.configure({
 // Do we still need Session's songId? May be for caching.
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
+  this.route('editSong', {
+    path: '/editSong/:_id',
+
+    before: function() {
+      this.subscribe('song', this.params._id).wait();
+    },
+
+    data: function() {
+      var data = {};
+
+      data.replayerSong = Songs.findOne(this.params._id);
+      data.song = data.replayerSong;
+
+      return data;
+    }
+  });
+
   this.route('upload');
   this.route('createSong');
 

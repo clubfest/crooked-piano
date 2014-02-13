@@ -1,12 +1,15 @@
+var song;
+
 Template.leadPlayer.created = function() {
   Session.setDefault('playSpeed', .7);
+  song = this.data.song;
 }
 
 Template.leadPlayer.rendered = function() {
   if (!this.rendered) {
     this.rendered = true;
 
-    LeadPlayer.create(this.data.song);
+    LeadPlayer.create(song);
   }
 
   LeadPlayer.redisplayNotes();
@@ -21,6 +24,16 @@ Template.leadPlayer.rendered = function() {
       Session.set('playSpeed', ui.value);
     },
   });  
+
+  // $('#track-slider').slider({
+  //   range: 'min',
+  //   min: 0,
+  //   max: song.segmentIds.length,
+  //   value: Session.get('segmentLevel'),
+  //   slide: function(evt, ui) {
+  //     Session.set('segmentLevel', ui.value);
+  //   },
+  // });
 }
 
 Template.leadPlayer.destroyed = function() {
