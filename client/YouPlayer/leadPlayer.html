@@ -9,8 +9,28 @@
   <div id='speed-slider'></div>
 </div>
 
-<div class='song-version spaced-out'>
-  Lead version, Part I
+<div class=' panel song-version spaced-out'>
+  <div>
+    <button id='switch-track'>
+      Switch Track
+    </button>
+  </div>
+  <div>
+    {{#if isSynchronous}}
+      <button id='asynchronous'>Don't Wait</button>
+    {{else}}
+      <button id='synchronous'>Wait</button>
+    {{/if}}
+  </div>
+
+  <div>
+      {{#if isAlphabetNotation}}
+        <button id="do-re-mi-notation">Do Re Mi</button>
+      {{else}}
+        <button id='alphabet-notation'>Music alphabet</button>      
+      {{/if}}
+  </div>
 </div>
+  
 
 </template>

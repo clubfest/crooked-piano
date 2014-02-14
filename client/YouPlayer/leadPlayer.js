@@ -1,7 +1,8 @@
 var song;
 
 Template.leadPlayer.created = function() {
-  Session.setDefault('playSpeed', .7);
+  Session.setDefault('playSpeed', .9);
+  Session.setDefault('isSynchronous', true);
   song = this.data.song;
 }
 
@@ -24,19 +25,24 @@ Template.leadPlayer.rendered = function() {
       Session.set('playSpeed', ui.value);
     },
   });  
-
-  // $('#track-slider').slider({
-  //   range: 'min',
-  //   min: 0,
-  //   max: song.segmentIds.length,
-  //   value: Session.get('segmentLevel'),
-  //   slide: function(evt, ui) {
-  //     Session.set('segmentLevel', ui.value);
-  //   },
-  // });
 }
 
 Template.leadPlayer.destroyed = function() {
   LeadPlayer.destroy();
 }
 
+Template.leadPlayer.events({
+  'click #synchronous': function() {
+    Session.set('isSynchronous', true);
+  },
+
+  'click #asynchronous': function() {
+    Session.set('isSynchronous', false);
+    LeadPlayer.transferProximateNotesToComputer();
+    LeadPlayer.playComputerProximateNotes();
+  },
+})
+
+Template.leadPlayer.isSynchronous = function() {
+  return Session.get('isSynchronous');
+}

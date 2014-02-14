@@ -99,9 +99,9 @@ Template.game.events({
   }
 });
 
-Template.game.isAlphabetNotation = function() {
+Handlebars.registerHelper('isAlphabetNotation', function() {
   return Session.get('isAlphabetNotation');
-}
+});
 
 // Template.game.levelZero = function() {
 //   return Session.get('playLevel') === 0;

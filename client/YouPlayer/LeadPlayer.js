@@ -17,7 +17,7 @@ LeadPlayer = {
 
     // if (Session.get('segmentLevel') >= this.song.segmentIds.length) {
     //   Session.set('segmentLevel', 0);
-    // }
+    // }  
 
     var self = this;
 
@@ -57,6 +57,7 @@ LeadPlayer = {
 
     this.proximateNotes = [];
     this.computerProximateNotes = [];
+    console.log('reset')
     this.prevNoteTime = null;
     this.updateProximateNotes();
   },
@@ -75,9 +76,7 @@ LeadPlayer = {
         this.playNotes.push(note);        
       }
     }
-
     Session.set('playLength', this.playNotes.length); // for the game template
-
   },
 
   switchTrack: function() { 
@@ -105,6 +104,10 @@ LeadPlayer = {
       this.segmentId = newSegmentId;
     }
 
+    this.transferProximateNotesToComputer();
+  },
+
+  transferProximateNotesToComputer: function() {
     if (this.proximateNotes.length > 0) {
       this.computerProximateNotes.splice(0,0, this.proximateNotes.pop());
       this.playComputerProximateNotes();
@@ -124,12 +127,13 @@ LeadPlayer = {
       }
     }
 
-
     if (matchIdx > -1) {
       this.incrementScore();
-      this.proximateNotes.splice(matchIdx, 1);
-      this.undisplayNote(note);
-      this.prevNoteTime = note.time;
+      if (Session.get('isSynchronous')) {
+        this.proximateNotes.splice(matchIdx, 1);
+        this.undisplayNote(note);
+        this.prevNoteTime = note.time;
+      }
 
       // the held back computer notes can now be played
       if (this.proximateNotes.length === 0) {
@@ -154,7 +158,13 @@ LeadPlayer = {
     Session.set('isDemoing', true);
     $('.demo-message').remove();
 
-    this.computerProximateNotes.push(this.proximateNotes.pop());
+    var note = this.proximateNotes.pop();
+
+    if (typeof note !== 'undefined') {
+      this.computerProximateNotes.push(note);
+    }
+
+    this.playComputerProximateNotes();
     this.updateProximateNotes();
 
     // var notes = [];
@@ -248,6 +258,25 @@ LeadPlayer = {
           self.updateProximateNotes();
         }, wait);
       }
+    } else if (!Session.get('isSynchronous')) {
+      var wait = 0;
+      var self = this;
+
+      if (this.prevNoteTime !== null) {
+        wait = (this.proximateNotes[0].time - this.prevNoteTime) / Session.get('playSpeed');
+      }
+      self.prevNoteTime = this.proximateNotes[0].time;
+
+        
+
+      window.setTimeout(function() {
+        if (self.computerProximateNotes.length > 0) {          
+          self.playComputerProximateNotes();
+        }
+        self.undisplayNotes();
+        self.proximateNotes = [];
+        self.updateProximateNotes();
+      }, wait);
     }
   },
 
@@ -276,6 +305,32 @@ LeadPlayer = {
     }  
     this.computerProximateNotes = []; 
   },
+
+  // playProximateNotes: function() { 
+  //   var self = this;
+  //   var notes = this.proximateNotes;
+
+  //   for (var j = 0; j < notes.length; j++) {
+  //     var note = $.extend({}, notes[j]);
+  //     // computerNote.velocity /= 2; // make computer less loud
+
+  //     // must do this first as we will change the time for recording purposes
+  //     this.prevNoteTime = notes[j].time; 
+
+  //     note.playedByComputer = true;
+  //     note.time = new Date().getTime(); // for recording
+
+  //     $(window).trigger('keyboardDown', note);
+
+  //     self.undisplayNote(note);
+
+  //     window.setTimeout(function(note) {        
+  //       $(window).trigger('keyboardUp', note); // for recording purposes
+  //     }, 200, note);
+
+  //   }  
+  //   this.proximateNotes = []; 
+  // },
 
   gameOver: function() {
     var self = this; 
