@@ -15,21 +15,17 @@ LeadPlayer = {
     this.song = song;
     this.playNotes = [];
 
-    // if (Session.get('segmentLevel') >= this.song.segmentIds.length) {
-    //   Session.set('segmentLevel', 0);
-    // }  
-
-    var self = this;
-
     simpleRecorder.init();
 
     this.loadPlayNotes();
+
     if (song.segmentIds.length > 0) {
       this.segmentId = parseInt(song.segmentIds[0].segmentId);
       // this.segmentId = this.playNotes[0].segmentId;
     }
 
     this.reset();
+    this.updateProximateNotes();
   },
 
   reset: function(playIndex) {
@@ -57,12 +53,15 @@ LeadPlayer = {
 
     this.proximateNotes = [];
     this.computerProximateNotes = [];
-    console.log('reset')
     this.prevNoteTime = null;
-    this.updateProximateNotes();
   },
 
   destroy: function() {
+    var highestTimeoutId = setTimeout(";");
+    for (var i = 0 ; i < highestTimeoutId ; i++) {
+        clearTimeout(i); 
+    }
+    this.reset();
     $(window).off('keyboardDown.youPlayer');
   },
 
@@ -195,7 +194,6 @@ LeadPlayer = {
   },
 
   updateProximateNotes: function() {
-
     if (this.getPlayIndex() >= this.playNotes.length &&
         this.proximateNotes.length === 0 &&
         this.computerProximateNotes.length === 0) {
