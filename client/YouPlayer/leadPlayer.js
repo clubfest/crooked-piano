@@ -2,11 +2,7 @@ var song;
 
 Template.leadPlayer.created = function() {
   Session.setDefault('playSpeed', .9);
-  if (IS_IOS) {
-    Session.setDefault('isSynchronous', false);
-  } else {
-    Session.setDefault('isSynchronous', true);
-  }
+  Session.setDefault('isSynchronous', true);
   song = this.data.song;
 }
 
