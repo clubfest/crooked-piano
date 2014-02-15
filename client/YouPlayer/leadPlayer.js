@@ -39,7 +39,6 @@ Template.leadPlayer.events({
   'click #asynchronous': function() {
     Session.set('isSynchronous', false);
     LeadPlayer.transferProximateNotesToComputer();
-    LeadPlayer.playComputerProximateNotes();
   },
 })
 

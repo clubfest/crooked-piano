@@ -19,10 +19,7 @@ LeadPlayer = {
 
     this.loadPlayNotes();
 
-    if (song.segmentIds.length > 0) {
-      this.segmentId = parseInt(song.segmentIds[0].segmentId);
-      // this.segmentId = this.playNotes[0].segmentId;
-    }
+    this.segmentId = song.mainTrack;
 
     this.reset();
     this.updateProximateNotes();
