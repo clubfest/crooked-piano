@@ -157,14 +157,9 @@ LeadPlayer = {
     Session.set('isDemoing', true);
     $('.demo-message').remove();
 
-    var note = this.proximateNotes.pop();
-
-    if (typeof note !== 'undefined') {
-      this.computerProximateNotes.push(note);
+    if (Session.get('isSynchronous')) {
+      this.transferProximateNotesToComputer();
     }
-
-    this.playComputerProximateNotes();
-    this.updateProximateNotes();
 
     // var notes = [];
     // var i = this.getPlayIndex() - this.proximateNotes.length - this.computerProximateNotes.length;
@@ -284,7 +279,7 @@ LeadPlayer = {
 
     for (var j = 0; j < notes.length; j++) {
       var computerNote = $.extend({},notes[j]);
-      computerNote.velocity /= 2; // make computer less loud
+      computerNote.velocity /= 2.5; // make computer less loud
 
       // must do this first as we will change the time for recording purposes
       this.prevNoteTime = notes[j].time; 

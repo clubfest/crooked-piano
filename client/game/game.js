@@ -32,6 +32,7 @@ Template.game.rendered = function() {
   $('.play-slider').slider({
     slide: function(evt, ui) {
       LeadPlayer.reset(ui.value);
+      LeadPlayer.updateProximateNotes();
     },
   })
 }
@@ -88,6 +89,7 @@ Template.game.events({
   'click #retry-game': function() {
     // players[Session.get('playLevel')].reset();
     LeadPlayer.reset();
+    LeadPlayer.updateProximateNotes();
   },
 
   'click #alphabet-notation': function() {

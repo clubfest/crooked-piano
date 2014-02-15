@@ -15,21 +15,25 @@
       Switch Track
     </button>
   </div>
-  <div>
-    {{#if isSynchronous}}
-      <button id='asynchronous'>Don't Wait</button>
-    {{else}}
-      <button id='synchronous'>Wait</button>
-    {{/if}}
-  </div>
-
-  <div>
-      {{#if isAlphabetNotation}}
-        <button id="do-re-mi-notation">Do Re Mi</button>
+  {{#isolate}}
+    <div>
+      {{#if isSynchronous}}
+        <button id='asynchronous'>Don't Wait</button>
       {{else}}
-        <button id='alphabet-notation'>Music alphabet</button>      
+        <button id='synchronous'>Wait</button>
       {{/if}}
-  </div>
+    </div>
+  {{/isolate}}
+
+  {{#isolate}}
+    <div>
+        {{#if isAlphabetNotation}}
+          <button id="do-re-mi-notation">Do Re Mi</button>
+        {{else}}
+          <button id='alphabet-notation'>Music alphabet</button>      
+        {{/if}}
+    </div>
+  {{/isolate}}
 </div>
   
 
