@@ -26,6 +26,10 @@ LeadPlayer = {
   },
 
   reset: function(playIndex) {
+    var highestTimeoutId = setTimeout(";");
+    for (var i = 0 ; i < highestTimeoutId ; i++) {
+        clearTimeout(i); 
+    }
     Session.set('numCorrect', 0);
     Session.set('numWrong', 0);
     Session.set('isWrong', false);
@@ -54,10 +58,6 @@ LeadPlayer = {
   },
 
   destroy: function() {
-    var highestTimeoutId = setTimeout(";");
-    for (var i = 0 ; i < highestTimeoutId ; i++) {
-        clearTimeout(i); 
-    }
     this.reset();
     $(window).off('keyboardDown.youPlayer');
   },

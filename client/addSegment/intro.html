@@ -1,7 +1,7 @@
 <template name='intro'>
 {{#with song}}
   <div id='song-desc'>
-    <h2 id='title-editable'>{{title}}</h2>
+    <h2><span id='artist-editable'>{{artist}}</span> - <span id='title-editable'>{{title}}</span></h2>
     <div id='desc-editable' data-mode='inline' data-type="wysihtml5" data-pk="1">
       {{{desc}}}
     </div>

@@ -10,6 +10,37 @@ Router.configure({
 // Do we still need Session's songId? May be for caching.
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
+  // this.route('keyboard')
+  this.route('songApi', {
+    path: '/songApi/:_id',
+
+    where: 'server',
+
+    action: function() {
+      var song = Songs.findOne(this.params._id);
+      this.response.setHeader('Content-Type', 'application/json');
+      this.response.write(JSON.stringify(song));
+    },
+  });
+
+  this.route('songApi', {
+    path: '/songsApi',
+
+    where: 'server',
+
+    action: function() {
+      var songs = Songs.find({}, {
+        fields: {
+          _id: 1,
+          createdAt: 1,
+          title: 1,
+        }
+      }).fetch();
+      this.response.setHeader('Content-Type', 'application/json');
+      this.response.write(JSON.stringify(songs));
+    },
+  });
+
   this.route('editSong', {
     path: '/editSong/:_id',
 
