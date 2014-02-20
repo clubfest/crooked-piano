@@ -91,11 +91,14 @@ simpleKeyboard = {
   connectKeyToKeyboard: function() {
     var self = this;
     var downKeys = {};
-
-    $(window).on('keydown.keyboard', function(evt) {
+    if (typeof event !== 'undefined') {
       var d = event.srcElement || event.target;
+
       var inInputField = (d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE')) 
                || d.tagName.toUpperCase() === 'TEXTAREA';
+    }
+
+    $(window).on('keydown.keyboard', function(evt) {
       if (inInputField) return ;
 
       var keyCode = fixKeyCode(evt.keyCode);

@@ -4,18 +4,14 @@ Template.result.hasPassed = function() {
   return Session.get('score') >= -1;
 }
 
-Template.result.scoreTallied = function() {
-  return Session.get('hasTallied');
-}
-
 Handlebars.registerHelper('score', function() {
   return Session.get('score');
 });
 
-Template.result.scoreTallied = function() {
+Handlebars.registerHelper('scoreTallied', function() {
   return Session.get('scoreTallied');
-}
+});
 
-Template.result.hasScore = function() {
+Handlebars.registerHelper('hasScore', function() {
   return Session.get('score') !== null;
-}
+});

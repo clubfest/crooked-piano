@@ -1,0 +1,22 @@
+<template name='sampleLeadPlayer'>
+
+{{#isolate}}
+{{#if hasScore}}
+  <div id='result-panel'>
+    <div id='score-panel'>
+      <div>
+        Score
+      </div>
+      <div>
+        {{score}}
+      </div>
+    </div>
+  </div>
+{{/if}}
+{{/isolate}}
+
+{{#isolate}}
+  {{> keyboard}}
+{{/isolate}}
+
+</template>
