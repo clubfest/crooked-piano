@@ -138,7 +138,8 @@ Router.map(function() {
 
   this.route('songs', {
     before: function() {
-      this.subscribe('mySongs')
+      this.subscribe('songIds');
+      this.subscribe('mySongs');
     },
   });
 
@@ -181,8 +182,8 @@ Router.map(function() {
   this.route('home', {
     path: '/',
     before: function() {
-      this.subscribe('myInfo').wait();
-      this.subscribe('songIds').wait();
+      // this.subscribe('myInfo').wait();
+      // this.subscribe('songIds').wait();
     }
   });
 });

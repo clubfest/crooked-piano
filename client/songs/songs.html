@@ -1,45 +1,44 @@
 <template name='songs'>
-  <h2>Games</h2>
-  <table id='rounded-corner'>
-    <tr>
-      <th>Title</th>
-    </tr>
-    {{#each gamifiedSongs}}
-      <tr>
-        <td>
-          <a href="/game/{{_id}}">
-            {{title}}            
-          </a>
-        </td>
-        
-      </tr>
-    {{/each}}
-  </table>
+  <div align='center' style='margin-top: 50px;'>
+    <h2>Games</h2>
+    <ul id='gamified-list' class='game-list'>
+      {{#each gamifiedSongs}}
+        <li class='gamified-item game-item' data-game-id='{{_id}}'>
+          <ul>
+            <li>
+              {{title}}
+            </li>
+            <li>
+              {{artist}}
+            </li>
+            <li>
+              {{viewCount}}
+            </li>
+          </ul>
+        </li>
+      {{/each}}
+    </ul>
 
-  <h2>My Songs</h2>
-  <table id='rounded-corner'>
-    <tr>
-      <th>Title</th>
-      <th>Date</th>
-      <th>Remove</th>
-    </tr>
-
-    {{#each mySongs}}
-      <tr>
-        <td>
-          <a href="{{pathFor 'addSegment'}}">
-            {{title}}            
-          </a>
-        </td>
-        <td>
-          {{beautifyDate createdAt}}            
-        </td>
-        <td>
-          <button class='delete-btn' data-song-id='{{_id}}'>
-            <i class='icon-remove'></i>
-          </button>
-        </td>
-      </tr>
-    {{/each}}
-  </table>
+    <h2>My Songs</h2>
+    <ul id='my-list' class='game-list'>
+      {{#each mySongs}}    
+        <li class='my-item game-item' data-game-id='{{_id}}'>
+          <ul>
+            <li>
+              {{title}}
+            </li>
+            <li>
+              {{beautifyDate createdAt}}            
+            </li>
+            <li>
+              {{viewCount}}
+            </li>
+            <button class='delete-btn' data-song-id='{{_id}}'>
+              <i class='icon-remove'></i>
+            </button>
+          </ul>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
 </template>

@@ -1,0 +1,17 @@
+.game-list * {
+  list-style: none;
+}
+
+.game-list > li{
+  display: inline-block;
+}
+
+.game-item {
+  cursor: pointer;
+  border-radius: 9px;
+  background: #CCC;
+  width: 220px;
+  padding: 10px;
+  margin: 10px;
+  display: block;
+}

@@ -1,4 +1,5 @@
 
+
 Template.songs.gamifiedSongs = function() {
   return Songs.find({isGamified: true}, {sort: {createdAt: -1}});
 }
@@ -19,4 +20,14 @@ Template.songs.events({
       if (err) alert(err.reason);
     })
   },
-})
+
+  'click .gamified-item': function(evt) {
+    var _id = evt.currentTarget.dataset.gameId;
+    Router.go('game', {_id: _id});
+  },
+
+  'click .my-item': function(evt) {
+    var _id = evt.currentTarget.dataset.gameId;
+    Router.go('addSegment', {_id: _id});
+  }
+});

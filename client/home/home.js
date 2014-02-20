@@ -17,3 +17,9 @@ Template.home.songId = function() {
     return song._id
   } 
 }
+
+Template.home.events({
+  'click #play-btn': function() {
+    MIDI.noteOn(0, 60, 60);
+  }
+})

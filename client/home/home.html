@@ -6,21 +6,20 @@
       Listening to music takes us to another world, where we can fly over majestic mountains, wind thru forests of uncertainties, and land safely on a peaceful lake. Today, I endow you with the power to play the music, so that you can hug the clouds, glaze the leaves and refresh in the cool mountain water.  
     </p>
   </div>
-  {{#if songId}}
-    <div class='panel'>
-      <a href="/game/{{songId}}" class='btn btn-primary'>Play</a>    
+  {{#if hasMidiNoteOn}}
+
+      <div class='panel'>
+        <a id='play-btn' href="/songs" class='btn btn-primary'>Play</a>    
+      </div>
+
+  {{else}}
+    <div class="panel">
+      <div id='loading-sound'>Loading Sound</div> 
+    </div>
+    <div class="panel">
+      If the loading is taking too long, try reloading.
     </div>
   {{/if}}
 
-  <div align='center' style='margin-top: 50px;'>
-    <div>
-      {{> songs}}     
-    </div>
-{{!-- 
-    <div>
-      <a href="/createSong" class='btn'>Create new song</a>      
-    </div>
---}}
-  </div>
 </div>
 </template>

@@ -4,3 +4,8 @@
   margin: 0 auto;
   line-height: 23px;
 }
+
+#loading-sound {
+  border-radius: 5px;
+  background: #E99;
+}
