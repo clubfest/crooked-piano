@@ -22,11 +22,14 @@ function loadMidiJs() {
     '/MIDI.js/js/Window/DOMLoader.script.js',
     '/MIDI.js/inc/Base64.js',
     '/MIDI.js/inc/base64binary.js',
-  ]
+  ];
+
+  Session.set('loadProgress', 0);
 
   $.each(files, function(idx, file) {
     $.getScript(file, function() {
       numDone++;
+      Session.set('loadProgress', Session.get('loadProgress') + 1);
 
       if (numDone === files.length) {
         MIDI.loadPlugin({
@@ -34,7 +37,6 @@ function loadMidiJs() {
           instrument: "acoustic_grand_piano",
           callback: function() {
             Session.set('hasMidiNoteOn', true);
-            console.log('sound is ready');
 
             $(window).on('keyboardDown.sound', function(evt, data) {
                 if (typeof data.note !== 'undefined') {

@@ -4,7 +4,11 @@
 // });
 
 Meteor.publish('song', function(songId) {
-  return Songs.find({_id: songId});
+  return Songs.find({_id: songId}, {
+    fields: {
+      desc: 0,
+    }
+  });
 });
 
 Meteor.publish('songIds', function() {
@@ -19,11 +23,18 @@ Meteor.publish('songIds', function() {
 });
 
 
-Meteor.publish('mySongs', function() {
-  return Songs.find({creatorId: this.userId});
+Meteor.publish('mySongIds', function() {
+  return Songs.find({creatorId: this.userId}, {
+    fields: {
+      title: 1,
+      creatorId: 1,
+      createdAt: 1,
+      isGamified: 1,
+    }
+  });
 });
 
-Meteor.publish('myProgresses', function() {
+Meteor.publish('myProgressIds', function() {
   return Progresses.find({userId: this.userId}, {
     fields: {notes: 0},
   });

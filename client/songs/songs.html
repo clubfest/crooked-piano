@@ -1,8 +1,5 @@
 <template name='songs'>
-  {{#isolate}}
-    {{> sampleLeadPlayer}}
-  {{/isolate}}
-  <div align='center' style='margin-top: 50px;'>
+  <div align='center'>
     <h2>Games</h2>
     <ul id='gamified-list' class='game-list'>
       {{#each gamifiedSongs}}
@@ -17,28 +14,6 @@
             <li>
               {{viewCount}}
             </li>
-          </ul>
-        </li>
-      {{/each}}
-    </ul>
-
-    <h2>My Songs</h2>
-    <ul id='my-list' class='game-list'>
-      {{#each mySongs}}    
-        <li class='my-item game-item' data-game-id='{{_id}}'>
-          <ul>
-            <li>
-              {{title}}
-            </li>
-            <li>
-              {{beautifyDate createdAt}}            
-            </li>
-            <li>
-              {{viewCount}}
-            </li>
-            <button class='delete-btn' data-song-id='{{_id}}'>
-              <i class='icon-remove'></i>
-            </button>
           </ul>
         </li>
       {{/each}}

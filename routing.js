@@ -10,7 +10,8 @@ Router.configure({
 // Do we still need Session's songId? May be for caching.
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
-  // this.route('keyboard')
+  // this.route('createSong');
+
   this.route('songApi', {
     path: '/songApi/:_id',
 
@@ -59,7 +60,6 @@ Router.map(function() {
   });
 
   this.route('upload');
-  this.route('createSong');
 
   this.route('feedback', {
     before: function() {
@@ -88,22 +88,11 @@ Router.map(function() {
     }
   });
 
-  // this.route('oldGame', {
-  //   path: '/game/:_id',
-  //   before: function() {
-  //     if (!Session.get('segmentLevel')) {
-  //       Session.set('segmentLevel', 0)
-  //     }
-  //     Router.go('game', {_id: this.params._id, segmentLevel: Session.get('segmentLevel')});
-  //   },
-  // });
-
   this.route('game', {
     path: '/game/:_id',
 
     before: function() {
       this.subscribe('song', this.params._id).wait();
-      this.subscribe('myInfo').wait();
     },
 
     data: function() {
@@ -117,14 +106,8 @@ Router.map(function() {
     // caching last game's songId; todo: check elsewhere, like profile, that this is defined
     after: function() {
       if (Session.get('songId') !== this.params._id) {
-        // Session.set('segmentLevel', 0); // reset the game
         Session.set('songId', this.params._id);
       }
-
-      // var level = parseInt( this.params.segmentLevel )
-      // if (!isNaN(level)) {
-      //   Session.set('segmentLevel', level)
-      // }
 
       if (Meteor.userId()) {
         Meteor.call('updateLastVisitedGame', this.params._id, function(err){ 
@@ -139,15 +122,13 @@ Router.map(function() {
   this.route('songs', {
     before: function() {
       this.subscribe('songIds');
-      this.subscribe('mySongs');
     },
   });
 
   this.route('profile', {
     before: function() {
-      this.subscribe('myProgresses');
-      this.subscribe('song', Session.get('songId'));
-      this.subscribe('songIds').wait();
+      this.subscribe('myProgressIds');
+      this.subscribe('mySongIds');
     },
 
     data: function() {
@@ -181,9 +162,5 @@ Router.map(function() {
 
   this.route('home', {
     path: '/',
-    before: function() {
-      // this.subscribe('myInfo').wait();
-      // this.subscribe('songIds').wait();
-    }
   });
 });

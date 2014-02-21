@@ -196,9 +196,14 @@ function diffOfOutKeys(notes, shift) {
     var note = notes[i].note;
     // console.log(note + shift);
 
-    if (note + shift > 86) {
-      diff += 2; // note that I hate high notes more than low notes
-    } else if (note + shift < 41) {
+    var newNote = note + shift;
+    if (newNote > 84) {
+      if ([86, 88, 89, 90, 91, 93].indexOf(newNote) > -1) {
+        diff += 2; // note that I hate high notes more than low notes
+      } else {
+        diff += 100; // notes that need to be shifted down sound really bad
+      }
+    } else if (note + shift < 47) {
       diff -= 1;
     }
   }

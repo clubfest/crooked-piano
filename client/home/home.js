@@ -22,4 +22,9 @@ Template.home.events({
   'click #play-btn': function() {
     MIDI.noteOn(0, 60, 60);
   }
-})
+});
+
+Template.home.loadProgress = function() {
+  var loadProgress = Session.get('loadProgress') || 1;
+  return Math.floor(loadProgress * 100 / 12);
+}

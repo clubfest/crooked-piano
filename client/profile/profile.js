@@ -17,7 +17,10 @@ Template.profile.nextSongId = function() {
     sort: {createdAt: -1}, 
     fields: {_id: 1}
   })._id;
+}
 
+Template.profile.mySongs = function() {
+  return Songs.find({creatorId: Meteor.userId()}, {sort: {createdAt: -1}});
 }
 
 Template.profile.events({

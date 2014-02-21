@@ -1,17 +1,7 @@
 <template name='profile'>
 {{progress}}
 <div id='body-wrapper'>
-  <h2>Progress</h2>
 
-  {{#isolate}}
-    {{#if hasSong}}
-      {{> replayer}}
-    {{/if}}
-  {{/isolate}}
-  <div class='spaced-out'>
-    {{#unless currentUser}}
-      To keep you progress, {{loginButtons}} before clicking next 
-    {{/unless}}
     <div class='panel'>  
       {{#if nextSongId}}  
         <a id='next-btn' class='btn btn-primary' data-next-song-id='{{nextSongId}}'>
@@ -25,6 +15,19 @@
         </a>
       {{/if}}
     </div>
+
+  <h2>Progress</h2>
+
+  {{#isolate}}
+    {{#if hasSong}}
+      {{> replayer}}
+    {{/if}}
+  {{/isolate}}
+  <div class='spaced-out'>
+    {{#unless currentUser}}
+      To keep you progress, {{loginButtons}} before clicking next 
+    {{/unless}}
+    
   </div>    
   {{#if currentUser}}
     <h2>Past songs</h2>
@@ -32,7 +35,7 @@
       <thead>
         <tr>
           <th>Title</th>
-          <th>Version</th>
+          <th>Artist</th>
           <th>Date</th>
         </tr>
       </thead>
@@ -48,9 +51,6 @@
               {{/if}}
             </a>
           </td>
-          <td class='listen-right' data-id='{{_id}}'>
-            {{version}}
-          </td>
           <td class='listen-left' data-id='{{_id}}'>
             {{beautifyDate createdAt}}
           </td>
@@ -59,10 +59,36 @@
     </table>
   {{/if}}
 
-  <h2>Feedback</h2>
+  <h2>My Songs</h2>
+  <ul id='my-list' class='game-list'>
+    {{#each mySongs}}    
+      <li class='my-item game-item' data-game-id='{{_id}}'>
+        <ul>
+          <li>
+            {{artist}}
+          </li>
+          <li>
+            {{title}}
+          </li>
+          <li>
+            {{beautifyDate createdAt}}            
+          </li>
+          <li>
+            {{viewCount}}
+          </li>
+          <button class='delete-btn' data-song-id='{{_id}}'>
+            <i class='icon-remove'></i>
+          </button>
+        </ul>
+      </li>
+    {{/each}}
+  </ul>
+
+
+  <h2>Feeling Generous?</h2>
   <div id='feedback-panel'>
     <div>
-      <textarea id='feedback-input' class="form-control" rows="3" placeholder="What's on your mind?"></textarea>  
+      <textarea id='feedback-input' class="form-control" rows="3" placeholder="Give me some feedback."></textarea>  
     </div>
     <div>
       <button id='submit-feedback'>Submit</button>
