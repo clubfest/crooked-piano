@@ -1,16 +1,15 @@
 
 Template.intro.song = function() {
-  return Songs.findOne(this.song._id);
+  return this.song;
 }
 
 Template.intro.rendered = function() {
-
   var songId = this.data.song._id;
-  
+
   $('#desc-editable').editable({
-    url: '/post',
     emptytext: 'Description',
     mode: "inline",
+    onblur: 'submit',
     success: function(res, newValue) {
       Meteor.call('updateSongDesc', songId, newValue, function(err) {
         if (err) alert(err.reason);
@@ -19,9 +18,9 @@ Template.intro.rendered = function() {
   });
 
   $('#title-editable').editable({
-    url: '/post',
     emptytext: 'Title',
     mode: "inline",
+    onblur: 'submit',
     success: function(res, newValue) {
       Meteor.call('updateSongTitle', songId, newValue, function(err) {
         if (err) alert(err.reason);
@@ -30,9 +29,9 @@ Template.intro.rendered = function() {
   });
 
   $('#artist-editable').editable({
-    url: '/post',
     emptytext: 'Artist',
     mode: "inline",
+    onblur: 'submit',
     success: function(res, newValue) {
       Meteor.call('updateSongArtist', songId, newValue, function(err) {
         if (err) alert(err.reason);

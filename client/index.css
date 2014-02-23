@@ -1,3 +1,9 @@
+img {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
 body {
   background-color: rgba(150, 200, 200, 0.5);
 }
@@ -26,7 +32,7 @@ a {
 }
 
 .panel {
-  margin: 10px;
+  margin-top: 15px;
   text-align: center;
 }
 
@@ -35,9 +41,19 @@ a {
   padding: 9px;
 }
 
+.tight-panel {
+  text-align: center;
+  margin-top: -45px;
+}
+
+.tight-panel > div {
+  display: inline-block;
+  padding: 9px;
+}
+
 .spaced-out {
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   font-size: 16px;
 }
 

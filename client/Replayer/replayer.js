@@ -44,7 +44,7 @@ Template.replayer.rendered = function() {
           simpleReplayer.pause();
           simpleReplayer.play();
         } else {
-          simpleReplayer.play();
+          // simpleReplayer.play();
         }
       }
     });  

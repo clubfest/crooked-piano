@@ -59,13 +59,6 @@ simpleKeyboard = {
           velocity: self.velocity,
         });
       }
-
-      // prevent double-tap zooming
-      if (self.lastTouched && new Date().getTime() - self.lastTouched < 501) {
-        evt.preventDefault();
-      }
-
-      self.lastTouched = new Date().getTime();
     });
 
     $('.key').on('touchend.keyboard', function(evt) {
@@ -83,10 +76,7 @@ simpleKeyboard = {
         });
       }
     });
-
-    // $(window).nodoubletapzoom();
   },
-
 
   connectKeyToKeyboard: function() {
     var self = this;
@@ -178,11 +168,11 @@ simpleKeyboard = {
   },
 
   adjustSettings: function(keyCode) {
-    if (keyCode === 38) {
-      this.shift++;
-    } else if (keyCode === 40){
-      this.shift--;
-    } 
+    // if (keyCode === 38) {
+    //   this.shift++;
+    // } else if (keyCode === 40){
+    //   this.shift--;
+    // } 
     // else if (keyCode === 37) {
     //   this.velocity -= 30;
     // } else if (keyCode === 39) {
@@ -222,8 +212,6 @@ noteToName = function(note, alphabet) {
     note += 12;
   }
 
-    
-
   if (alphabet) {
     var conversion = {
       0: 'C',
@@ -258,64 +246,6 @@ noteToName = function(note, alphabet) {
 
   return conversion[note];
 }
-
-var keyCodeToNote = {
-  67: 41,
-  86: 42,
-  70: 43,
-  51: 45,
-  192: 47,
-  49: 48, // C
-  50: 49,
-  81: 50,
-  87: 51,
-  65: 52,
-  90: 53,
-  88: 54,
-  83: 55,
-  68: 56,
-  69: 57,
-  82: 58,
-  52: 59,
-  53: 60, // C
-  54: 61,
-  84: 62,
-  89: 63,
-  71: 64,
-  66: 65,
-  78: 66,
-  72: 67,
-  74: 68,
-  85: 69,
-  73: 70,
-  56: 71,
-  57: 72, //C
-  48: 73,
-  79: 74,
-  80: 75,
-  76: 76,
-  190: 77,
-  191: 78,
-  186: 79,
-  222: 80,
-  219: 81,
-  221: 82,
-  187: 83,
-  8: 84, //C
-  220: 86,
-  189: 88,
-  77: 89,
-  188: 90,
-  75: 91,
-  55: 93,
-};
-
-noteToKeyCode = {};
-
-for (prop in keyCodeToNote) {
-  noteToKeyCode[keyCodeToNote[prop]] = parseInt(prop);
-}
-
 // (function($) {
 //   var IS_IOS = navigator.userAgent.match(/(iPhone|iPad|webOs|Android)/i);
 //   $.fn.nodoubletapzoom = function() {

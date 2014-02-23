@@ -34,19 +34,20 @@
 .keyboard li {float: left;}
 
 .keyboard .key {
+  cursor: pointer;
   display: block;
   color: #111;
   font: bold 13pt arial;
   text-decoration: none;
   text-align: center;
-  width: 47px;
+  width: 48px;
   height: 44px;
   padding-top: 4px;
-  margin: 2px;
+  margin: 0px;
   background: #eff0f2;
   -moz-border-radius: 4px;
-  border-radius: 4px;
-  border-top: 1px solid #A88;
+  border-radius: 8px;
+  border: 3px solid #99B;
   background: #fff;
 }
 

@@ -1,4 +1,19 @@
 
+Template.home.rendered = function() {
+  document.title = 'Crooked Piano | Play it Anywhere';
+
+  $('<meta>', {
+    name: 'description',
+    content: 'With the Crooked Piano, you can can learn and play the piano anywhere.',
+  }).appendTo('head');
+}
+
+Template.home.events({
+  'click #play-btn': function() {
+    MIDI.noteOn(0, 60, 60);
+  }
+});
+
 Template.home.songId = function() {
   var user = Meteor.user();
   
@@ -17,12 +32,6 @@ Template.home.songId = function() {
     return song._id
   } 
 }
-
-Template.home.events({
-  'click #play-btn': function() {
-    MIDI.noteOn(0, 60, 60);
-  }
-});
 
 Template.home.loadProgress = function() {
   var loadProgress = Session.get('loadProgress') || 1;

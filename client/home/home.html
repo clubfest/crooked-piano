@@ -1,16 +1,20 @@
 <template name='home'>
 <div id='body-wrapper'>
   <div class='panel'>
-    <h1>Crooked Piano</h1>
+    <h1>Crooked Piano<i class='icon-music'></i></h1>
     <p id='intro'>
-      Listening to music takes us to another world, where we can fly over majestic mountains, wind thru forests of uncertainties, and land safely on a peaceful lake. Today, I endow you with the power to play the music, so that you can hug the clouds, glaze the leaves and refresh in the cool mountain water.  
+      Music carries us to another world, where we can fly over majestic mountains and into the mysterious forest. Today, I give you the Crooked Piano so that you can touch the clouds, glaze the leaves and experience a new dimension in your musical adventure.
     </p>
   </div>
   
   {{#if hasMidiNoteOn}}
-      <div class='panel'>
-        <a id='play-btn' href="/songs" class='btn btn-primary'>Play</a>    
-      </div>
+    <div class='panel'>
+      <a id='play-btn' href="/songs" class='btn btn-success'>
+        <i class='icon-hand-down'></i> Play
+      </a>    
+    </div>
+
+    {{> keyboard}}
 
   {{else}}
     <div class="panel">

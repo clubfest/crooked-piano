@@ -3,7 +3,9 @@
 // TODO: think about adding id to each note
 Template.upload.rendered = function() {
   var midiInput = document.getElementById('midi-input');
+
   midiInput.onchange = function(evt) {
+    // todo: add waiting cursor
     var fileList = midiInput.files;
     if (fileList.length > 0) {
       var file = fileList[0];
@@ -22,13 +24,9 @@ Template.upload.rendered = function() {
 
         Session.set('message', 'Tranlating');
 
-        var shift = parseInt($('#shift-input').val());
-        var numTracks = parseInt($('#num-tracks-input').val());
-
-        Translator.midiToNotes(player.data, shift, numTracks);
+        Translator.midiToNotes(player.data);
         Translator.createTranslatedSong();
         Session.set('message', '');
-
       }
 
       fileReader.readAsDataURL(file);
@@ -41,15 +39,11 @@ var Translator = {
   notes: [],
   notesByTrack: {},
   
-  midiToNotes: function(data, shift, numTracks) {
-    this.convertToMyFormat(data, numTracks);
-    this.smartShift(shift); // TODO: remove this, once we modify the computer to play notes and display a different-octave keyCode
-    this.annotateKeyCode();
-  },
-
-  convertToMyFormat: function(data, numTracks) {
+  midiToNotes: function(data) {
     this.notes = [];
     this.notesByTrack = {};
+    this.trackNames = [];
+    this.songInfo = [];
 
     var time = 0;
 
@@ -61,42 +55,52 @@ var Translator = {
 
       if (event.subtype === "noteOn" || event.subtype === "noteOff") {
         var segmentId = noteInfo[0].track;
-
-        if (isNaN(numTracks) || segmentId <= numTracks) {
-
-          var note = {
-            time: time,
-            note: event.noteNumber,
-            velocity: event.velocity,
-            segmentId: segmentId,
-          }
-
-          if (event.subtype === "noteOn") {
-            note.isKeyboardDown = true;
-          } 
-          this.notes.push(note);
-
-          if (!this.notesByTrack[segmentId]) {
-            this.notesByTrack[segmentId] = {
-              notes: [],
-              // segmentId: segmentId,
-            };
-          }
-          this.notesByTrack[segmentId].notes.push(note);
+        var note = {
+          time: time,
+          note: event.noteNumber,
+          velocity: event.velocity,
+          segmentId: segmentId,
         }
 
+        if (event.subtype === "noteOn") {
+          note.isKeyboardDown = true;
+        } 
+        this.notes.push(note);
+
+        if (!this.notesByTrack[segmentId]) {
+          this.notesByTrack[segmentId] = {
+            notes: [],
+            // segmentId: segmentId,
+          };
+        }
+        this.notesByTrack[segmentId].notes.push(note);
 
       } else {
-        // todo: add instrument info
+        if (event.subtype === 'trackName') {
+          if (!this.notesByTrack[noteInfo[0].track]) {
+            this.notesByTrack[noteInfo[0].track] = {
+              notes: [],
+            }
+          }
+
+          // Save the instrument name
+          this.notesByTrack[noteInfo[0].track].text = event.text;
+        }
       }
     }
-    // annotation is needed for gamification later on
-    for (var segmentId in this.notesByTrack) {
-      var trackNotes = this.notesByTrack[segmentId].notes;
 
-      if (trackNotes.length > 0) {
-        trackNotes[0].isStart = true;
-        trackNotes[trackNotes.length - 1].isEnd = true;
+    for (var segmentId in this.notesByTrack) {
+      if (this.notesByTrack[segmentId].notes.length === 0) {
+        this.songInfo.push(this.notesByTrack[segmentId].text);
+        delete this.notesByTrack[segmentId];
+      } else {
+        // annotation is needed for gamification later on
+        var trackNotes = this.notesByTrack[segmentId].notes;
+
+        if (trackNotes.length > 0) {
+          trackNotes[0].isStart = true;
+          trackNotes[trackNotes.length - 1].isEnd = true;
+        }
       }
     }
   },
@@ -167,11 +171,11 @@ var Translator = {
   },
 
   createTranslatedSong: function() {
-    Meteor.call('createTranslatedSong', this.notes, this.notesByTrack, function(err, songId) {
+    Meteor.call('createTranslatedSong', this.notes, this.notesByTrack, this.songInfo, function(err, songId) {
       if (err) {
         alert(err.reason);
       } else {
-        Router.go('addSegment', {_id: songId});
+        Router.go('editSong', {_id: songId});
       }
     });
   }

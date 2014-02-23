@@ -1,22 +1,26 @@
 <template name='songs'>
+<div id='body-wrapper'>
   <div align='center'>
     <h2>Games</h2>
     <ul id='gamified-list' class='game-list'>
       {{#each gamifiedSongs}}
         <li class='gamified-item game-item' data-game-id='{{_id}}'>
           <ul>
+            {{#if youtubeId}}
+              <li>
+                <img src="http://img.youtube.com/vi/{{youtubeId}}/default.jpg"/>
+              </li>
+            {{/if}}
+            <li class='big-font'>
+              {{artist}} - {{title}}
+            </li>              
             <li>
-              {{title}}
-            </li>
-            <li>
-              {{artist}}
-            </li>
-            <li>
-              {{viewCount}}
+              {{playCount}} views
             </li>
           </ul>
         </li>
       {{/each}}
     </ul>
   </div>
+</div>
 </template>

@@ -11,6 +11,15 @@ Template.leadPlayer.rendered = function() {
     this.rendered = true;
 
     LeadPlayer.create(song);
+
+    var self = this;
+
+    Deps.autorun(function() {
+      var song = self.data.song;
+      if (song.notes) {
+        LeadPlayer.setPlayNotes(song.notes);
+      }
+    })
   }
 
   LeadPlayer.redisplayNotes();

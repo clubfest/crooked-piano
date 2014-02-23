@@ -17,7 +17,7 @@ LeadPlayer = {
 
     simpleRecorder.init();
 
-    this.loadPlayNotes();
+    this.setPlayNotes(this.song.previewNotes);
 
     this.segmentId = song.mainTrack;
 
@@ -25,11 +25,27 @@ LeadPlayer = {
     this.updateProximateNotes();
   },
 
+  setPlayNotes: function(notes) {
+    var ret = []
+    for (var i = 0; i < notes.length; i++) {
+      var note = notes[i];
+
+      if (note.isKeyboardDown === true) {
+        ret.push(note);        
+      }
+    }
+
+    Session.set('playLength', ret.length); // for the game template
+    console.log(ret.length);
+    this.playNotes = ret;
+  },
+
   reset: function(playIndex) {
     var highestTimeoutId = setTimeout(";");
     for (var i = 0 ; i < highestTimeoutId ; i++) {
         clearTimeout(i); 
     }
+
     Session.set('numCorrect', 0);
     Session.set('numWrong', 0);
     Session.set('isWrong', false);
@@ -60,19 +76,6 @@ LeadPlayer = {
   destroy: function() {
     this.reset();
     $(window).off('keyboardDown.youPlayer');
-  },
-
-  loadPlayNotes: function() {
-    // var goodBreak = Math.min(this.segmentInfo.endIndex + 200, this.song.notes.length - 1);
-    this.playNotes = []
-    for (var i = 0; i < this.song.notes.length; i++) {
-      var note = this.song.notes[i];
-
-      if (note.isKeyboardDown === true) {
-        this.playNotes.push(note);        
-      }
-    }
-    Session.set('playLength', this.playNotes.length); // for the game template
   },
 
   switchTrack: function() { 
@@ -117,7 +120,7 @@ LeadPlayer = {
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
 
-      if (data.note === note.note) {
+      if (data.note === note.note || data.keyCode === note.keyCode) {
         matchIdx = i;
         break ;
       }
@@ -156,25 +159,9 @@ LeadPlayer = {
 
     if (Session.get('isSynchronous')) {
       this.transferProximateNotesToComputer();
+    } else {
+      // don't update because the computer notes will be loaded in the wrong order
     }
-
-    // var notes = [];
-    // var i = this.getPlayIndex() - this.proximateNotes.length - this.computerProximateNotes.length;
-    // for ( ; i < this.playNotes.length; i++) {
-    //   var note = this.playNotes[i];
-    //   if (!this.isComputerNote(note)) {
-    //     notes.push(note);
-    //     var noteUp = $.extend(true, {}, note);
-    //     $.extend(noteUp, {
-    //       isKeyboardDown: false,
-    //       time: note.time + 1000,
-    //     });
-    //     notes.push(noteUp);
-    //   }
-    // }
-
-    // simpleReplayer.init(notes);
-    // simpleReplayer.play();
   },
 
   pauseDemo: function() {
@@ -295,32 +282,6 @@ LeadPlayer = {
     }  
     this.computerProximateNotes = []; 
   },
-
-  // playProximateNotes: function() { 
-  //   var self = this;
-  //   var notes = this.proximateNotes;
-
-  //   for (var j = 0; j < notes.length; j++) {
-  //     var note = $.extend({}, notes[j]);
-  //     // computerNote.velocity /= 2; // make computer less loud
-
-  //     // must do this first as we will change the time for recording purposes
-  //     this.prevNoteTime = notes[j].time; 
-
-  //     note.playedByComputer = true;
-  //     note.time = new Date().getTime(); // for recording
-
-  //     $(window).trigger('keyboardDown', note);
-
-  //     self.undisplayNote(note);
-
-  //     window.setTimeout(function(note) {        
-  //       $(window).trigger('keyboardUp', note); // for recording purposes
-  //     }, 200, note);
-
-  //   }  
-  //   this.proximateNotes = []; 
-  // },
 
   gameOver: function() {
     var self = this; 

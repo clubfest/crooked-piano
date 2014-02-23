@@ -1,22 +1,96 @@
 <template name='editSong'>
-<canvas id='notes-canvas'></canvas>
-<div>
-  {{#with song}}
-    {{#each segmentIds}}
-      {{#isolate}}
-        <input 
-          type='checkbox' class='segment-checkbox' 
-          data-segment-id='{{segmentId}}' value='{{segmentId}}' 
-          {{#unless isRemoved}} checked {{/unless}}
-        />
-          {{segmentId}}
-        </input>
-      {{/isolate}}
-    {{/each}}
-  {{/with}}
+
+{{> intro}}
+
+{{#with song}}
+  {{#if youtubeId}}
+    <div class='panel'>
+      <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+    </div>
+  {{/if}}
+  <div class='panel spaced-out'>
+    <div>
+      <label>Your Track number</label>
+      <div id='main-track-editable' data-mode='inline'>
+        {{mainTrack}}
+      </div>
+    </div>
+    <div>
+      <label>Youtube Link</label>
+      <div id='youtube-link-editable' data-mode='inline'>
+        {{youtubeLink}}
+      </div>
+    </div>
+    <div>
+      <label>Shift the song</label>
+      <div id='shift-editable' data-mode='inline'>
+        {{shift}}
+      </div>
+    </div>
+  </div>
+{{/with}}
+
+<div class='panel'>
+  <a id='gamify-song' class='btn btn-primary'>
+    <i class='icon-film'></i>
+    gamify
+  </a>  
 </div>
-<div>
-  Warning: you may need to refresh the page to get the music sheet redrawn
+
+{{#isolate}}
+  {{> replayer}}
+{{/isolate}}
+
+<div class='spaced-out'>
+
+    <div class='panel'>
+      <h2>Tracks</h2>
+      <p>
+        Click any green track if you want to remove it from the song        
+      </p>
+      {{#each segmentInfos}}
+        {{#isolate}}
+          {{#if isRemoved}}
+            <a class='unremove-track btn' data-segment-id='{{segmentId}}'>
+              {{text}} ({{segmentId}})
+            </a>
+          {{else}}
+            <a class='remove-track btn btn-success' data-segment-id='{{segmentId}}'>
+              <i class='icon-check'></i>
+              {{text}} ({{segmentId}})
+            </a>
+          {{/if}}
+        {{/isolate}}
+      {{/each}}
+    </div>
+
+  <canvas id='notes-canvas'></canvas>
+
+  <div class='tight-panel'>
+    {{#with song}}
+      <div>        
+        <ul class='game-list'>
+        <li class='cloud'>
+          Credits:            
+        </li>
+        {{#each songInfo}}
+          <li class='cloud'>
+              {{this}}            
+          </li>
+        {{/each}}
+        </ul>
+      </div>
+    {{/with}}
+  </div>
+</div>
+
+  
+
+<div class='panel'>
+<a class='delete-btn btn' data-song-id='{{_id}}'>
+  <i class='icon-remove'></i>
+  Delete Song
+</a>  
 </div>
 
 </template>

@@ -1,4 +1,3 @@
-////// next level after profile
 
 Router.configure({
   layoutTemplate: 'layout',
@@ -6,12 +5,8 @@ Router.configure({
   loadingTemplate: 'loading',
 });
 
-// When a page needs specific things from a song, we put it in data.song
-// Do we still need Session's songId? May be for caching.
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
-  // this.route('createSong');
-
   this.route('songApi', {
     path: '/songApi/:_id',
 
@@ -71,8 +66,8 @@ Router.map(function() {
     }
   });
 
-  this.route('addSegment', {
-    path: '/addSegment/:_id',
+  this.route('editSong', {
+    path: '/editSong/:_id',
 
     before: function() {
       this.subscribe('song', this.params._id).wait();
@@ -92,7 +87,8 @@ Router.map(function() {
     path: '/game/:_id',
 
     before: function() {
-      this.subscribe('song', this.params._id).wait();
+      this.subscribe('songId', this.params._id).wait();
+      this.subscribe('songNotes', this.params._id);
     },
 
     data: function() {
@@ -107,14 +103,6 @@ Router.map(function() {
     after: function() {
       if (Session.get('songId') !== this.params._id) {
         Session.set('songId', this.params._id);
-      }
-
-      if (Meteor.userId()) {
-        Meteor.call('updateLastVisitedGame', this.params._id, function(err){ 
-          if(err) {
-            alert(err.reason);
-          }
-        });
       }
     }
   });

@@ -1,42 +1,46 @@
-// TODO: get rid of popSongs
-// Meteor.publish('popSongs', function() {
-//   return Songs.find({isGamified: true});
-// });
 
 Meteor.publish('song', function(songId) {
+  return Songs.find({_id: songId});
+});
+
+Meteor.publish('songId', function(songId) {
   return Songs.find({_id: songId}, {
     fields: {
-      desc: 0,
+      notes: 0,
     }
   });
 });
+
+Meteor.publish('songNotes', function(songId) {
+  return Songs.find({_id: songId}, {
+    fields: {
+      notes: 1,
+    }
+  });
+});
+
 
 Meteor.publish('songIds', function() {
   return Songs.find({}, {
     fields: {
-      title: 1,
-      creatorId: 1,
-      createdAt: 1,
-      isGamified: 1,
+      notes: 0,
     }
   });
 });
 
-
 Meteor.publish('mySongIds', function() {
   return Songs.find({creatorId: this.userId}, {
     fields: {
-      title: 1,
-      creatorId: 1,
-      createdAt: 1,
-      isGamified: 1,
+      notes: 0,
     }
   });
 });
 
 Meteor.publish('myProgressIds', function() {
   return Progresses.find({userId: this.userId}, {
-    fields: {notes: 0},
+    fields: {
+      notes: 0
+    },
   });
 });
 

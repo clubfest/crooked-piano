@@ -75,7 +75,7 @@ simpleRecorder = {
   },
 
   onSave: function(songId) {
-    Router.go('addSegment', {_id: songId});
+    Router.go('editSong', {_id: songId});
   },
 
   connectKeyboardToRecorder: function() {

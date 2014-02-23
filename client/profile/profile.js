@@ -1,26 +1,17 @@
 
-Template.profile.nextSongId = function() {
-  var song = this.song;
+Template.profile.created = function() {
+  // find the next song if the current song is defined
+  var song = this.data.replayerSong;
 
-  if (song && song.createdAt) {
-    var nextSong = Songs.findOne({createdAt: {$lt: song.createdAt}}, {
-      fields: {_id: 1},
-      sort: {createdAt: -1}
-    });
+  if (typeof song !== 'undefined') {
+    var nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {sort: {createdAt: 1}});
 
-    if (nextSong) {
-      return nextSong._id;
+    if (!nextSong) {
+      nextSong = Songs.findOne({}, {sort: {createdAt: 1}});
     }
-    // else, there is no song, so just show the create button
-  }
-  return Songs.findOne({}, {
-    sort: {createdAt: -1}, 
-    fields: {_id: 1}
-  })._id;
-}
 
-Template.profile.mySongs = function() {
-  return Songs.find({creatorId: Meteor.userId()}, {sort: {createdAt: -1}});
+    Session.set('nextSong', nextSong);
+  }
 }
 
 Template.profile.events({
@@ -56,23 +47,45 @@ Template.profile.events({
         $input.val('');  
       }
     });
-  }
+  },
+
+  'click .progress-item': function(evt) {
+    var _id = evt.currentTarget.dataset.progressId;
+    Router.go('progress', {_id: _id});
+  },
+
+  'click .my-item': function(evt) {
+    var _id = evt.currentTarget.dataset.gameId;
+    Router.go('editSong', {_id: _id});
+  },
 });
 
-Template.profile.created = function() {
-  // find the next song if the current song is defined
-  var song = this.data.replayerSong;
+Template.profile.nextSongId = function() {
+  var song = this.song;
 
-  if (typeof song !== 'undefined') {
-    var nextSong = Songs.findOne({createdAt: {$gt: song.createdAt}}, {sort: {createdAt: 1}});
+  if (song && song.createdAt) {
+    var nextSong = Songs.findOne({createdAt: {$lt: song.createdAt}}, {
+      fields: {_id: 1},
+      sort: {createdAt: -1}
+    });
 
-    if (!nextSong) {
-      nextSong = Songs.findOne({}, {sort: {createdAt: 1}});
+    if (nextSong) {
+      return nextSong._id;
     }
-
-    Session.set('nextSong', nextSong);
+    // else, there is no song, so just show the create button
   }
-  
+  song = Songs.findOne({}, {
+    sort: {createdAt: -1}, 
+    fields: {_id: 1}
+  });
+
+  if (song) {
+    return song._id;
+  }
+}
+
+Template.profile.mySongs = function() {
+  return Songs.find({creatorId: Meteor.userId()}, {sort: {createdAt: -1}});
 }
 
 Template.profile.hasSong = function() {

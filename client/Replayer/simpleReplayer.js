@@ -23,10 +23,10 @@ simpleReplayer = {
   },
 
   play: function() {
-    if (Session.get('monotromeIsSet')) {
-      Monotrome.pause(); // TODO: pause and recalculate if monotrome is running; integrate monotrome with replayer
-      Monotrome.syncMonotromeWithSong();
-    }
+    // if (Session.get('monotromeIsSet')) {
+    //   Monotrome.pause(); // TODO: pause and recalculate if monotrome is running; integrate monotrome with replayer
+    //   Monotrome.syncMonotromeWithSong();
+    // }
 
     Session.set('isReplaying', true);
     if (!Session.get('replayerIndex') ||  Session.get('replayerIndex') >= this.notes.length - 1) {
@@ -43,7 +43,7 @@ simpleReplayer = {
   },
 
   pause: function() {
-    Monotrome.pause();
+    // Monotrome.pause();
     window.clearTimeout(this.timeout);
     Session.set('isReplaying', false);
   },
