@@ -36,7 +36,6 @@ LeadPlayer = {
     }
 
     Session.set('playLength', ret.length); // for the game template
-    console.log(ret.length);
     this.playNotes = ret;
   },
 
@@ -449,3 +448,32 @@ LeadPlayer = {
     
   },
 }
+
+
+tallyScore = function() {
+  var score = 100 * Session.get('numCorrect') /(Session.get('numCorrect') + Session.get('numWrong'));
+
+  Session.set('score', 0);
+  window.setTimeout(function() {
+    tallyingScore(score);
+  }, 5 * WAIT_TIME);
+}
+
+function tallyingScore(score) {
+  var oldScore = Session.get('score');
+  var time = oldScore / 2;
+  if (score - oldScore < 8) {
+    time = 1000 / ((score - oldScore) + 1)
+  }
+  if (oldScore < score) {
+    Session.set('score', oldScore + 1);
+    MIDI.noteOn(0, Math.floor(oldScore*score % 47) + 40, oldScore / 4);
+    window.setTimeout(function() {
+      tallyingScore(score);
+    }, time);
+
+  } else {
+    Session.set('scoreTallied', true);
+  }
+}
+

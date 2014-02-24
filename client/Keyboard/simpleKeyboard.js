@@ -9,6 +9,7 @@ simpleKeyboard = {
   connectMouseToKeyboard: function() {
     var self = this;
 
+    $('.key').off('mousedown.keyboard');
     $('.key').on('mousedown.keyboard', function(evt){
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
       var note = convertKeyCodeToNote(keyCode);
@@ -25,6 +26,7 @@ simpleKeyboard = {
       }
     });
 
+    $('.key').off('mouseup.keyboard');
     $('.key').on('mouseup.keyboard', function(evt) {
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
       var note = convertKeyCodeToNote(keyCode);
@@ -45,6 +47,7 @@ simpleKeyboard = {
   connectTouchToKeyboard: function() {
     var self = this;
 
+    $('.key').off('touchstart.keyboard');
     $('.key').on('touchstart.keyboard', function(evt){
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
       var note = convertKeyCodeToNote(keyCode);
@@ -61,6 +64,7 @@ simpleKeyboard = {
       }
     });
 
+    $('.key').off('touchend.keyboard');
     $('.key').on('touchend.keyboard', function(evt) {
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
       var note = convertKeyCodeToNote(keyCode);
@@ -184,7 +188,6 @@ simpleKeyboard = {
 ///// init
 simpleKeyboard.connectKeyToKeyboard();
 simpleKeyboard.connectKeyboardToDisplay();
-
 
 
 ////// helpers

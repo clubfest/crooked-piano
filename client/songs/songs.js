@@ -1,7 +1,7 @@
 
 
 Template.songs.gamifiedSongs = function() {
-  return Songs.find({isGamified: true}, {sort: {createdAt: -1}});
+  return Songs.find({isGamified: true});
 }
 
 

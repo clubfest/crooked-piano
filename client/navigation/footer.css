@@ -1,0 +1,8 @@
+.like-buttons > div {
+  display: inline-block;
+}
+
+.panel > .fb-like {
+  margin: 0px;
+  padding: 0px;
+}

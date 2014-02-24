@@ -1,17 +1,22 @@
 
 Template.home.rendered = function() {
-  document.title = 'Crooked Piano | Play it Anywhere';
+  if (!this.rendered) {
+    this.rendered = true;
 
-  $('<meta>', {
-    name: 'description',
-    content: 'With the Crooked Piano, you can can learn and play the piano anywhere.',
-  }).appendTo('head');
+    document.title = 'Crooked Piano | Play It Anywhere';
+
+    $('<meta>', {
+      name: 'description',
+      content: 'With the Crooked Piano, you can can learn and play the piano anywhere.',
+    }).appendTo('head');
+  }
+    
 }
 
 Template.home.events({
   'click #play-btn': function() {
-    MIDI.noteOn(0, 60, 60);
-  }
+    MIDI.noteOn(0, 60, 30);
+  },
 });
 
 Template.home.songId = function() {

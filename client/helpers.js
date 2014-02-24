@@ -7,3 +7,8 @@ Handlebars.registerHelper('youtubeId', function() {
   // this should be a song context
   return this.youtubeId;
 });
+
+Handlebars.registerHelper('absoluteUrl', function() {
+  // this should be a song context
+  return Meteor.absoluteUrl();
+});

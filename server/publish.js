@@ -1,3 +1,17 @@
+// todo: add infinite scrolling
+Meteor.publish('gameInfos', function() {
+  return Songs.find({}, {
+    fields: {
+      title: 1,
+      artist: 1,
+      youtubeId: 1,
+      isGamified: 1,
+      createdAt: 1,
+      playCount: 1,
+    },
+    sort: {createdAt: -1},
+  });
+});
 
 Meteor.publish('song', function(songId) {
   return Songs.find({_id: songId});
@@ -24,6 +38,7 @@ Meteor.publish('songIds', function() {
   return Songs.find({}, {
     fields: {
       notes: 0,
+      previewNotes: 0,
     }
   });
 });
@@ -31,8 +46,14 @@ Meteor.publish('songIds', function() {
 Meteor.publish('mySongIds', function() {
   return Songs.find({creatorId: this.userId}, {
     fields: {
-      notes: 0,
-    }
+      title: 1,
+      artist: 1,
+      youtubeId: 1,
+      isGamified: 1,
+      createdAt: 1,
+      playCount: 1,
+    },
+    sort: {createdAt: -1},
   });
 });
 
@@ -41,6 +62,7 @@ Meteor.publish('myProgressIds', function() {
     fields: {
       notes: 0
     },
+    sort: {createdAt: -1},
   });
 });
 

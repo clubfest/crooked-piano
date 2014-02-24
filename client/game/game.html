@@ -3,11 +3,12 @@
   
   {{#with song}}
     <div id='song-desc'>
-      <h2>{{title}}</h2>
-
-      <div>
-        {{{desc}}}
-      </div>
+      <h2>{{artist}} - {{title}}</h2>
+      {{#if youtubeId}}
+        <div class='panel'>
+          <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+        </div>
+      {{/if}}
     </div>
   {{/with}}
   <hr/>
@@ -25,6 +26,13 @@
   {{#isolate}}
     {{> leadPlayer}}
   {{/isolate}}
+
+  {{#with song}}
+    <div class='panel'>
+      {{{desc}}}
+    </div>
+
+  {{/with}}
 
 </div>
 

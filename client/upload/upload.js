@@ -5,7 +5,8 @@ Template.upload.rendered = function() {
   var midiInput = document.getElementById('midi-input');
 
   midiInput.onchange = function(evt) {
-    // todo: add waiting cursor
+    // $('body').css('cursor', 'progress');
+
     var fileList = midiInput.files;
     if (fileList.length > 0) {
       var file = fileList[0];
@@ -14,7 +15,6 @@ Template.upload.rendered = function() {
       fileReader.onload = function() {
         var player = MIDI.Player;
 
-        Session.set('message', 'Uploading');
         try {
           player.loadFile(fileReader.result);
         } catch (e) {
@@ -26,7 +26,9 @@ Template.upload.rendered = function() {
 
         Translator.midiToNotes(player.data);
         Translator.createTranslatedSong();
-        Session.set('message', '');
+
+        // $('body').css('cursor', 'default');
+        // Session.set('message', '');
       }
 
       fileReader.readAsDataURL(file);

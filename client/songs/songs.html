@@ -8,11 +8,14 @@
           <ul>
             {{#if youtubeId}}
               <li>
-                <img src="http://img.youtube.com/vi/{{youtubeId}}/default.jpg"/>
+                <img src="http://img.youtube.com/vi/{{youtubeId}}/default.jpg" width='200'/>
               </li>
             {{/if}}
             <li class='big-font'>
-              {{artist}} - {{title}}
+              {{artist}}
+            </li>
+            <li>
+              {{title}}
             </li>              
             <li>
               {{playCount}} views

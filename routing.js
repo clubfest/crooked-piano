@@ -109,7 +109,7 @@ Router.map(function() {
 
   this.route('songs', {
     before: function() {
-      this.subscribe('songIds');
+      this.subscribe('gameInfos');
     },
   });
 

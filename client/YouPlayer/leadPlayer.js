@@ -1,25 +1,28 @@
 var song;
+var isPreview;
 
 Template.leadPlayer.created = function() {
   Session.setDefault('playSpeed', .9);
   Session.setDefault('isSynchronous', true);
   song = this.data.song;
+
+  LeadPlayer.create(song);
+  isPreview = true;
 }
 
 Template.leadPlayer.rendered = function() {
-  if (!this.rendered) {
-    this.rendered = true;
-
-    LeadPlayer.create(song);
-
+  // if (!this.rendered) {
+  //   this.rendered = true;
+  // }
+  if (isPreview) {
     var self = this;
-
     Deps.autorun(function() {
       var song = self.data.song;
       if (song.notes) {
         LeadPlayer.setPlayNotes(song.notes);
+        isPreview = false;
       }
-    })
+    });
   }
 
   LeadPlayer.redisplayNotes();
@@ -49,8 +52,17 @@ Template.leadPlayer.events({
     Session.set('isSynchronous', false);
     LeadPlayer.transferProximateNotesToComputer();
   },
+
+  'click #play-btn': function() {
+    MIDI.noteOn(0, 60, 60);
+  },
 })
 
 Template.leadPlayer.isSynchronous = function() {
   return Session.get('isSynchronous');
+}
+
+Template.leadPlayer.loadProgress = function() {
+  var loadProgress = Session.get('loadProgress') || 1;
+  return Math.floor(loadProgress * 100 / 12);
 }

@@ -1,19 +1,15 @@
 <head>
   <title>Crooked Piano</title>
   <meta charset="utf-8">
+  <meta name="google-site-verification" content="YSgyVLJB0jP4PBqfKxEw45UCXVaoyEGAitF6edzpy-o" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <link rel="icon" href="/favicon64.png" sizes="64x64" type="image/vnd.microsoft.icon">
+  <link rel="apple-touch-icon-precomposed" size='64x64' href="/favicon64.png"/>
 </head>
 
 <body>
 
 </body>
-
-<template name='loading'>
-  <div>
-    Loading
-  </div>
-</template>
 
 <template name='notFound'>
   <div>
@@ -27,7 +23,7 @@
       <a href="/">Home</a>
     </div>
     <div>
-      <a href="/songs">Songs</a>
+      <a href="/songs">Games</a>
     </div>
     {{#if currentUser}}
       <div>
@@ -45,7 +41,9 @@
     </div>
   </div>    
 
+<div id='body-wrapper'>
   {{yield}}
-
+</div>
 </template>
+
 
