@@ -1,4 +1,10 @@
 <template name='keyboard'>
+  {{#unless hasMidiNoteOn}}
+    <div class="panel">
+      <div id='loading-sound'>Reload Sound {{loadProgress}}%</div> 
+    </div>
+  {{/unless}}
+
   <div class="keyboard">
   {{#if hasMidiNoteOn}}
 
@@ -66,4 +72,5 @@
     </ul>
   {{/if}}
   </div>
+
 </template>

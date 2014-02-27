@@ -18,32 +18,12 @@
 </template>
 
 <template name='layout'>
-  <div class='panel spaced-out'>
-    <div>
-      <a href="/">Home</a>
-    </div>
-    <div>
-      <a href="/songs">Games</a>
-    </div>
-    {{#if currentUser}}
-      <div>
-        <a href="{{pathFor 'profile'}}">Profile</a>
-      </div>
-      <div>
-        <a href="/upload">Upload</a>
-      </div>
-    {{/if}}      
-    <div>
-      {{loginButtons}}
-    </div>
-    <div>
-      {{message}}
-    </div>
-  </div>    
+  {{> navbar}}   
 
-<div id='body-wrapper'>
-  {{yield}}
-</div>
+  <div id='body-wrapper'>
+    {{yield}}
+  </div>
+  
 </template>
 
 

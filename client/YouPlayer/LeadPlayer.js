@@ -6,6 +6,8 @@ CLUSTER_TIME = 50;
 LeadPlayer = {
   create: function(song) {
     var self = this;
+
+    $(window).off('keyboardDown.youPlayer');
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
       if (data.playedByComputer !== true) {
         self.judge(data);
@@ -22,7 +24,12 @@ LeadPlayer = {
     this.segmentId = song.mainTrack;
 
     this.reset();
-    this.updateProximateNotes();
+
+    // todo: deal with when sound is not loaded
+    // if (Session.get('hasMidiNoteOn')) {
+      this.updateProximateNotes();
+    // }
+
   },
 
   setPlayNotes: function(notes) {
@@ -100,6 +107,7 @@ LeadPlayer = {
 
     if (newSegmentId !== null) {
       this.segmentId = newSegmentId;
+      Session.set('mainTrack', newSegmentId);
     }
 
     this.transferProximateNotesToComputer();
@@ -180,29 +188,34 @@ LeadPlayer = {
     }
     
     if (this.getPlayIndex() >= this.playNotes.length ||
-        this.proximateNotes.length > 0) {
+        this.proximateNotes.length > 0 ) {
       return;
     }
 
     while(1) {
-
       var note = this.playNotes[this.getPlayIndex()];
       this.incrementPlayIndex(); // TODO: simplify this
+      
+      if (Session.get('shift') !== 0) {
+        note.note += Session.get('shift');
+        note.keyCode = convertNoteToKeyCode(note.note);
+      }
+
 
       if (Session.get('isDemoing') || this.isComputerNote(note)) {
+
         this.computerProximateNotes.push(note);
 
       } else {
         if (this.proximateNotes.length > 0) {
           if (note.note > this.proximateNotes[0].note) {
-          // TODO: add bass instrument
-          // if (note.note < this.proximateNotes[0].note) {
             var lowerNote = this.proximateNotes[0];
             var higherNote = note;
           } else {
             var lowerNote = note;
             var higherNote = this.proximateNotes[0];
           }
+
 
           this.computerProximateNotes.push(lowerNote);
           this.proximateNotes = [higherNote];

@@ -3,6 +3,8 @@
     "iron-router": {},
     "jquery-ui": {},
     "font-awesome": {},
-    "x-editable-bootstrap": {}
+    "x-editable-bootstrap": {},
+    "npm": {},
+    "GAnalytics": {}
   }
 }

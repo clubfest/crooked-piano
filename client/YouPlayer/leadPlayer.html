@@ -1,13 +1,17 @@
 <template name='leadPlayer'>
 
 {{#isolate}}
-  {{#if hasMidiNoteOn}}
-    {{> keyboard}}
-  {{else}}
-    <div class="panel">
-      <div id='loading-sound'>Loading Sound {{loadProgress}}%</div> 
-    </div>
-  {{/if}}
+      {{> result}}
+{{/isolate}}
+
+{{#isolate}}
+  {{> playerControl}}
+{{/isolate}}
+
+<div class='play-slider'></div>
+
+{{#isolate}}
+  {{> keyboard}}
 {{/isolate}}
 
 <div>
@@ -17,16 +21,30 @@
 
 <div class=' panel song-version spaced-out'>
   <div>
+    <div>
+      {{#isolate}}
+        <div>
+          Shift
+        </div>
+        <div>
+          <button id='shift-down'><i class='icon-minus'></i></button>
+          {{shift}}
+          <button id='shift-up'><i class='icon-plus'></i></button>      
+        </div>
+      {{/isolate}}
+    </div>
+  </div>
+  <div>
     <button id='switch-track'>
-      Switch Track
+      Switch Parts
     </button>
   </div>
   {{#isolate}}
     <div>
       {{#if isSynchronous}}
-        <button id='asynchronous'>Don't Wait</button>
+        <button id='asynchronous'>Fast</button>
       {{else}}
-        <button id='synchronous'>Wait</button>
+        <button id='synchronous'>Slow</button>
       {{/if}}
     </div>
   {{/isolate}}

@@ -7,22 +7,27 @@ Handlebars.registerHelper('hasMidiNoteOn', function() {
   return Session.get('hasMidiNoteOn');
 });
 
+Handlebars.registerHelper('hasSoundFiles', function() {
+  return Session.get('loadProgress') === files.length;
+});
 
-function loadMidiJs() {
+
+var files = [
+  '/MIDI.js/inc/jasmid/replayer.js',
+  '/MIDI.js/inc/jasmid/midifile.js',
+  '/MIDI.js/inc/jasmid/stream.js',
+  '/MIDI.js/js/MIDI/AudioDetect.js',
+  '/MIDI.js/js/MIDI/LoadPlugin.js',
+  '/MIDI.js/js/MIDI/Plugin.js',
+  '/MIDI.js/js/MIDI/Player.js',
+  '/MIDI.js/js/Window/DOMLoader.XMLHttp.js',
+  '/MIDI.js/js/Window/DOMLoader.script.js',
+  '/MIDI.js/inc/Base64.js',
+  '/MIDI.js/inc/base64binary.js',
+];
+
+loadMidiJs = function() {
   var numDone = 0;
-  var files = [
-    '/MIDI.js/inc/jasmid/replayer.js',
-    '/MIDI.js/inc/jasmid/midifile.js',
-    '/MIDI.js/inc/jasmid/stream.js',
-    '/MIDI.js/js/MIDI/AudioDetect.js',
-    '/MIDI.js/js/MIDI/LoadPlugin.js',
-    '/MIDI.js/js/MIDI/Plugin.js',
-    '/MIDI.js/js/MIDI/Player.js',
-    '/MIDI.js/js/Window/DOMLoader.XMLHttp.js',
-    '/MIDI.js/js/Window/DOMLoader.script.js',
-    '/MIDI.js/inc/Base64.js',
-    '/MIDI.js/inc/base64binary.js',
-  ];
 
   Session.set('loadProgress', 0);
 
@@ -32,22 +37,30 @@ function loadMidiJs() {
       Session.set('loadProgress', Session.get('loadProgress') + 1);
 
       if (numDone === files.length) {
-        MIDI.loadPlugin({
-          soundfontUrl: "/MIDI.js/soundfont/",
-          instrument: "acoustic_grand_piano",
-          callback: function() {
-            Session.set('hasMidiNoteOn', true);
-
-            $(window).on('keyboardDown.sound', function(evt, data) {
-                if (typeof data.note !== 'undefined') {
-                  data.channel = data.channel || 0;
-                  MIDI.noteOn(data.channel, data.note, data.velocity  /*+ data.note * 2 */);
-                }
-            });
-            // TODO: keyboardUp.sound if without pedal
-          }
-        });
+        loadSound();
       }
     })
+  });
+}
+
+loadSound = function() {
+  Session.set('hasMidiNoteOn', false);
+  MIDI.loadPlugin({
+    soundfontUrl: "/MIDI.js/soundfont/",
+    instrument: "acoustic_grand_piano",
+    callback: function() {
+      Session.set('hasMidiNoteOn', true);
+
+      $(window).off('keyboardDown.sound');
+      $(window).on('keyboardDown.sound', function(evt, data) {
+          if (typeof data.note !== 'undefined') {
+            data.channel = data.channel || 0;
+            MIDI.noteOn(data.channel, data.note, data.velocity  /*+ data.note * 2 */);
+          }
+      });
+      // TODO: keyboardUp.sound if without pedal
+      Session.set('hasMidiNoteOn', true);
+    }
+
   });
 }

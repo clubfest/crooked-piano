@@ -11,13 +11,9 @@
       <a id='play-btn' href="/songs" class='btn btn-success'>
         <i class='icon-hand-down'></i> Play
       </a>    
-    </div>
-
-    {{> keyboard}}
-
-  {{else}}
-    <div class="panel">
-      <div id='loading-sound'>Loading Sound {{loadProgress}}%</div> 
-    </div>
+    </div>    
   {{/if}}
+
+  {{> keyboard}}
+
 </template>

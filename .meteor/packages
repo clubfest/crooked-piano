@@ -13,3 +13,7 @@ accounts-ui
 accounts-google
 accounts-facebook
 # appcache
+http
+npm
+GAnalytics
+d3

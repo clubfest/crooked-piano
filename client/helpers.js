@@ -12,3 +12,7 @@ Handlebars.registerHelper('absoluteUrl', function() {
   // this should be a song context
   return Meteor.absoluteUrl();
 });
+
+Handlebars.registerHelper('isIos', function() {
+  return IS_IOS;
+});

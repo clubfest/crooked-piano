@@ -216,20 +216,39 @@ noteToName = function(note, alphabet) {
   }
 
   if (alphabet) {
-    var conversion = {
-      0: 'C',
-      1: 'C\u266F',
-      2: 'D',
-      3: 'E\u266D',
-      4: 'E',
-      5: 'F',
-      6: 'F\u266F',
-      7: 'G',
-      8: 'A\u266D',
-      9: 'A',
-      10: 'B\u266D',
-      11: 'B',
+    if (1 || Session.get('isSharp')) {
+      var conversion = {
+        0: 'C',
+        1: 'C\u266F',
+        2: 'D',
+        3: 'D\u266F',
+        4: 'E',
+        5: 'F',
+        6: 'F\u266F',
+        7: 'G',
+        8: 'G\u266F',
+        9: 'A',
+        10: 'A\u266F',
+        11: 'B',
+      };
+    } else {
+      var conversion = {
+        0: 'C',
+        1: 'D\u266D',
+        2: 'D',
+        3: 'E\u266D',
+        4: 'E',
+        5: 'F',
+        6: 'G\u266D',
+        7: 'G',
+        8: 'A\u266D',
+        9: 'A',
+        10: 'B\u266D',
+        11: 'B',
     };
+    }
+
+
   } else {
     var conversion = {
       0: 'Do',
@@ -249,23 +268,3 @@ noteToName = function(note, alphabet) {
 
   return conversion[note];
 }
-// (function($) {
-//   var IS_IOS = navigator.userAgent.match(/(iPhone|iPad|webOs|Android)/i);
-//   $.fn.nodoubletapzoom = function() {
-//     if (IS_IOS)
-//       $(this).bind('touchstart', function preventZoom(e) {
-//         var t2 = e.timeStamp
-//           , t1 = $(this).data('lastTouch') || t2
-//           , dt = t2 - t1
-//           , fingers = e.originalEvent.touches.length;
-//         $(this).data('lastTouch', t2);
-//         if (!dt || dt > 500 || fingers > 1) return; // not double-tap
- 
-//         e.preventDefault(); // double tap - prevent the zoom
-//         // also synthesize click events we just swallowed up
-//         $(this).trigger('click').trigger('click');
-//       });
-
-//     return this;
-//   };
-// })(jQuery);

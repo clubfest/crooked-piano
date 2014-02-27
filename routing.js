@@ -7,6 +7,27 @@ Router.configure({
 
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
+  this.route('gamify', {
+    path: '/gamify/:url',
+    action: function() {
+      var self = this;
+
+      self.render('loading');
+
+      Meteor.call('downloadMidi', this.params.url, function(err, songId) {
+        if (err) {
+          alert(err.reason + '\nTry to upload the file from your computer.');
+          // console.log(err.reason);
+          self.render('upload');
+        } else {
+          Router.go('editSong', {_id: songId});
+        }
+      });
+      
+    }
+  });
+
+  this.route('loading')
   this.route('songApi', {
     path: '/songApi/:_id',
 
@@ -45,6 +66,7 @@ Router.map(function() {
     },
 
     data: function() {
+      console.log('data')
       var data = {};
 
       data.replayerSong = Songs.findOne(this.params._id);
@@ -150,5 +172,10 @@ Router.map(function() {
 
   this.route('home', {
     path: '/',
+    before: function() {
+      GAnalytics.pageview();
+    },
   });
+
+  this.route('chart')
 });

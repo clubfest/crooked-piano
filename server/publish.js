@@ -52,6 +52,7 @@ Meteor.publish('mySongIds', function() {
       isGamified: 1,
       createdAt: 1,
       playCount: 1,
+      creatorId: 1,
     },
     sort: {createdAt: -1},
   });
