@@ -1,0 +1,67 @@
+<template name='advancedControl'>
+<div class='panel song-version spaced-out'>
+   <div>
+    {{#isolate}}
+      <div>
+        {{tonality}}
+      </div>
+      <div>
+        <button id='sample-down'><i class='icon-minus'></i></button>
+        {{sampleSize}}
+        <button id='sample-up'><i class='icon-plus'></i></button>
+      </div>
+    {{/isolate}}
+  </div>
+  <div>
+    {{#isolate}}
+      <div>
+        Shift
+      </div>
+      <div>
+        <button id='shift-down'><i class='icon-minus'></i></button>
+        {{shift}}
+        <button id='shift-up'><i class='icon-plus'></i></button>      
+      </div>
+    {{/isolate}}
+  </div>
+  <div>
+    {{#isolate}}
+      <div>
+        Switch Track
+      </div>
+      <button id='switch-track'>
+        <i class='icon-pause'></i>
+        {{mainTrack}}
+      </button>
+    {{/isolate}}
+  </div>
+  {{#isolate}}
+    <div>
+      <div>
+        Difficulty
+      </div>
+      {{#if isSynchronous}}
+        <button id='asynchronous'>Easy</button>
+      {{else}}
+        <button id='synchronous'>Hard</button>
+      {{/if}}
+    </div>
+  {{/isolate}}
+
+  {{#isolate}}
+    <div>
+      <div>
+        Notation
+      </div>
+      {{#if isAlphabetNotation}}
+        <button id="do-re-mi-notation">Alphabet</button>
+      {{else}}
+        <button id='alphabet-notation'>Do Re Mi</button>      
+      {{/if}}
+    </div>
+  {{/isolate}}
+
+  <button id='display-guitar'>Guitar</button>
+  <button id='clear-guitar'>clear</button>
+</div>
+</template>

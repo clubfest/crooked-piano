@@ -1,18 +1,58 @@
 
-.keyboard .key.first-cluster {
-  background: #5F5;
+.piano-keyboard .keyboard .key.first-cluster {
+  background: #2F2;
   /*font-size: 24px;*/
 }
 
-.keyboard .computer-note {
+@media all and (max-width: 760px) {
+  .piano-keyboard .keyboard .key.first-cluster {
+    background: #2F2;
+    -webkit-box-shadow: 1px 1px 300px 100px rgba(14, 255, 14, .3);
+    -moz-box-shadow:    1px 1px 300px 100px rgba(14, 255, 14, .3);
+    box-shadow:         1px 1px 300px 100px rgba(14, 255, 14, .3);
+    /*font-size: 24px;*/
+  }
+}
+
+@media all and (max-width: 580px) {
+  .piano-keyboard .keyboard .key.first-cluster {
+    -webkit-box-shadow: 1px 1px 400px 250px rgba(14, 255, 14, .2);
+    -moz-box-shadow:    1px 1px 400px 250px rgba(14, 255, 14, .2);
+    box-shadow:         1px 1px 400px 250px rgba(14, 255, 14, .2);
+  }
+}
+
+@media all and (max-width: 460px) {
+  .piano-keyboard .keyboard .key.first-cluster {
+    -webkit-box-shadow: 1px 1px 800px 400px rgba(14, 255, 14, .15);
+    -moz-box-shadow:    1px 1px 800px 400px rgba(14, 255, 14, .15);
+    box-shadow:         1px 1px 800px 400px rgba(14, 255, 14, .15);
+  }
+}
+
+.piano-keyboard .keyboard .computer-note {
   font-size: 24px;
   background: #E99;
 }
 
-.keyboard .key.repeated-note {
-  background: #1F1;
+.piano-keyboard .keyboard .key.repeated-note {
+  background: #2F5;
 }
 
 .song-version {
   font-size: 16px;
+}
+
+.guitar-keyboard .keyboard .key.first-cluster {
+  background: #5F5;
+  /*font-size: 24px;*/
+}
+
+.guitar-keyboard .keyboard .computer-note {
+  font-size: 24px;
+  background: #E99;
+}
+
+.guitar-keyboard .keyboard .key.repeated-note {
+  background: #1F1;
 }

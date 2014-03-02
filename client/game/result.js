@@ -15,3 +15,7 @@ Handlebars.registerHelper('scoreTallied', function() {
 Handlebars.registerHelper('hasScore', function() {
   return Session.get('score') !== null;
 });
+
+Template.result.inEditMode = function() {
+  return location.href.match(/editSong/i); // fix this hack
+}

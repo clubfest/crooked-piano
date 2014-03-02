@@ -35,7 +35,6 @@ loadMidiJs = function() {
     $.getScript(file, function() {
       numDone++;
       Session.set('loadProgress', Session.get('loadProgress') + 1);
-
       if (numDone === files.length) {
         loadSound();
       }
@@ -59,7 +58,6 @@ loadSound = function() {
           }
       });
       // TODO: keyboardUp.sound if without pedal
-      Session.set('hasMidiNoteOn', true);
     }
 
   });

@@ -245,7 +245,7 @@ noteToName = function(note, alphabet) {
         9: 'A',
         10: 'B\u266D',
         11: 'B',
-    };
+      };
     }
 
 

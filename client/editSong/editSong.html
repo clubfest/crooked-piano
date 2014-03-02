@@ -1,28 +1,8 @@
 <template name='editSong'>
 
-  
-
 {{#isolate}}
   {{> intro}}
 {{/isolate}}
-
-<div class='panel spaced-out'>
-  <div>
-    <div id='youtube-link-editable' data-mode='inline'>
-      {{youtubeLink}}
-    </div>
-  </div>
-  <div>
-    <a id='gamify-song' class='btn btn-primary'>
-      <i class='icon-film'></i>
-      gamify
-    </a>  
-  </div>
-</div>
-
-<hr/>
-
-{{> leadPlayer}}
 
 {{#with song}}
   {{#if youtubeId}}
@@ -30,12 +10,24 @@
       <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
     </div>
   {{/if}}
+
+  <div class='panel'>
+    <div id='youtube-link-editable' data-mode='inline'>
+      {{youtubeLink}}
+    </div>
+  </div>
 {{/with}}
+
+<hr/>
+
+{{#isolate}}
+  {{> leadPlayer}}  
+{{/isolate}}
 
 <div class='spaced-out'>
   <div class='panel'>
     <p>
-      Click on a track's button to remove        
+      Click on a green button button to remove that part        
     </p>
     {{#each segmentInfos}}
       {{#isolate}}
@@ -53,7 +45,9 @@
       {{/isolate}}
     {{/each}}
   </div>
-  <canvas id='notes-canvas'></canvas>
+  {{#isolate}}
+    <canvas id='notes-canvas'></canvas>
+  {{/isolate}}
   <div class='panel'>
     {{#with song}}
       <div>        
@@ -71,6 +65,7 @@
     {{/with}}
   </div>
 </div>
+
 
   
 

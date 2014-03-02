@@ -11,7 +11,12 @@ Template.keyboard.rendered = function() {
 }
 
 Template.keyboard.events({
-  'click #loading-sound': function() {
+  'click #load-sound': function() {
     loadMidiJs();
   }
-})
+});
+
+Template.keyboard.loadProgress = function() {
+  var loadProgress = Session.get('loadProgress') || 0;
+  return Math.floor(loadProgress * 100 / 12);
+}

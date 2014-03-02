@@ -7,10 +7,17 @@
         </button>
       </div>
       <div>
-        <button id='next-game'>
-          <i class='icon-chevron-right'></i>
-          Next
-        </button>
+        {{#if inEditMode}}
+          <button id='gamify-song' class='btn btn-success'>
+            <i class='icon-music'></i>
+            Gamify
+          </button>
+        {{else}}
+          <button id='next-game'>
+            <i class='icon-chevron-right'></i>
+            Next
+          </button>
+        {{/if}}
       </div>
     </div>
 

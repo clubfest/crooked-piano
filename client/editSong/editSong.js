@@ -7,22 +7,9 @@ Template.editSong.created = function() {
   song = this.data.song;
 
   Session.set('mainTrack', song.mainTrack);
-  // LeadPlayer.create(song);
-  // isPreview = true;
 }
 
 Template.editSong.rendered = function() {  
-  // if (isPreview) {
-  //   var self = this;
-  //   Deps.autorun(function() {
-  //     if (song.notes) {        
-  //       LeadPlayer.setPlayNotes(song.notes);
-  //       isPreview = false;
-  //     }
-  //   });
-  // }
-
-  LeadPlayer.redisplayNotes();
   canvas = document.getElementById('notes-canvas');
 
   canvas.height = 500; // canvas must be less than 8192
@@ -34,29 +21,8 @@ Template.editSong.rendered = function() {
   Deps.autorun(function() {
     drawNotes();
   });
-  
 
   songId = song._id;
-  
-  $('#main-track-editable').editable({
-    mode: "inline",
-    onblur: 'submit',
-    success: function(res, newValue) {
-      Meteor.call('updateSongMainTrack', songId, newValue, function(err) {
-        if (err) alert(err.reason);
-      });
-    },
-  });
-
-  $('#shift-editable').editable({
-    mode: "inline",
-    onblur: 'submit',
-    success: function(res, newValue) {
-      Meteor.call('updateSongShift', songId, newValue, function(err) {
-        if (err) alert(err.reason);
-      });
-    },
-  });
 
   $('#youtube-link-editable').editable({
     mode: "inline",
@@ -132,6 +98,10 @@ Template.editSong.events({
     });
   },
 
+  'click #get-tonality': function() {
+    Session.set('tonality', getTonality());
+  },
+
 });
 
 
@@ -157,16 +127,13 @@ Template.editSong.isRemoved = function() {
   return segment.isRemoved;
 }
 
-Template.editSong.isMyPart = function(segmentId) {
-  simpleRecorder.notes
-}
-
 function drawNotes() {
-  var idx = Session.get('playIndex') - LeadPlayer.proximateNotes.length - LeadPlayer.computerProximateNotes.length;
+  var idx = LeadPlayer.getIndex();
+  
   if (!idx) idx = 0;
 
   var notes = LeadPlayer.playNotes;
-  if (notes.length === 0) return ; // no track selected
+  if (notes.length === 0 || idx >= notes.length) return ; // no track selected
 
   var offset = notes[idx].time;
 

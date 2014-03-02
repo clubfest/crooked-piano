@@ -14,7 +14,6 @@ Template.upload.rendered = function() {
         var player = MIDI.Player;
 
         try {
-          // console.log(fileReader.result);
           player.loadFile(fileReader.result);
         } catch (e) {
           Session.set('message', 'Upload failed');

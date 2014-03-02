@@ -1,64 +1,41 @@
 <template name='leadPlayer'>
 
 {{#isolate}}
-      {{> result}}
+  {{> result}}
 {{/isolate}}
 
 {{#isolate}}
   {{> playerControl}}
 {{/isolate}}
 
-<div class='play-slider'></div>
-
 {{#isolate}}
-  {{> keyboard}}
+  <div class='play-slider'></div>
 {{/isolate}}
 
-<div>
-  Change Speed:
-  <div id='speed-slider'></div>
-</div>
+{{#isolate}}
+{{#if displayGuitar}}
+  {{> guitar}}  
+{{else}}
+  {{> keyboard}}
+{{/if}}
+{{/isolate}}
 
-<div class=' panel song-version spaced-out'>
+{{#isolate}}
   <div>
-    <div>
-      {{#isolate}}
-        <div>
-          Shift
-        </div>
-        <div>
-          <button id='shift-down'><i class='icon-minus'></i></button>
-          {{shift}}
-          <button id='shift-up'><i class='icon-plus'></i></button>      
-        </div>
-      {{/isolate}}
-    </div>
+    Change Speed:
+    <div id='speed-slider'></div>
   </div>
-  <div>
-    <button id='switch-track'>
-      Switch Parts
-    </button>
-  </div>
-  {{#isolate}}
-    <div>
-      {{#if isSynchronous}}
-        <button id='asynchronous'>Fast</button>
-      {{else}}
-        <button id='synchronous'>Slow</button>
-      {{/if}}
-    </div>
-  {{/isolate}}
+{{/isolate}}
 
-  {{#isolate}}
-    <div>
-        {{#if isAlphabetNotation}}
-          <button id="do-re-mi-notation">Do Re Mi</button>
-        {{else}}
-          <button id='alphabet-notation'>Music alphabet</button>      
-        {{/if}}
-    </div>
-  {{/isolate}}
-</div>
+{{#isolate}}
+  {{> advancedControl}}
+{{/isolate}}
+
+{{#isolate}}
+
+{{/isolate}}
+
+
   
 
 </template>

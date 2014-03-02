@@ -7,10 +7,10 @@ Template.leadPlayer.created = function() {
   Session.set('playSpeed', song.speed || 1);
   Session.set('shift', song.shift || 0);
   Session.setDefault('isSynchronous', true);
+  Session.set('sampleSize', 10);
   isPreview = true;
 
   LeadPlayer.create(song);
-  console.log('created');
 }
 
 Template.leadPlayer.rendered = function() {
@@ -23,16 +23,31 @@ Template.leadPlayer.rendered = function() {
         min: 0,
         max: Session.get('playLength'),
         value: LeadPlayer.getPlayIndex(),
+
+        slide: function(evt, ui) {
+          LeadPlayer.reset(ui.value);
+          LeadPlayer.updateProximateNotes();
+        },
       });
+    });
+
+    Deps.autorun(function() {
+      if ((Session.get('playIndex') % (Session.get('sampleSize') / 2) === 0)) {
+        Session.set('tonality', getTonality(Session.get('sampleSize')));
+      }
     }); 
   }
 
-  $('.play-slider').slider({
-    slide: function(evt, ui) {
-      LeadPlayer.reset(ui.value);
-      LeadPlayer.updateProximateNotes();
-    },
-  });
+  $('#speed-slider').slider({
+      range: 'min',
+      min: .1,
+      max: 1.4,
+      step: 0.05,
+      value: Session.get('playSpeed'),
+      slide: function(evt, ui) {
+        Session.set('playSpeed', ui.value);
+      },
+    }); 
 
   if (isPreview) {
     var self = this;
@@ -41,23 +56,13 @@ Template.leadPlayer.rendered = function() {
       if (song.notes) {
         LeadPlayer.setPlayNotes(song.notes);
         isPreview = false;
-        console.log('reloaded');
       }
     });
   }
 
   LeadPlayer.redisplayNotes();
 
-  $('#speed-slider').slider({
-    range: 'min',
-    min: .1,
-    max: 1.4,
-    step: 0.05,
-    value: Session.get('playSpeed'),
-    slide: function(evt, ui) {
-      Session.set('playSpeed', ui.value);
-    },
-  });  
+     
 }
 
 Template.leadPlayer.destroyed = function() {
@@ -73,18 +78,12 @@ Template.leadPlayer.events({
     Session.set('isSynchronous', false);
     LeadPlayer.transferProximateNotesToComputer();
   },
-
-  // 'click #start': function() {
-  //   Session.set('isPaused', false);
-  // },
   
   'click #demo': function() {
-    // players[Session.get('playLevel')].demo();
     LeadPlayer.demo();
   },
 
   'click #pause-demo': function() {
-    // players[Session.get('playLevel')].pauseDemo();
     LeadPlayer.pauseDemo();
   },
 
@@ -121,19 +120,50 @@ Template.leadPlayer.events({
     Session.set('shift', Session.get('shift') - 1);
     displayNoteDistribution();
   },
+
+  'click #sample-up': function() {
+    Session.set('sampleSize', Session.get('sampleSize') + 1);
+    Session.set('tonality', getTonality(Session.get('sampleSize')));
+  },
+
+  'click #sample-down': function() {
+    Session.set('sampleSize', Session.get('sampleSize') - 1);
+    Session.set('tonality', getTonality(Session.get('sampleSize')));
+  },
+
+  'click #display-guitar': function() {
+    Session.set('displayGuitar', !Session.get('displayGuitar'));
+  },
 });
 
-Template.leadPlayer.shift = function() {
+Template.leadPlayer.displayGuitar = function() {
+  return Session.get('displayGuitar');
+}
+
+Template.advancedControl.tonality = function() {
+  return Session.get('tonality') || 'Tonality';
+}
+
+Template.advancedControl.sampleSize = function() {
+  return Session.get('sampleSize');
+}
+
+Template.advancedControl.shift = function() {
   return Session.get('shift');
 }
 
-Template.leadPlayer.isSynchronous = function() {
+Template.advancedControl.isSynchronous = function() {
   return Session.get('isSynchronous');
 }
 
-Template.leadPlayer.loadProgress = function() {
-  var loadProgress = Session.get('loadProgress') || 1;
-  return Math.floor(loadProgress * 100 / 12);
+Template.advancedControl.mainInstrumentName = function() {
+  if (song.segments && song.mainTrack) {
+    return song.segments[song.mainTrack].text;
+  }
+}
+
+Template.advancedControl.mainTrack = function() {
+  return Session.get('mainTrack');
 }
 
 Handlebars.registerHelper('isPaused', function() {
@@ -141,25 +171,93 @@ Handlebars.registerHelper('isPaused', function() {
 });
 
 function displayNoteDistribution() {
-  var currIdx = LeadPlayer.getPlayIndex();
-  var notes = LeadPlayer.playNotes.slice(currIdx, currIdx + 100); // 100 is arbitrary
+  var noteDistribution = getNoteDistribution(200); // 100 is arbitrary
 
-  var noteStatistics = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  for (var i = 0; i < noteDistribution.length; i++) {
+    var keyCode = convertNoteToKeyCode(72 + i);
+    var dom = $('[data-key-code="' + keyCode + '"]');
+
+    dom.html('<span>' + noteDistribution[i] + '</span>');
+  }
+}
+
+OCTAVE = 12;
+getNoteDistribution = function(surveyLength) {
+  var currIdx = LeadPlayer.getIndex();
+  var notes = LeadPlayer.playNotes.slice(currIdx, currIdx + surveyLength);
+
+  var noteDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   for (var i = 0; i < notes.length; i++) {
     var note = notes[i];      
     var noteNumber = note.note + Session.get('shift');
     
     // statistics
-    noteStatistics[noteNumber % 12] += 1;
+    noteDistribution[noteNumber % OCTAVE] += 1;
   }
 
-  for (var i = 0; i < noteStatistics.length; i++) {
-    var keyCode = convertNoteToKeyCode(72 + i);
-    var dom = $('[data-key-code="' + keyCode + '"]');
+  return noteDistribution;
+}
 
-    dom.html('<span>' + noteStatistics[i] + '</span>');
+getTonality = function(size) {
+  var noteDist = getNoteDistribution(size);
+  var majorTriadCount = [];
+  var minorTriadCount = [];
+
+  for (var i = 0; i < OCTAVE; i++) {
+    var num = noteDist[0+i] + noteDist[(4+i)%OCTAVE] + noteDist[(7+i)%OCTAVE];
+    majorTriadCount.push(num);
   }
+
+  for (var i = 0; i < OCTAVE; i++) {
+    var num = noteDist[0+i] + noteDist[(3+i)%OCTAVE] + noteDist[(7+i)%OCTAVE];
+    minorTriadCount.push(num);
+  }
+
+  var majorMax = getMaxOfArray(majorTriadCount);
+  var minorMax = getMaxOfArray(minorTriadCount);
+
+  if (minorMax > majorMax) {
+    var idx = minorTriadCount.indexOf(minorMax);
+    var conversion = {
+      0: 'C',
+      1: 'D\u266D',
+      2: 'D',
+      3: 'E\u266D',
+      4: 'E',
+      5: 'F',
+      6: 'G\u266D',
+      7: 'G',
+      8: 'A\u266D',
+      9: 'A',
+      10: 'B\u266D',
+      11: 'B',
+    };
+    var tonality = conversion[idx] + ' minor';
+  } else {
+    var idx = majorTriadCount.indexOf(majorMax);
+    var conversion = {
+      0: 'C',
+      1: 'C\u266F',
+      2: 'D',
+      3: 'D\u266F',
+      4: 'E',
+      5: 'F',
+      6: 'F\u266F',
+      7: 'G',
+      8: 'G\u266F',
+      9: 'A',
+      10: 'A\u266F',
+      11: 'B',
+    };
+    var tonality = conversion[idx] + ' major';
+  }
+  return tonality;
+
+}
+
+function getMaxOfArray(numArray) {
+    return Math.max.apply(null, numArray);
 }
 
 

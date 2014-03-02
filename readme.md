@@ -1,35 +1,46 @@
 
 ## TODO
 
-* allow non-user to upload temporarily
-* upload means pre-gamified, but fully gamified until shared
-* show analytics as you play 
-* allow you to tweak the shift and tracks
-* update the fingering dynamically with caching only after you gamify
+* Fill in the best shift
 
-* to make it public, requires title, artist and description
-
-
-* upload the song without changes and allow replay
+* redirect non-user to sign in
 
 * snap notes together both in time and in tone
-* Fill in the best shift
 * Add slow recording
-
 
 * paginate
 * most recent
 * most played
 
+## Marketing
+
+* post comment on youtube video that the gamified song links to
+* find places where people talk about a piece of music and gamify it
+* create video on youtube (programmatically if possible)
+* create quora question: what song inspired to learn more music / musical instrument
+* not possible on Quora: create a widget to embed the game in
+
+## Copyright
+
+* post copyright info in editSong
+* have the user fill out the Thanks
+* have copyright holder sign up differently to offer them a button to remove main track
+* create a competition for people to improvise
+* help people improvise by finding a song with similar chord progression
+
+## Recognize Chords
+
+C-major: 0, 4, 7
+G#-major: 0, 3, 8
+F-major: 0, 5, 9
+
+C-minor: 0, 3, 7
+A-minor: 0, 4, 8
+F-minor: 0, 5, 8
 
 
-## Done
 
-* artist
-* youtube video
 
-* reversible removal of tracks
-* the notes being drawn is reactive
 
 ## Video
 Let me show you a new way to experience

@@ -21,15 +21,12 @@ LeadPlayer = {
 
     this.setPlayNotes(this.song.previewNotes);
 
+    Session.set('mainTrack', song.mainTrack);
     this.segmentId = song.mainTrack;
 
     this.reset();
 
-    // todo: deal with when sound is not loaded
-    // if (Session.get('hasMidiNoteOn')) {
-      this.updateProximateNotes();
-    // }
-
+    this.updateProximateNotes();
   },
 
   setPlayNotes: function(notes) {
@@ -47,16 +44,19 @@ LeadPlayer = {
   },
 
   reset: function(playIndex) {
-    var highestTimeoutId = setTimeout(";");
-    for (var i = 0 ; i < highestTimeoutId ; i++) {
-        clearTimeout(i); 
+    if (Session.get('hasMidiNoteOn')) { 
+      // MIDI.js also use setTimeout
+      // so we must check that we are the only 1 using the timeout.
+      var highestTimeoutId = setTimeout(";");
+      for (var i = 0 ; i < highestTimeoutId ; i++) {
+          clearTimeout(i); 
+      }
     }
 
     Session.set('numCorrect', 0);
     Session.set('numWrong', 0);
     Session.set('isWrong', false);
     Session.set('score', null);
-    Session.set('isDemoing', false);
     Session.set('scoreTallied', false);
 
     if (!playIndex) {
@@ -68,7 +68,6 @@ LeadPlayer = {
     simpleRecorder.stop();
     simpleRecorder.clear();
     simpleRecorder.start();
-
 
     if (this.proximateNotes && this.computerProximateNotes) {
       this.undisplayNotes();
@@ -157,17 +156,17 @@ LeadPlayer = {
   },
 
   demo: function() {
-    if (this.getPlayIndex() === this.playNotes.length) {
-      this.reset();
-    }
-
-    Session.set('isDemoing', true);
-    $('.demo-message').remove();
+    Session.set('isDemoing', true); // must come first or timing won't work
 
     if (Session.get('isSynchronous')) {
       this.transferProximateNotesToComputer();
     } else {
       // don't update because the computer notes will be loaded in the wrong order
+    }
+    
+    if (this.computerProximateNotes.length === 0 ||this.getPlayIndex() === this.playNotes.length) {
+      this.reset();
+      this.updateProximateNotes();
     }
   },
 
@@ -193,7 +192,7 @@ LeadPlayer = {
     }
 
     while(1) {
-      var note = this.playNotes[this.getPlayIndex()];
+      var note = $.extend({}, this.playNotes[this.getPlayIndex()]);
       this.incrementPlayIndex(); // TODO: simplify this
       
       if (Session.get('shift') !== 0) {
@@ -201,9 +200,7 @@ LeadPlayer = {
         note.keyCode = convertNoteToKeyCode(note.note);
       }
 
-
       if (Session.get('isDemoing') || this.isComputerNote(note)) {
-
         this.computerProximateNotes.push(note);
 
       } else {
@@ -400,6 +397,14 @@ LeadPlayer = {
     if (!dom.hasClass('first-cluster')) {
       dom.html('<span>'+noteToName(note.note, Session.get('isAlphabetNotation'))+'</span>');
     }
+
+    for (var i = 0; i < 2; i++) {
+      noteNumber = note.note + i * 12;
+      dom = $('[data-note='+noteNumber+']');
+      dom.addClass('computer-note');
+      dom.html('<span>'+noteToName(noteNumber, Session.get('isAlphabetNotation'))+'</span>');
+    }
+      
   },
 
   undisplayNotes: function() {
@@ -426,6 +431,13 @@ LeadPlayer = {
     // TODO: undisplay repeated notes properly
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.removeClass('first-cluster computer-note repeated-note');
+
+    for (var i = 0; i < 2; i++) {
+      noteNumber = note.note + 12 * i;
+      dom = $('[data-note='+noteNumber+']');
+      dom.removeClass('first-cluster computer-note repeated-note');
+    }
+
     // if (dom.hasClass('repeated-note')) {
     //   dom.removeClass('repeated-note');
     //   dom.addClass('first-cluster');
