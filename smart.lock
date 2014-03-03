@@ -2,7 +2,14 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "iron-router": {},
+      "iron-router": {
+        "git": "git@github.com:EventedMind/iron-router.git",
+        "branch": "blaze-integration"
+      },
+      "blaze-layout": {
+        "git": "https://github.com/EventedMind/blaze-layout.git",
+        "branch": "devel"
+      },
       "jquery-ui": {},
       "font-awesome": {},
       "x-editable-bootstrap": {},
@@ -11,9 +18,14 @@
     },
     "packages": {
       "iron-router": {
-        "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.6.4",
-        "commit": "927bbaed1b87894fb6fb70807f74ff3a5bd89f29"
+        "git": "git@github.com:EventedMind/iron-router.git",
+        "branch": "blaze-integration",
+        "commit": "6fd133401bb6de65a30ba148f7d61ea1b4dc9b43"
+      },
+      "blaze-layout": {
+        "git": "https://github.com/EventedMind/blaze-layout.git",
+        "branch": "devel",
+        "commit": "d4f12dc99bc36492d2790da31e5013b77efc3c05"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",

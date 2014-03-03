@@ -5,6 +5,12 @@ Router.configure({
   loadingTemplate: 'loading',
 });
 
+// Router.before(function() {
+//   console.log('before')
+//   if (! this.ready())
+//     this.render('loading');
+// });
+
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
   this.route('gamify', {
@@ -27,12 +33,9 @@ Router.map(function() {
     }
   });
 
-  this.route('loading')
   this.route('songApi', {
     path: '/songApi/:_id',
-
     where: 'server',
-
     action: function() {
       var song = Songs.findOne(this.params._id);
       this.response.setHeader('Content-Type', 'application/json');
@@ -42,9 +45,7 @@ Router.map(function() {
 
   this.route('songApi', {
     path: '/songsApi',
-
     where: 'server',
-
     action: function() {
       var songs = Songs.find({}, {
         fields: {
@@ -60,13 +61,10 @@ Router.map(function() {
 
   this.route('editSong', {
     path: '/editSong/:_id',
-
     before: function() {
       this.subscribe('song', this.params._id).wait();
     },
-
     data: function() {
-      console.log('data')
       var data = {};
 
       data.replayerSong = Songs.findOne(this.params._id);
@@ -109,16 +107,19 @@ Router.map(function() {
     path: '/game/:_id',
 
     before: function() {
+      console.log('game before')
       this.subscribe('songId', this.params._id).wait();
       this.subscribe('songNotes', this.params._id);
     },
 
     data: function() {
-      var data = {};
+      console.log('game data')
 
-      data.song = Songs.findOne(this.params._id);
+      // var data = {};
 
-      return data;
+      // data.song = Songs.findOne(this.params._id);
+
+      // return data;
     },
 
     // caching last game's songId; todo: check elsewhere, like profile, that this is defined

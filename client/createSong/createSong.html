@@ -7,9 +7,9 @@
 
   <div class='panel'>
     {{#if currentUser}} 
-      {{loginButtons}}
+      {{> loginButtons}}
     {{else}}
-      Before recording the song, {{loginButtons}}
+      Before recording the song, {{> loginButtons}}
     {{/if}}  
     <div>
       <a href="{{pathFor 'songs'}}">songs</a>

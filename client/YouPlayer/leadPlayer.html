@@ -1,41 +1,22 @@
 <template name='leadPlayer'>
 
-{{#isolate}}
   {{> result}}
-{{/isolate}}
 
-{{#isolate}}
   {{> playerControl}}
-{{/isolate}}
 
-{{#isolate}}
   <div class='play-slider'></div>
-{{/isolate}}
 
-{{#isolate}}
-{{#if displayGuitar}}
-  {{> guitar}}  
-{{else}}
-  {{> keyboard}}
-{{/if}}
-{{/isolate}}
+  {{#if displayGuitar}}
+    {{> guitar}}  
+  {{else}}
+    {{> keyboard}}
+  {{/if}}
 
-{{#isolate}}
   <div>
     Change Speed:
     <div id='speed-slider'></div>
   </div>
-{{/isolate}}
 
-{{#isolate}}
-  {{> advancedControl}}
-{{/isolate}}
-
-{{#isolate}}
-
-{{/isolate}}
-
-
-  
+  {{> advancedControl}}  
 
 </template>

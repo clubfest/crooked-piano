@@ -19,14 +19,16 @@ LeadPlayer = {
 
     simpleRecorder.init();
 
-    this.setPlayNotes(this.song.previewNotes);
+    if (this.song.previewNotes) {
+      this.setPlayNotes(this.song.previewNotes);
 
-    Session.set('mainTrack', song.mainTrack);
-    this.segmentId = song.mainTrack;
+      Session.set('mainTrack', song.mainTrack);
+      this.segmentId = song.mainTrack;
 
-    this.reset();
+      this.reset();
 
-    this.updateProximateNotes();
+      this.updateProximateNotes();
+    }
   },
 
   setPlayNotes: function(notes) {
