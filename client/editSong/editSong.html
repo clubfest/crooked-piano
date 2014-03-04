@@ -43,19 +43,34 @@
     <canvas id='notes-canvas'></canvas>
 
     <div class='panel'>
-      {{#with song}}
-        <div>        
-          <ul class='game-list'>
-          <li class='cloud'>
-            Credits:            
-          </li>
-          {{#each songInfo}}
-            <li class='cloud'>
-              {{this}}            
-            </li>
-          {{/each}}
-          </ul>
-        </div>
+      {{#with song.songInfo}}
+        {{#if lyrics}}
+          <h2>Lyrics</h2>
+          <div>
+            {{{join lyrics}}}
+          </div>
+        {{/if}}
+        
+        {{#if trackNames}}
+          <h2>Track Names</h2>
+          <div>
+            {{trackNames}}
+          </div>
+        {{/if}}
+
+        {{#if instruments}}
+          <h2>Instruments</h2>
+          <div>
+            {{instruments}}
+          </div>
+        {{/if}}
+
+        {{#if copyrightNotice}}
+          <h2>Copyright</h2>
+          <div>
+            {{copyrightNotice}}
+          </div>
+        {{/if}}
       {{/with}}
     </div>
   </div>

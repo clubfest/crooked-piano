@@ -1,0 +1,22 @@
+#dragandrophandler {
+  border: 5px solid #999;
+  background: #eee;
+  width: 300px;
+  min-height: 250px;
+  margin: 20px auto;
+  text-align:center;
+  padding: 20px 0;
+  vertical-align:middle;
+  padding:10px 10px 10 10px;
+  margin-bottom:10px;
+  font-size:20px;
+
+  -moz-border-radius-topleft: 21px;
+  -moz-border-radius-topright: 21px;
+  -moz-border-radius-bottomright: 21px;
+  -moz-border-radius-bottomleft: 21px;
+  border-top-left-radius: 21px;
+  border-top-right-radius: 21px;
+  border-bottom-right-radius: 21px;
+  border-bottom-left-radius: 21px;
+}

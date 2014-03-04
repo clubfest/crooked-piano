@@ -1,11 +1,11 @@
 
-.piano-keyboard .keyboard .key.first-cluster {
+.piano-keyboard .keyboard .key.my-note {
   background: #2F2;
   /*font-size: 24px;*/
 }
 
 @media all and (max-width: 760px) {
-  .piano-keyboard .keyboard .key.first-cluster {
+  .piano-keyboard .keyboard .key.my-note {
     background: #2F2;
     -webkit-box-shadow: 1px 1px 300px 100px rgba(14, 255, 14, .3);
     -moz-box-shadow:    1px 1px 300px 100px rgba(14, 255, 14, .3);
@@ -15,7 +15,7 @@
 }
 
 @media all and (max-width: 580px) {
-  .piano-keyboard .keyboard .key.first-cluster {
+  .piano-keyboard .keyboard .key.my-note {
     -webkit-box-shadow: 1px 1px 400px 250px rgba(14, 255, 14, .2);
     -moz-box-shadow:    1px 1px 400px 250px rgba(14, 255, 14, .2);
     box-shadow:         1px 1px 400px 250px rgba(14, 255, 14, .2);
@@ -23,7 +23,7 @@
 }
 
 @media all and (max-width: 460px) {
-  .piano-keyboard .keyboard .key.first-cluster {
+  .piano-keyboard .keyboard .key.my-note {
     -webkit-box-shadow: 1px 1px 800px 400px rgba(14, 255, 14, .15);
     -moz-box-shadow:    1px 1px 800px 400px rgba(14, 255, 14, .15);
     box-shadow:         1px 1px 800px 400px rgba(14, 255, 14, .15);
@@ -43,7 +43,7 @@
   font-size: 16px;
 }
 
-.guitar-keyboard .keyboard .key.first-cluster {
+.guitar-keyboard .keyboard .key.my-note {
   background: #5F5;
   /*font-size: 24px;*/
 }

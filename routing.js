@@ -5,11 +5,8 @@ Router.configure({
   loadingTemplate: 'loading',
 });
 
-// Router.before(function() {
-//   console.log('before')
-//   if (! this.ready())
-//     this.render('loading');
-// });
+// Router.before('loading');
+// Router.before('dataNotFound')
 
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {

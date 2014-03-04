@@ -1,7 +1,7 @@
 // IMPORTANT: proximateNotes is at most length 1;
 
 WAIT_TIME = 300;
-CLUSTER_TIME = 50;
+CLUSTER_TIME = 99;
 
 LeadPlayer = {
   create: function(song) {
@@ -42,15 +42,15 @@ LeadPlayer = {
         ret.push(note);
       }
     }
-
-    Session.set('playLength', ret.length); // for the game template
     this.playNotes = ret;
+    // this.playNotes = notes;
+    // Session.set('playLength', notes.length); // for the game template
   },
 
   reset: function(playIndex) {
     if (Session.get('hasMidiNoteOn')) { 
       // MIDI.js also use setTimeout
-      // so we must check that we are the only 1 using the timeout.
+      // so we must check that we are the only program using the timeout.
       var highestTimeoutId = setTimeout(";");
       for (var i = 0 ; i < highestTimeoutId ; i++) {
           clearTimeout(i); 
@@ -118,7 +118,8 @@ LeadPlayer = {
 
   transferProximateNotesToComputer: function() {
     if (this.proximateNotes.length > 0) {
-      this.computerProximateNotes.splice(0,0, this.proximateNotes.pop());
+      // Write test: Why splice instead of push?
+      this.computerProximateNotes.splice(0, 0, this.proximateNotes.pop());
       this.playComputerProximateNotes();
       this.updateProximateNotes();
     }
@@ -199,11 +200,16 @@ LeadPlayer = {
       var note = $.extend({}, this.playNotes[this.getPlayIndex()]);
       this.incrementPlayIndex(); // TODO: simplify this
 
-      if (note.event === 'lyrics') {
-        Session.set('lyrics', note.text);
+      if (note.event === 'noteOff') {
+        continue;
+      } else if (note.event === 'lyrics') { 
+        if ($.trim(note.text).length > 0){       
+          var array = this.song.songInfo.lyrics.slice(note.index, note.index + 5);
+          var lyrics = array.join("");
+          Session.set('lyrics', lyrics);
+        }
         continue;
       }
-
       
       if (Session.get('shift') !== 0) {
         note.note += Session.get('shift');
@@ -225,6 +231,7 @@ LeadPlayer = {
 
 
           this.computerProximateNotes.push(lowerNote);
+
           this.proximateNotes = [higherNote];
 
         } else {
@@ -232,8 +239,8 @@ LeadPlayer = {
         }
       }
 
-      if (this.getPlayIndex() === this.playNotes.length ||
-          this.playNotes[this.getPlayIndex()].time - note.time > CLUSTER_TIME) {
+      var nextNote = this.getNextNoteOn();
+      if (!nextNote || nextNote.time - note.time > CLUSTER_TIME) {
         break;
       }
     }
@@ -285,18 +292,22 @@ LeadPlayer = {
       computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
 
       // must do this first as we will change the time for recording purposes
-      this.prevNoteTime = notes[j].time; 
+      if (computerNote.event === 'noteOn') {
+        this.prevNoteTime = notes[j].time; 
+      
+        computerNote.playedByComputer = true;
+        computerNote.time = new Date().getTime(); // for recording
 
-      computerNote.playedByComputer = true;
-      computerNote.time = new Date().getTime(); // for recording
+        $(window).trigger('keyboardDown', computerNote);
 
-      $(window).trigger('keyboardDown', computerNote);
+        self.undisplayNote(computerNote);
 
-      self.undisplayNote(computerNote);
-
-      window.setTimeout(function(note) {        
-        $(window).trigger('keyboardUp', note); // for recording purposes
-      }, 200, computerNote);
+        window.setTimeout(function(note) {        
+          $(window).trigger('keyboardUp', note); // for recording purposes
+        }, 200, computerNote);
+      } else {
+        console.log(computerNote)
+      }
 
     }  
     this.computerProximateNotes = []; 
@@ -390,7 +401,7 @@ LeadPlayer = {
   },
 
   displayNote: function(note) {
-    var displayClass = 'first-cluster '
+    var displayClass = 'my-note '
 
     if (this.coincidingNextNotes(note)) {
       displayClass += " repeated-note"
@@ -404,7 +415,7 @@ LeadPlayer = {
   displayComputerNote: function(note) {
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.addClass('computer-note')
-    if (!dom.hasClass('first-cluster')) {
+    if (!dom.hasClass('my-note')) {
       dom.html('<span>'+noteToName(note.note, Session.get('isAlphabetNotation'))+'</span>');
     }
 
@@ -440,20 +451,13 @@ LeadPlayer = {
   undisplayNote: function(note) {
     // TODO: undisplay repeated notes properly
     var dom = $('[data-key-code='+note.keyCode+']');
-    dom.removeClass('first-cluster computer-note repeated-note');
+    dom.removeClass('my-note computer-note repeated-note');
 
     for (var i = 0; i < 2; i++) {
       noteNumber = note.note + 12 * i;
       dom = $('[data-note='+noteNumber+']');
-      dom.removeClass('first-cluster computer-note repeated-note');
+      dom.removeClass('my-note computer-note repeated-note');
     }
-
-    // if (dom.hasClass('repeated-note')) {
-    //   dom.removeClass('repeated-note');
-    //   dom.addClass('first-cluster');
-    // } else {
-    //   dom.removeClass('first-cluster computer-note');
-    // }
   },
 
   incrementScore: function() {
@@ -480,7 +484,15 @@ LeadPlayer = {
     } else {
       return Session.getIndex;
     }
-    
+  },
+
+  getNextNoteOn: function() {
+    for (var i = this.getPlayIndex(); i < this.playNotes.length; i++) {
+      var note = this.playNotes[i];
+      if (note.event === 'noteOn') {
+        return note;
+      }
+    }
   },
 }
 

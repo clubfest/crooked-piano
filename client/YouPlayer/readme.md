@@ -4,6 +4,10 @@ youPlayer
 * Initialize the youPlayer when the template is created (only once)
 * Then set up the song
 
+## Display notes
+* Only undisplay a computer note on noteOff
+  * Must check that the note is not being displayed as my note
+
 ## What is proximateNotes
 
 `updateProximateNotes` for sparse music:

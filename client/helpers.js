@@ -16,3 +16,10 @@ Handlebars.registerHelper('absoluteUrl', function() {
 Handlebars.registerHelper('isIos', function() {
   return IS_IOS;
 });
+
+Handlebars.registerHelper('join', function(array) {
+  // todo: escape user input string
+  var ret = array.join("");
+  ret = ret.replace(/[!.?,;:]/g, "$&<br/>");
+  return ret;
+})
