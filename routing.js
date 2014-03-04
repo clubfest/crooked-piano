@@ -61,8 +61,8 @@ Router.map(function() {
 
   this.route('editSong', {
     path: '/editSong/:_id',
-    before: function() {
-      this.subscribe('song', this.params._id).wait();
+    waitOn: function() {
+      return this.subscribe('song', this.params._id);
     },
     data: function() {
       var data = {};
@@ -71,6 +71,14 @@ Router.map(function() {
       data.song = data.replayerSong;
 
       return data;
+    },
+
+    action: function() {
+      if (this.ready()) {
+        this.render('editSong');
+      } else {
+        this.render('loading');
+      }
     }
   });
 
@@ -89,8 +97,8 @@ Router.map(function() {
   this.route('editSong', {
     path: '/editSong/:_id',
 
-    before: function() {
-      this.subscribe('song', this.params._id).wait();
+    waitOn: function() {
+      return this.subscribe('song', this.params._id);
     },
 
     data: function() {
@@ -100,6 +108,14 @@ Router.map(function() {
       data.song = data.replayerSong;
 
       return data;
+    },
+
+    action: function() {
+      if (this.ready()) {
+        this.render('editSong');
+      } else {
+        this.render('loading');
+      }
     }
   });
 
@@ -107,19 +123,29 @@ Router.map(function() {
     path: '/game/:_id',
 
     before: function() {
-      console.log('game before')
-      this.subscribe('songId', this.params._id).wait();
       this.subscribe('songNotes', this.params._id);
+    },
+
+    waitOn: function() {
+      return this.subscribe('songId', this.params._id);
+    },
+
+    action: function() {
+      if (this.ready()) {
+        this.render('game');        
+      } else {
+        this.render('loading');
+      }
     },
 
     data: function() {
       console.log('game data')
 
-      // var data = {};
+      var data = {};
 
-      // data.song = Songs.findOne(this.params._id);
+      data.song = Songs.findOne(this.params._id);
 
-      // return data;
+      return data;
     },
 
     // caching last game's songId; todo: check elsewhere, like profile, that this is defined
@@ -178,5 +204,4 @@ Router.map(function() {
     },
   });
 
-  this.route('chart')
 });

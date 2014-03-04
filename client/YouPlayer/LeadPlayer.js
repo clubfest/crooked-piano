@@ -38,6 +38,8 @@ LeadPlayer = {
 
       if (note.isKeyboardDown === true) {
         ret.push(note);        
+      } else if (note.event === 'lyrics') {
+        ret.push(note);
       }
     }
 
@@ -196,6 +198,12 @@ LeadPlayer = {
     while(1) {
       var note = $.extend({}, this.playNotes[this.getPlayIndex()]);
       this.incrementPlayIndex(); // TODO: simplify this
+
+      if (note.event === 'lyrics') {
+        Session.set('lyrics', note.text);
+        continue;
+      }
+
       
       if (Session.get('shift') !== 0) {
         note.note += Session.get('shift');
@@ -274,7 +282,7 @@ LeadPlayer = {
 
     for (var j = 0; j < notes.length; j++) {
       var computerNote = $.extend({},notes[j]);
-      computerNote.velocity /= 2.5; // make computer less loud
+      computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
 
       // must do this first as we will change the time for recording purposes
       this.prevNoteTime = notes[j].time; 

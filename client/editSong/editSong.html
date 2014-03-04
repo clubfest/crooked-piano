@@ -1,36 +1,31 @@
 <template name='editSong'>
 
-{{#isolate}}
   {{> intro}}
-{{/isolate}}
 
-{{#with song}}
-  {{#if youtubeId}}
+  {{#with song}}
+    {{#if youtubeId}}
+      <div class='panel'>
+        <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+      </div>
+    {{/if}}
+
     <div class='panel'>
-      <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+      <div id='youtube-link-editable' data-mode='inline'>
+        {{youtubeLink}}
+      </div>
     </div>
-  {{/if}}
+  {{/with}}
 
-  <div class='panel'>
-    <div id='youtube-link-editable' data-mode='inline'>
-      {{youtubeLink}}
-    </div>
-  </div>
-{{/with}}
+  <hr/>
 
-<hr/>
-
-{{#isolate}}
   {{> leadPlayer}}  
-{{/isolate}}
 
-<div class='spaced-out'>
-  <div class='panel'>
-    <p>
-      Click on a green button button to remove that part        
-    </p>
-    {{#each segmentInfos}}
-      {{#isolate}}
+  <div class='spaced-out'>
+    <div class='panel'>
+      <p>
+        Click on a green button button to remove that part        
+      </p>
+      {{#each segmentInfos}}
         {{#if isRemoved}}
           <a class='unremove-track btn' data-segment-id='{{segmentId}}'>
             {{text}} ({{segmentId}})
@@ -42,40 +37,39 @@
             {{text}} ({{segmentId}})
           </a>
         {{/if}}
-      {{/isolate}}
-    {{/each}}
-  </div>
-  {{#isolate}}
+      {{/each}}
+    </div>
+
     <canvas id='notes-canvas'></canvas>
-  {{/isolate}}
+
+    <div class='panel'>
+      {{#with song}}
+        <div>        
+          <ul class='game-list'>
+          <li class='cloud'>
+            Credits:            
+          </li>
+          {{#each songInfo}}
+            <li class='cloud'>
+              {{this}}            
+            </li>
+          {{/each}}
+          </ul>
+        </div>
+      {{/with}}
+    </div>
+  </div>
+
+
+    
+
   <div class='panel'>
     {{#with song}}
-      <div>        
-        <ul class='game-list'>
-        <li class='cloud'>
-          Credits:            
-        </li>
-        {{#each songInfo}}
-          <li class='cloud'>
-              {{this}}            
-          </li>
-        {{/each}}
-        </ul>
-      </div>
+      <a class='delete-btn btn' data-song-id='{{_id}}'>
+        <i class='icon-remove'></i>
+        Delete Song
+      </a>  
     {{/with}}
   </div>
-</div>
-
-
-  
-
-<div class='panel'>
-{{#with song}}
-  <a class='delete-btn btn' data-song-id='{{_id}}'>
-    <i class='icon-remove'></i>
-    Delete Song
-  </a>  
-{{/with}}
-</div>
 
 </template>

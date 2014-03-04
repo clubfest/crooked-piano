@@ -30,6 +30,23 @@
 
 ## Recognize Chords
 
+diff = 3 means NE
+diff = 4 means E
+
+The rest depends on what recent notes are played to connect them
+
+3 3 = diminished (1)
+3 4 = minor (1)
+4 3 = major (1)
+4 4 = augmented (?)
+5 4 = major (2)
+5 5 = sus4 (2)
+
+3 3 3 = diminished 7 (?)
+3 3 4 = minor 6 (2)
+
+
+
 C-major: 0, 4, 7
 G#-major: 0, 3, 8
 F-major: 0, 5, 9

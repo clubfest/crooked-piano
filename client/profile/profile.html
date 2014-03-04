@@ -1,85 +1,84 @@
 <template name='profile'>
-{{progress}}
-<div id='body-wrapper'>
+  {{progress}}
+  <div id='body-wrapper'>
 
-    <div class='panel'>  
-      {{#if nextSongId}}  
-        <a id='next-btn' class='btn btn-primary' data-next-song-id='{{nextSongId}}'>
-          Next
-          <i class='icon-chevron-right'></i>
-        </a>
-      {{else}}
-        <a class='btn' href='/createSong'>
-          Create
-          <i class='icon-chevron-right'></i>
-        </a>
-      {{/if}}
-    </div>
+      <div class='panel'>  
+        {{#if nextSongId}}  
+          <a id='next-btn' class='btn btn-primary' data-next-song-id='{{nextSongId}}'>
+            Next
+            <i class='icon-chevron-right'></i>
+          </a>
+        {{else}}
+          <a class='btn' href='/createSong'>
+            Create
+            <i class='icon-chevron-right'></i>
+          </a>
+        {{/if}}
+      </div>
 
-  <h2>Progress</h2>
+    <h2>Progress</h2>
 
-  {{#isolate}}
     {{#if hasSong}}
       {{> replayer}}
     {{/if}}
-  {{/isolate}}
-  <div class='spaced-out'>
-    {{#unless currentUser}}
-      To keep you progress, {{> loginButtons}} before clicking next 
-    {{/unless}}
-    
-  </div>    
-  {{#if currentUser}}    
-    <ul id='progress-list' class='game-list'>     
-      {{#each progresses}}
-        <li class='progress-item cloud' data-progress-id='{{_id}}'>
+
+    <div class='spaced-out'>
+      {{#unless currentUser}}
+        To keep you progress, {{> loginButtons}} before clicking next 
+      {{/unless}}  
+    </div>    
+
+    {{#if currentUser}}    
+      <ul id='progress-list' class='game-list'>     
+        {{#each progresses}}
+          <li class='progress-item cloud' data-progress-id='{{_id}}'>
+            <ul>
+              <li>
+                {{title}} 
+              </li>
+              <li data-id='{{_id}}'>
+                {{beautifyDate createdAt}}
+              </li>
+            </ul>
+            <span class='shadow'></span>
+          </li>            
+        {{/each}}
+      </ul>
+    {{/if}}
+
+    <h2>My Songs</h2>
+    <ul id='my-list' class='game-list'>
+      {{#each mySongs}}    
+        <li class='my-item cloud' data-game-id='{{_id}}'>
           <ul>
             <li>
-              {{title}} 
+              {{artist}}
             </li>
-            <li data-id='{{_id}}'>
-              {{beautifyDate createdAt}}
+            <li>
+              {{title}}
+            </li>
+            <li>
+              {{beautifyDate createdAt}}            
+            </li>
+            <li>
+              {{playCount}} plays
             </li>
           </ul>
           <span class='shadow'></span>
-        </li>            
+        </li>
       {{/each}}
     </ul>
-  {{/if}}
-
-  <h2>My Songs</h2>
-  <ul id='my-list' class='game-list'>
-    {{#each mySongs}}    
-      <li class='my-item cloud' data-game-id='{{_id}}'>
-        <ul>
-          <li>
-            {{artist}}
-          </li>
-          <li>
-            {{title}}
-          </li>
-          <li>
-            {{beautifyDate createdAt}}            
-          </li>
-          <li>
-            {{playCount}}
-          </li>
-        </ul>
-        <span class='shadow'></span>
-      </li>
-    {{/each}}
-  </ul>
 
 
-  <h2>Feeling Generous?</h2>
-  <div id='feedback-panel'>
-    <div>
-      <textarea id='feedback-input' class="form-control" rows="3" placeholder="Give me some feedback."></textarea>  
-    </div>
-    <div>
-      <button id='submit-feedback'>Submit</button>
+    <h2>Feeling Generous?</h2>
+    <div id='feedback-panel'>
+      <div>
+        <textarea id='feedback-input' class="form-control" rows="3" placeholder="Give me some feedback."></textarea>  
+      </div>
+      <div>
+        <button id='submit-feedback'>Submit</button>
+      </div>
     </div>
   </div>
-</div>
 
 </template>

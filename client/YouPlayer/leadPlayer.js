@@ -7,6 +7,7 @@ Template.leadPlayer.created = function() {
   Session.set('playSpeed', song.speed || 1);
   Session.set('shift', song.shift || 0);
   Session.setDefault('isSynchronous', true);
+  Session.set('backgroundVolume', song.backgroundVolume || 0.8);
   Session.set('sampleSize', 10);
   isPreview = true;
 
@@ -14,40 +15,48 @@ Template.leadPlayer.created = function() {
 }
 
 Template.leadPlayer.rendered = function() {
-  if (!this.rendered) {
-    this.rendered = true;
 
-    Deps.autorun(function() {
-      $('.play-slider').slider({
-        range: "min",
-        min: 0,
-        max: Session.get('playLength'),
-        value: LeadPlayer.getPlayIndex(),
+  Deps.autorun(function() {
+    $('.play-slider').slider({
+      range: "min",
+      min: 0,
+      max: Session.get('playLength'),
+      value: LeadPlayer.getPlayIndex(),
 
-        slide: function(evt, ui) {
-          LeadPlayer.reset(ui.value);
-          LeadPlayer.updateProximateNotes();
-        },
-      });
+      slide: function(evt, ui) {
+        LeadPlayer.reset(ui.value);
+        LeadPlayer.updateProximateNotes();
+      },
     });
+  });
 
-    Deps.autorun(function() {
-      if ((Session.get('playIndex') % (Session.get('sampleSize') / 2) === 0)) {
-        Session.set('tonality', getTonality(Session.get('sampleSize')));
-      }
-    }); 
-  }
+  Deps.autorun(function() {
+    if ((Session.get('playIndex') % (Session.get('sampleSize') / 2) === 0)) {
+      Session.set('tonality', getTonality(Session.get('sampleSize')));
+    }
+  }); 
 
   $('#speed-slider').slider({
-      range: 'min',
-      min: .1,
-      max: 1.4,
-      step: 0.05,
-      value: Session.get('playSpeed'),
-      slide: function(evt, ui) {
-        Session.set('playSpeed', ui.value);
-      },
-    }); 
+    range: 'min',
+    min: .1,
+    max: 1.4,
+    step: 0.05,
+    value: Session.get('playSpeed'),
+    slide: function(evt, ui) {
+      Session.set('playSpeed', ui.value);
+    },
+  }); 
+
+  $('#background-volume-slider').slider({
+    range: 'min',
+    min: 0,
+    max: 1.5,
+    step: 0.1,
+    value: Session.get('backgroundVolume'),
+    slide: function(evt, ui) {
+      Session.set('backgroundVolume', ui.value);
+    },
+  });
 
   if (isPreview) {
     var self = this;
@@ -60,9 +69,7 @@ Template.leadPlayer.rendered = function() {
     });
   }
 
-  LeadPlayer.redisplayNotes();
-
-     
+  LeadPlayer.redisplayNotes();  
 }
 
 Template.leadPlayer.destroyed = function() {
@@ -135,6 +142,10 @@ Template.leadPlayer.events({
     Session.set('displayGuitar', !Session.get('displayGuitar'));
   },
 });
+
+Template.leadPlayer.lyrics = function() {
+  return Session.get('lyrics');
+}
 
 Template.leadPlayer.displayGuitar = function() {
   return Session.get('displayGuitar');
