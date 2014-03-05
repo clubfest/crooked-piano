@@ -1,0 +1,13 @@
+#tab-headings {
+}
+
+.tab-heading {
+  cursor: pointer;
+  padding: 8px;
+  display: inline-block;
+}
+
+.tab-heading .selected {
+  background: #CCC;
+  border: 2px solid;
+}

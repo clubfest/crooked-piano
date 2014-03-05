@@ -23,4 +23,10 @@ Handlebars.registerHelper('join', function(array) {
   ret = ret.split(/[!.?,;:]/);
   // ret = ret.replace(/[!.?,;:]/g, "$&<br/>");
   return ret;
-})
+});
+
+htmlEncode = function(str) {
+    return str.replace(/[&<>"']/g, function($0) {
+        return "&" + {"&":"amp", "<":"lt", ">":"gt", '"':"quot", "'":"#39"}[$0] + ";";
+    });
+}

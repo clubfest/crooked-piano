@@ -12,6 +12,8 @@
 * most recent
 * most played
 
+* Input lyrics and have the user correct it
+
 ## Marketing
 
 * post comment on youtube video that the gamified song links to

@@ -1,4 +1,9 @@
 
+.lyrics {
+  font-size: 20px;
+  margin: 0 0 0 40%;
+}
+
 .piano-keyboard .keyboard .key.my-note {
   background: #2F2;
   /*font-size: 24px;*/

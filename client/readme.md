@@ -37,7 +37,7 @@ Progress
 LeadPlayer Options
 ==================
 Title
-Score
+Result
 Navigation
 Piano
 (Lyrics)

@@ -143,6 +143,19 @@ Template.leadPlayer.events({
 });
 
 Template.leadPlayer.lyrics = function() {
+  // var array = Session.get('lyricsArray');
+
+  // if (array.length > 1) {
+  //   var lyrics = htmlencode(array[0]) + "<span style='color: red;'>";
+  //   lyrics += htmlencode(array[1]) + '</span>';
+
+  //   for (var i = 2; i < array.length; i++) {
+  //     lyrics += htmlencode(array[i]);
+  //   }
+  //   return lyrics;
+  // } else if (array.length > 0) {
+  //   return htmlencode(array[0]);
+  // }   
   return Session.get('lyrics');
 }
 
@@ -150,31 +163,6 @@ Template.leadPlayer.displayGuitar = function() {
   return Session.get('displayGuitar');
 }
 
-Template.advancedControl.tonality = function() {
-  return Session.get('tonality') || 'Tonality';
-}
-
-Template.advancedControl.sampleSize = function() {
-  return Session.get('sampleSize');
-}
-
-Template.advancedControl.shift = function() {
-  return Session.get('shift');
-}
-
-Template.advancedControl.isSynchronous = function() {
-  return Session.get('isSynchronous');
-}
-
-Template.advancedControl.mainInstrumentName = function() {
-  if (song.segments && song.mainTrack) {
-    return song.segments[song.mainTrack].text;
-  }
-}
-
-Template.advancedControl.mainTrack = function() {
-  return Session.get('mainTrack');
-}
 
 Handlebars.registerHelper('isPaused', function() {
   return Session.get('isPaused');

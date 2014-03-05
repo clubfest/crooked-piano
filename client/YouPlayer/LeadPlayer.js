@@ -203,10 +203,31 @@ LeadPlayer = {
       if (note.event === 'noteOff') {
         continue;
       } else if (note.event === 'lyrics') { 
-        if ($.trim(note.text).length > 0){       
-          var array = this.song.songInfo.lyrics.slice(note.index, note.index + 5);
-          var lyrics = array.join("");
-          Session.set('lyrics', lyrics);
+        if ($.trim(note.text).length > 0) {
+          var lyrics = this.song.songInfo.lyrics;
+          var lyricsString = "";
+
+          if (note.index > 0) {
+            lyricsString = htmlEncode(lyrics[note.index - 1]);
+          }
+
+          lyricsString += "<br/>";
+
+          if (note.index < lyrics.length) {
+            lyricsString += "<span style='color: #181;'>";
+            lyricsString += htmlEncode(lyrics[note.index]);
+            lyricsString += "</span>";
+          }
+
+          for (var i = note.index + 1; i < note.index + 4; i++) {
+            if (i < lyrics.length) {
+              lyricsString += htmlEncode(this.song.songInfo.lyrics[i]);
+            } else {
+              break;
+            }
+          }
+
+          Session.set('lyrics', lyricsString);
         }
         continue;
       }
