@@ -136,10 +136,7 @@ Router.map(function() {
     },
 
     data: function() {
-      console.log('game data')
-
       var data = {};
-
       data.song = Songs.findOne(this.params._id);
 
       return data;

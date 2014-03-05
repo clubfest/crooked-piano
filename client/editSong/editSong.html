@@ -47,8 +47,13 @@
         {{#if lyrics}}
           <h2>Lyrics</h2>
           <div>
-            {{{join lyrics}}}
+            {{#each join lyrics}}
+              <div class='lyrics-line'>
+                {{this}}
+              </div>
+            {{/each}}
           </div>
+            
         {{/if}}
         
         {{#if trackNames}}

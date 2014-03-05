@@ -1,10 +1,78 @@
+Flow of uploader
+================
+
+* Upload a song directly or using add-on
+  * Prompt to sign in if not done so
+* Play, adjust and then save/gamify
+  * default shifting to C major scale
+  * default volume to be 1.1
+* Perform and save the progress
+* View the progress with a list of recommendation with similar chord progression
+* Share the performance
+
+Flow of a new user
+==================
+
+* Got linked to a performance
+* Click play and start playing
+* When saving progress, user is prompted to sign in
+
+Profile
+=======
+
+* List of songs uploaded
+* Link to playlist of progresses
+
+Playlist
+========
+
+* Embedded progress page with autoplay and sort options
+
+Progress
+========
+
+* performer's name
+* autoplay a shuffled list of songs you performed
+
+LeadPlayer Options
+==================
+Title
+Score
+Navigation
+Piano
+(Lyrics)
+Tabbed options
+
+* Description
+  * Blurb
+  * Video
+  * Comment
+* Music
+  * Notations
+    * Default to Do Re Mi
+  *  Shifting Global tone
+    * Default to C major / A minor
+  * Local Tone
+* Effects
+  * Speed
+  * Main Track Volume
+  * Difficulty
+
+Editting Options
+================
+Requires us to id the notes
+Use idCounter
+
+* Commentary
+* Lyrics
+* Track
+  * Select a beat
+  * Display the beat visually
+
 Monetization
 ============
 
-* space restriction
-* time restriction
-* level restriction
-* analysis restriction
+* Performance analysis
 
 New Features
 ============

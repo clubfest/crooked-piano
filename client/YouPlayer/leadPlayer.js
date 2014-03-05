@@ -15,7 +15,6 @@ Template.leadPlayer.created = function() {
 }
 
 Template.leadPlayer.rendered = function() {
-
   Deps.autorun(function() {
     $('.play-slider').slider({
       range: "min",
@@ -69,7 +68,7 @@ Template.leadPlayer.rendered = function() {
     });
   }
 
-  LeadPlayer.redisplayNotes();  
+  LeadPlayer.redisplayNotes();
 }
 
 Template.leadPlayer.destroyed = function() {

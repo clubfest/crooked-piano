@@ -32,19 +32,19 @@ LeadPlayer = {
   },
 
   setPlayNotes: function(notes) {
-    var ret = []
-    for (var i = 0; i < notes.length; i++) {
-      var note = notes[i];
+    // var ret = []
+    // for (var i = 0; i < notes.length; i++) {
+    //   var note = notes[i];
 
-      if (note.isKeyboardDown === true) {
-        ret.push(note);        
-      } else if (note.event === 'lyrics') {
-        ret.push(note);
-      }
-    }
-    this.playNotes = ret;
-    // this.playNotes = notes;
-    // Session.set('playLength', notes.length); // for the game template
+    //   if (note.isKeyboardDown === true) {
+    //     ret.push(note);        
+    //   } else if (note.event === 'lyrics') {
+    //     ret.push(note);
+    //   }
+    // }
+    // this.playNotes = ret;
+    this.playNotes = notes;
+    Session.set('playLength', notes.length); // for the game template
   },
 
   reset: function(playIndex) {
@@ -246,7 +246,10 @@ LeadPlayer = {
     }
 
     this.redisplayNotes();
+    this.playFreeNotes();
+  },
 
+  playFreeNotes: function() {
     if (this.proximateNotes.length === 0) {
       if (this.computerProximateNotes.length > 0) {
         var wait = 0;
@@ -410,6 +413,8 @@ LeadPlayer = {
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.addClass(displayClass);
     dom.html('<span>'+dom.data('content')+'</span>')
+    console.log(dom)
+    
   },
 
   displayComputerNote: function(note) {
