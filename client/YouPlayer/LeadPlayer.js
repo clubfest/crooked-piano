@@ -434,8 +434,6 @@ LeadPlayer = {
     var dom = $('[data-key-code='+note.keyCode+']');
     dom.addClass(displayClass);
     dom.html('<span>'+dom.data('content')+'</span>')
-    console.log(dom)
-    
   },
 
   displayComputerNote: function(note) {

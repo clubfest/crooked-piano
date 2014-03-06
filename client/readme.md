@@ -1,3 +1,30 @@
+Install
+=======
+
+I am using the unstable version of meteor, so you will need meteorite to take care of the dependencies
+
+```
+sudo npm install -g meteorite
+```
+
+Of course, you will need to install meteor
+```
+curl https://install.meteor.com/ | sh
+```
+
+And finally run meteorite
+
+```
+mrt
+```
+
+How to recognize the chords
+===========================
+
+* Remove the melodic part unless we need more info
+* Local min or more than 3 notes implies a change
+
+
 Flow of uploader
 ================
 

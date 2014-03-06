@@ -12,7 +12,13 @@
 * most recent
 * most played
 
-* Input lyrics and have the user correct it
+* youtube api for description and commenting
+* include youtube description to help with searching
+
+* Have user input lyrics and parse it by understanding the true melody
+  * Separate a tune and lyrics into paragraphs
+  * Separate them into phrases
+
 
 ## Marketing
 
