@@ -1,23 +1,3 @@
-Install
-=======
-
-I am using the unstable version of meteor, so you will need meteorite to take care of the dependencies
-
-```
-sudo npm install -g meteorite
-```
-
-Of course, you will need to install meteor
-```
-curl https://install.meteor.com/ | sh
-```
-
-And finally run meteorite
-
-```
-mrt
-```
-
 How to recognize the chords
 ===========================
 
@@ -121,3 +101,74 @@ The goal is to make it easier for recording music
   * translate this into useful advice of how to play better
   * finger placement advice
   * piano finger placement: require AI
+
+
+## Marketing
+
+* post comment on youtube video that the gamified song links to
+* find places where people talk about a piece of music and gamify it
+* create video on youtube (programmatically if possible)
+* create quora question: what song inspired to learn more music / musical instrument
+* not possible on Quora: create a widget to embed the game in
+
+## Copyright
+
+* post copyright info in editSong
+* have the user fill out the Thanks
+* have copyright holder sign up differently to offer them a button to remove main track
+* create a competition for people to improvise
+* help people improvise by finding a song with similar chord progression
+
+
+
+## Video
+Let me show you a new way to experience
+  the music you love
+
+---- to game page
+
+I was watching a movie when
+  a captivating tune started
+  I wanted to play along
+  
+With the Crooked Piano,
+  I can enjoy the music by 
+  playing along like this
+
+---- click the first part
+  
+Or if you like to type,
+  you can just type along
+  with the yellow key indicator
+
+---- type the second part
+
+Without any muscial background,
+  I can still play the melody effortlessly
+---- click next
+  
+To make the song sound better,
+  we can add some colorful bass notes
+  
+But playing the Crooked Piano
+  with 2 hands is not easy
+  
+So for beginners,
+  the Crooked Piano will help you
+  by playing the left hand notes
+
+Now, I just need to click as
+  I did before
+  
+----- click the first part
+ 
+but with a more colorful sound
+
+Or if you like to type,
+  you can just type along
+  with the yellow key indicator
+  
+---- scoring
+This is how you can play and enjoy
+  a beautiful song without
+  any musical knowledge
