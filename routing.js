@@ -120,11 +120,13 @@ Router.map(function() {
     path: '/game/:_id',
 
     before: function() {
-      this.subscribe('songNotes', this.params._id);
     },
 
     waitOn: function() {
-      return this.subscribe('songId', this.params._id);
+      return [
+        this.subscribe('songId', this.params._id),
+        this.subscribe('songNotes', this.params._id)
+      ];
     },
 
     action: function() {

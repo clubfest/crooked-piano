@@ -1,0 +1,16 @@
+<template name='tempoTab'>
+  <div>
+    Change Speed:
+    <div id='speed-slider'></div>
+  </div>
+  <div>
+    <div>
+      Wait
+    </div>
+    {{#if isSynchronous}}
+      <button id='asynchronous'>No</button>
+    {{else}}
+      <button id='synchronous'>Yes</button>
+    {{/if}}
+  </div>
+</template>

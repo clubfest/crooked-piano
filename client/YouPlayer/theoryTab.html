@@ -1,0 +1,21 @@
+<template name='theoryTab'>
+  <div class='panel'>
+    <div>
+      <div>
+        Notation
+      </div>
+      {{#if isAlphabetNotation}}
+        <button id="do-re-mi-notation">Alphabet</button>
+      {{else}}
+        <button id='alphabet-notation'>Do Re Mi</button> 
+      {{/if}}
+    </div>
+    <div>
+      <button id='display-guitar'>Guitar</button>
+      <button id='clear-guitar'>clear</button>
+    </div>
+    <div>
+      {{tonality}}
+    </div>
+  </div>   
+</template>

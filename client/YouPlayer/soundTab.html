@@ -1,0 +1,38 @@
+<template name='soundTab'>
+  <div class='panel'>
+    <div class='slider-block'>
+      <div class='control-heading'>Background Volume</div>
+      <div id='background-volume-slider'></div>
+    </div>
+  </div>
+
+  <div class='panel'>
+    <div>
+      <div class='control-heading'>
+        Current Track
+      </div>
+      <div>
+        {{mainTrack}}
+      </div>
+    </div>
+    <div>
+      <div class='control-heading'>
+        Switch Track
+      </div>
+      <button id='switch-track'>
+        ???        
+      </button>
+    </div>
+
+    <div class='fixed-block'>
+      <div class='control-heading'>
+        Key Shift (Tone?) 
+      </div>
+      <div>
+        <button id='shift-down'><i class='icon-minus'></i></button>
+        {{shift}}
+        <button id='shift-up'><i class='icon-plus'></i></button>  
+      </div>
+    </div>
+  </div>
+</template>

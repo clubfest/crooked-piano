@@ -32,17 +32,6 @@ LeadPlayer = {
   },
 
   setPlayNotes: function(notes) {
-    // var ret = []
-    // for (var i = 0; i < notes.length; i++) {
-    //   var note = notes[i];
-
-    //   if (note.isKeyboardDown === true) {
-    //     ret.push(note);        
-    //   } else if (note.event === 'lyrics') {
-    //     ret.push(note);
-    //   }
-    // }
-    // this.playNotes = ret;
     this.playNotes = notes;
     Session.set('playLength', notes.length); // for the game template
   },
@@ -315,6 +304,10 @@ LeadPlayer = {
       var computerNote = $.extend({},notes[j]);
       computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
 
+      if (notes.length > 5) {
+        computerNote.velocity *= 4 / notes.length;
+      }
+
       // must do this first as we will change the time for recording purposes
       if (computerNote.event === 'noteOn') {
         this.prevNoteTime = notes[j].time; 
@@ -340,10 +333,7 @@ LeadPlayer = {
   gameOver: function() {
     var self = this; 
     if (Session.get('isDemoing')) {
-      // simpleReplayer.destroy();
-      $("<div class='demo-message' align='center'>It's your turn to play it.</div>").prependTo('body');
       self.reset();
-
     } else {
       // TODO: record the melodic part
       // self.saveGame();

@@ -35,28 +35,6 @@ Template.leadPlayer.rendered = function() {
     }
   }); 
 
-  $('#speed-slider').slider({
-    range: 'min',
-    min: .1,
-    max: 1.4,
-    step: 0.05,
-    value: Session.get('playSpeed'),
-    slide: function(evt, ui) {
-      Session.set('playSpeed', ui.value);
-    },
-  }); 
-
-  $('#background-volume-slider').slider({
-    range: 'min',
-    min: 0,
-    max: 1.5,
-    step: 0.1,
-    value: Session.get('backgroundVolume'),
-    slide: function(evt, ui) {
-      Session.set('backgroundVolume', ui.value);
-    },
-  });
-
   if (isPreview) {
     var self = this;
     Deps.autorun(function() {
@@ -143,19 +121,6 @@ Template.leadPlayer.events({
 });
 
 Template.leadPlayer.lyrics = function() {
-  // var array = Session.get('lyricsArray');
-
-  // if (array.length > 1) {
-  //   var lyrics = htmlencode(array[0]) + "<span style='color: red;'>";
-  //   lyrics += htmlencode(array[1]) + '</span>';
-
-  //   for (var i = 2; i < array.length; i++) {
-  //     lyrics += htmlencode(array[i]);
-  //   }
-  //   return lyrics;
-  // } else if (array.length > 0) {
-  //   return htmlencode(array[0]);
-  // }   
   return Session.get('lyrics');
 }
 
@@ -169,7 +134,7 @@ Handlebars.registerHelper('isPaused', function() {
 });
 
 function displayNoteDistribution() {
-  var noteDistribution = getNoteDistribution(200); // 100 is arbitrary
+  var noteDistribution = getNoteDistribution(200); // 200 is arbitrary
 
   for (var i = 0; i < noteDistribution.length; i++) {
     var keyCode = convertNoteToKeyCode(72 + i);
@@ -188,10 +153,13 @@ getNoteDistribution = function(surveyLength) {
 
   for (var i = 0; i < notes.length; i++) {
     var note = notes[i];      
-    var noteNumber = note.note + Session.get('shift');
-    
-    // statistics
-    noteDistribution[noteNumber % OCTAVE] += 1;
+
+    if (note.event === "noteOn") {
+      var noteNumber = note.note + Session.get('shift');
+      
+      // statistics
+      noteDistribution[noteNumber % OCTAVE] += 1;
+    }
   }
 
   return noteDistribution;

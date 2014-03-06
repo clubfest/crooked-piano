@@ -1,0 +1,12 @@
+<template name='infoTab'>
+  {{#with song}}
+    <div>
+      {{{desc}}}
+    </div>
+    {{#if youtubeId}}
+      <div>
+        <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+      </div>
+    {{/if}} 
+  {{/with}}
+</template>

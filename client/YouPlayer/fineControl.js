@@ -1,3 +1,7 @@
+Template.fineControl.rendered = function() {
+  Session.set('visibleTab', 'infoTab')
+}
+
 Template.fineControl.events({
   'click #clear-guitar': function() {
     $('.guitar-keyboard a span').html('');
@@ -5,10 +9,26 @@ Template.fineControl.events({
 
   'click .tab-heading': function(evt) {
     var name = evt.currentTarget.dataset.name;
-    console.log(name);
+    
+    Session.set("visibleTab", name);
   }
 });
 
+Template.fineControl.infoTabSelected = function() {
+  return Session.get('visibleTab') === 'infoTab';
+}
+
+Template.fineControl.soundTabSelected = function() {
+  return Session.get('visibleTab') === 'soundTab';
+}
+
+Template.fineControl.tempoTabSelected = function() {
+  return Session.get('visibleTab') === 'tempoTab';
+}
+
+Template.fineControl.theoryTabSelected = function() {
+  return Session.get('visibleTab') === 'theoryTab';
+}
 
 Template.fineControl.tonality = function() {
   return Session.get('tonality') || 'Tonality';

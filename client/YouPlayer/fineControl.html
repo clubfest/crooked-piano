@@ -1,102 +1,46 @@
 <template name='fineControl'>
   <div id='tabbed-options'>
     <div id='tab-headings'>
-      <div class='tab-heading' data-name='descriptionTabSelected'>
-        Description
+      <div class='tab-heading 
+          {{#if infoTabSelected}}tab-selected{{/if}}' 
+          data-name='infoTab'>
+        Info
       </div>
 
-      <div class='tab-heading' data-name='foregroundTabSelected'>
-        Foreground
+      <div class='tab-heading
+          {{#if soundTabSelected}}tab-selected{{/if}}' 
+          data-name='soundTab'>
+        Sound
       </div>
 
-      <div class='tab-heading' data-name='backgroundTabSelected'>
-        Background
+      <div class='tab-heading
+          {{#if tempoTabSelected}}tab-selected{{/if}}' 
+          data-name='tempoTab'>
+        Tempo
       </div>
+
+      <div class='tab-heading
+          {{#if theoryTabSelected}}tab-selected{{/if}}' 
+          data-name='theoryTab'>
+        Theory
+      </div>      
     </div>
-   <div>
-          Volume:
-          <div id='background-volume-slider'></div>
-        </div>  
-
-<div>
-          Change Speed:
-          <div id='speed-slider'></div>
-        </div> 
 
     <div class='tab-content'>
-      {{#if descriptionTabSelected}}
-            
+      {{#if infoTabSelected}}
+        {{> infoTab}}
       {{/if}}
 
-      {{#if foregroundTabSelected}}
-        
-        <div>
-          Notation
-        </div>
-        {{#if isAlphabetNotation}}
-          <button id="do-re-mi-notation">Alphabet</button>
-        {{else}}
-          <button id='alphabet-notation'>Do Re Mi</button>      
-        {{/if}}
+      {{#if theoryTabSelected}}  
+        {{> theoryTab}}          
       {{/if}}
 
-      {{#if backgroundTabSelected}}
-        <div>
-          Change Speed:
-          <div id='speed-slider'></div>
-        </div>
+      {{#if soundTabSelected}}
+        {{> soundTab}}
+      {{/if}}
+      {{#if tempoTabSelected}}
+        {{> tempoTab}}        
       {{/if}}
     </div>    
   </div>
-
-
-
-<div class='panel song-version spaced-out'>
-   <div>
-    <div>
-      {{tonality}}
-    </div>
-    <div>
-      <button id='sample-down'><i class='icon-minus'></i></button>
-      {{sampleSize}}
-      <button id='sample-up'><i class='icon-plus'></i></button>
-    </div>
-  </div>
-  <div>
-    <div>
-      Shift
-    </div>
-    <div>
-      <button id='shift-down'><i class='icon-minus'></i></button>
-      {{shift}}
-      <button id='shift-up'><i class='icon-plus'></i></button>      
-    </div>
-  </div>
-  <div>
-    <div>
-      Switch Track
-    </div>
-    <button id='switch-track'>
-      <i class='icon-pause'></i>
-      {{mainTrack}}
-    </button>
-  </div>
-  <div>
-    <div>
-      Difficulty
-    </div>
-    {{#if isSynchronous}}
-      <button id='asynchronous'>Easy</button>
-    {{else}}
-      <button id='synchronous'>Hard</button>
-    {{/if}}
-  </div>
-
-  <div>
-    
-  </div>
-
-  <button id='display-guitar'>Guitar</button>
-  <button id='clear-guitar'>clear</button>
-</div>
 </template>
