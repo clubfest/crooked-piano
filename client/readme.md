@@ -1,3 +1,19 @@
+TODO
+====
+
+* clean up lyrics: slash, title, chords
+* check if there can be lyrics without meta text
+*
+
+Remove Noisy Part
+=================
+
+* Compute the noise contribution of each part
+* Compute the melodic color
+* Compute the harmonic color
+* Compute the rhythmic color
+* Use the tempo info for visualization
+
 How to recognize the chords
 ===========================
 

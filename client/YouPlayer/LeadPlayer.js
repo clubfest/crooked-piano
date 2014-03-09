@@ -23,7 +23,7 @@ LeadPlayer = {
       this.setPlayNotes(this.song.previewNotes);
 
       Session.set('mainTrack', song.mainTrack);
-      this.segmentId = song.mainTrack;
+      // this.segmentId = song.mainTrack;
 
       this.reset();
 
@@ -76,29 +76,30 @@ LeadPlayer = {
     $(window).off('keyboardDown.youPlayer');
   },
 
-  switchTrack: function() { 
-    var newSegmentId = null;
-
-    for (var i = 0; i < this.computerProximateNotes.length; i++) {
-      var note = this.computerProximateNotes[i];
-      if (note.segmentId !== this.segmentId) {
-        newSegmentId = note.segmentId;
-        break;
-      }
-    }   
-
-    if (newSegmentId === null) {
-      for (var i = this.getPlayIndex(); i < this.playNotes.length; i++) {
-        var note = this.playNotes[i];
-        if (note.segmentId !== this.segmentId) {
+  switchTrack: function(newSegmentId) { 
+    Session.set('isDemoing', false);
+    
+    if (typeof newSegmentId === "undefined") {
+      for (var i = 0; i < this.computerProximateNotes.length; i++) {
+        var note = this.computerProximateNotes[i];
+        if (note.segmentId !== this.getSegmentId()) {
           newSegmentId = note.segmentId;
           break;
+        }
+      }   
+
+      if (typeof newSegmentId === "undefined") {
+        for (var i = this.getPlayIndex(); i < this.playNotes.length; i++) {
+          var note = this.playNotes[i];
+          if (note.segmentId !== this.getSegmentId()) {
+            newSegmentId = note.segmentId;
+            break;
+          }
         }
       }
     }
 
-    if (newSegmentId !== null) {
-      this.segmentId = newSegmentId;
+    if (typeof newSegmentId !== "undefined") {
       Session.set('mainTrack', newSegmentId);
     }
 
@@ -169,7 +170,7 @@ LeadPlayer = {
   },
 
   isComputerNote: function(note) {
-    return note.segmentId !== this.segmentId;
+    return note.segmentId !== this.getSegmentId();
   },
 
   updateProximateNotes: function() {
@@ -192,8 +193,9 @@ LeadPlayer = {
       if (note.event === 'noteOff') {
         continue;
       } else if (note.event === 'lyrics') { 
-        if ($.trim(note.text).length > 0) {
-          var lyrics = this.song.songInfo.lyrics;
+        var lyrics = this.song.songInfo.lyrics;
+
+        if ($.trim(note.text).length > 0 && lyrics.length > 50) { // 50 is arbitrary
           var lyricsString = "";
 
           if (note.index > 0) {
@@ -221,7 +223,7 @@ LeadPlayer = {
         continue;
       }
       
-      if (Session.get('shift') !== 0) {
+      if (Session.get('shift') !== 0 || !note.keyCode) {
         note.note += Session.get('shift');
         note.keyCode = convertNoteToKeyCode(note.note);
       }
@@ -356,14 +358,14 @@ LeadPlayer = {
       }  
     }
 
-    var version = this.segmentId;
+    var version = this.getSegmentId();
     var tempLength = TempGames.incomplete.length;
 
     if (tempLength > 0) {
       var incomplete = TempGames.incomplete[tempLength - 1];
       if (incomplete.songId !== this.song._id) {
         TempGames.incomplete = []; // reset if you moved to a new song
-      } else if (TempGames.incomplete[tempLength - 1].segmentId === this.segmentId) {
+      } else if (TempGames.incomplete[tempLength - 1].segmentId === this.getSegmentId()) {
         TempGames.incomplete.pop();
       }
     }
@@ -379,7 +381,7 @@ LeadPlayer = {
       endTime: endTime,
       originalEndTime: this.playNotes[this.playNotes.length - 1].time,
       version: version,
-      segmentId: this.segmentId,
+      segmentId: this.getSegmentId(),
     });
   },
 
@@ -507,6 +509,10 @@ LeadPlayer = {
         return note;
       }
     }
+  },
+
+  getSegmentId: function() {
+    return Session.get('mainTrack');
   },
 }
 

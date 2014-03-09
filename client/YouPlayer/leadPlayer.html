@@ -3,16 +3,16 @@
   
   {{> playerControl}}
 
-  <div class='play-slider'></div>
-
   {{#if displayGuitar}}
     {{> guitar}}  
   {{else}}
     {{> keyboard}}
   {{/if}}
 
+  <div class='play-slider'></div>
+
   <div class='lyrics'>
-    {{{lyrics}}}
+    {{{currentLyrics}}}
   </div>
 
   {{> fineControl}}

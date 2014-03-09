@@ -11,3 +11,15 @@ Template.soundTab.rendered = function() {
     },
   });
 }
+
+Template.soundTab.globalTonality = function() {
+  return "C major";
+}
+
+Template.soundTab.globalTonalityCertainty = function() {
+  return "95%";
+}
+
+Template.soundTab.shift = function() {
+  return Session.get('shift');
+}

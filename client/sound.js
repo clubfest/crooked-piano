@@ -57,6 +57,13 @@ loadSound = function() {
             MIDI.noteOn(data.channel, data.note, damp(data.velocity, data.note)  );
           }
       });
+
+      $(window).on('keyboardUp.sound', function(evt, data) {
+          if (typeof data.note !== 'undefined') {
+            data.channel = data.channel || 0;
+            MIDI.noteOff(data.channel, data.note);
+          }
+      });
       // TODO: keyboardUp.sound if without pedal
     }
 
@@ -64,5 +71,5 @@ loadSound = function() {
 }
 
 function damp(velocity, note) {
-  return velocity * note / 60;
+  return velocity * note * note / 70 / 70;
 }

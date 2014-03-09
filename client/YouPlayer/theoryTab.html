@@ -2,20 +2,41 @@
   <div class='panel'>
     <div>
       <div>
-        Notation
+        Keyboard
       </div>
+      <div>
+        <select>
+          <option>Do Re Mi</option>
+          <option>A B C</option>
+          <option>None</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <div>
+        Display
+      </div>
+      <div>
+        <select>
+          <option>Melody</option>
+          <option>Chord</option>
+          <option>Lyrics</option>
+          <option>Commentary</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <div>
+        Keyboard Layout
+      </div>
+      <button id='display-guitar'>Guitar</button>
+      <button id='clear-guitar'>clear</button>
       {{#if isAlphabetNotation}}
         <button id="do-re-mi-notation">Alphabet</button>
       {{else}}
         <button id='alphabet-notation'>Do Re Mi</button> 
       {{/if}}
     </div>
-    <div>
-      <button id='display-guitar'>Guitar</button>
-      <button id='clear-guitar'>clear</button>
-    </div>
-    <div>
-      {{tonality}}
-    </div>
+    
   </div>   
 </template>

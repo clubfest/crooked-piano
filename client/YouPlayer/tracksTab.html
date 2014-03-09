@@ -1,0 +1,49 @@
+<template name='tracksTab'>
+
+  <div class='panel'>
+    <div>
+      <div>
+        <button id='switch-track'>
+          Switch Track   
+        </button>
+      </div>
+      <p>If the current section does not involve you, but you want to be involved, click "Switch Track"</p>
+
+      <div class='control-heading'>
+        Your Track
+      </div>
+      <div>
+        <select id='track-select'>
+          {{#each segmentInfos}}
+            {{#unless isRemoved}}
+              <option selected='{{#if isMainTrack}}selected{{/if}}'
+                  value={{segmentId}}>
+                ({{segmentId}}) {{text}}
+              </option>        
+            {{/unless}}
+          {{/each}}
+        </select>
+      </div>
+      <p>If you have a specific track you want to switch to, select it.</p>
+    </div>
+  </div>
+
+  <div class='panel'>
+    <h3>
+      Removed Tracks        
+    </h3>
+    {{#each segmentInfos}}
+      <div>
+        <input type="checkbox" id="checkbox-{{segmentId}}" 
+            class='track-checkbox' value="{{segmentId}}"
+            checked={{isRemoved}} />
+        <label for="checkbox-{{segmentId}}">({{segmentId}}) {{text}}</label>
+        <div>average note: {{averageNote}}</div>
+        <div>average jump: {{averageJump}}</div>
+        <div>wait time: {{waitTime}}</div>
+        <div>category: {{instrumentCategory}}</div>
+      </div>
+    {{/each}}
+    <p>Check a box to remove a track that you think is too noisy</p>
+  </div>
+</template>

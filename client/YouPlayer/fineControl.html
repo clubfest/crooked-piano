@@ -20,9 +20,15 @@
       </div>
 
       <div class='tab-heading
+          {{#if tracksTabSelected}}tab-selected{{/if}}' 
+          data-name='tracksTab'>
+        Tracks
+      </div>   
+
+      <div class='tab-heading
           {{#if theoryTabSelected}}tab-selected{{/if}}' 
           data-name='theoryTab'>
-        Theory
+        Visual
       </div>      
     </div>
 
@@ -38,6 +44,11 @@
       {{#if soundTabSelected}}
         {{> soundTab}}
       {{/if}}
+
+      {{#if tracksTabSelected}}
+        {{> tracksTab}}
+      {{/if}}
+
       {{#if tempoTabSelected}}
         {{> tempoTab}}        
       {{/if}}

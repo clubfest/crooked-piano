@@ -1,5 +1,7 @@
 var song;
 var isPreview;
+var GLOBAL_SAMPLE_SIZE = 200;
+var LOCAL_SAMPLE_SIZE = 200;
 
 Template.leadPlayer.created = function() {
   song = this.data.song;
@@ -8,7 +10,6 @@ Template.leadPlayer.created = function() {
   Session.set('shift', song.shift || 0);
   Session.setDefault('isSynchronous', true);
   Session.set('backgroundVolume', song.backgroundVolume || 0.8);
-  Session.set('sampleSize', 10);
   isPreview = true;
 
   LeadPlayer.create(song);
@@ -20,7 +21,7 @@ Template.leadPlayer.rendered = function() {
       range: "min",
       min: 0,
       max: Session.get('playLength'),
-      value: LeadPlayer.getPlayIndex(),
+      value: Session.get('playIndex'),
 
       slide: function(evt, ui) {
         LeadPlayer.reset(ui.value);
@@ -30,8 +31,8 @@ Template.leadPlayer.rendered = function() {
   });
 
   Deps.autorun(function() {
-    if ((Session.get('playIndex') % (Session.get('sampleSize') / 2) === 0)) {
-      Session.set('tonality', getTonality(Session.get('sampleSize')));
+    if ((Session.get('playIndex') % (LOCAL_SAMPLE_SIZE / 2) === 0)) {
+      Session.set('tonality', getTonality(LOCAL_SAMPLE_SIZE));
     }
   }); 
 
@@ -53,16 +54,7 @@ Template.leadPlayer.destroyed = function() {
   LeadPlayer.destroy();
 }
 
-Template.leadPlayer.events({
-  'click #synchronous': function() {
-    Session.set('isSynchronous', true);
-  },
-
-  'click #asynchronous': function() {
-    Session.set('isSynchronous', false);
-    LeadPlayer.transferProximateNotesToComputer();
-  },
-  
+Template.leadPlayer.events({  
   'click #demo': function() {
     LeadPlayer.demo();
   },
@@ -105,22 +97,22 @@ Template.leadPlayer.events({
     displayNoteDistribution();
   },
 
-  'click #sample-up': function() {
-    Session.set('sampleSize', Session.get('sampleSize') + 1);
-    Session.set('tonality', getTonality(Session.get('sampleSize')));
-  },
+  // 'click #sample-up': function() {
+  //   Session.set('sampleSize', Session.get('sampleSize') + 1);
+  //   Session.set('tonality', getTonality(Session.get('sampleSize')));
+  // },
 
-  'click #sample-down': function() {
-    Session.set('sampleSize', Session.get('sampleSize') - 1);
-    Session.set('tonality', getTonality(Session.get('sampleSize')));
-  },
+  // 'click #sample-down': function() {
+  //   Session.set('sampleSize', Session.get('sampleSize') - 1);
+  //   Session.set('tonality', getTonality(Session.get('sampleSize')));
+  // },
 
   'click #display-guitar': function() {
     Session.set('displayGuitar', !Session.get('displayGuitar'));
   },
 });
 
-Template.leadPlayer.lyrics = function() {
+Template.leadPlayer.currentLyrics = function() {
   return Session.get('lyrics');
 }
 
@@ -145,13 +137,22 @@ function displayNoteDistribution() {
 }
 
 OCTAVE = 12;
-getNoteDistribution = function(surveyLength) {
+
+getGlobalTonality = function() {
+  return getTonality(GLOBAL_SAMPLE_SIZE);
+}
+
+getNoteDistribution = function(sampleSize) {
   var currIdx = LeadPlayer.getIndex();
-  var notes = LeadPlayer.playNotes.slice(currIdx, currIdx + surveyLength);
+  var notes = LeadPlayer.playNotes;
 
   var noteDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-  for (var i = 0; i < notes.length; i++) {
+  for (var i = currIdx; i < notes.length; i++) {
+    if (i - currIdx > sampleSize) {
+      break ;
+    }
+
     var note = notes[i];      
 
     if (note.event === "noteOn") {

@@ -104,6 +104,22 @@ Template.editSong.events({
 
 });
 
+Handlebars.registerHelper('lyrics', function(array) {
+  array = song.songInfo.lyrics;
+  
+  if (!array) return ;
+
+  // todo: escape user input string
+  var clean = array.join("");
+  var ret = "";
+
+  clean = clean.split(/[!.?,;:\/\\]/);
+  for (var i = 0; i < clean.length; i++) {
+    ret += htmlEncode(clean[i]) + "<br/>";
+  }
+  // ret = ret.replace(/[!.?,;:]/g, "$&<br/>");
+  return ret;
+});
 
 Template.editSong.segmentInfos = function() {
   var ret = [];
@@ -112,7 +128,6 @@ Template.editSong.segmentInfos = function() {
   for (var i = song.segmentIds.length - 1; i >= 0; i--) {
     var segmentId = song.segmentIds[i];
     var segment = song.segments[segmentId];
-
     // add some additional info
     segment.segmentId = segmentId;
     
@@ -136,7 +151,6 @@ function drawNotes() {
   if (notes.length === 0 || idx >= notes.length) return ; // no track selected
 
   var offset = notes[idx].time;
-
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   for (var i = idx; i < notes.length; i++) {
@@ -144,7 +158,7 @@ function drawNotes() {
     var y = (note.time - offset) / 20 + 10;
     if (y > canvas.height) break;
 
-    if (note.isKeyboardDown) {
+    if (note.event === 'noteOn') {
       context.fillStyle = 'rgb(0, 0, 0)'; // black
       context.fillText(
         noteToName(note.note, true) + note.segmentId, 

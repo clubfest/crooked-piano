@@ -20,68 +20,39 @@
 
   {{> leadPlayer}}  
 
-  <div class='spaced-out'>
-    <div class='panel'>
-      <p>
-        Click on a green button button to remove that part        
-      </p>
-      {{#each segmentInfos}}
-        {{#if isRemoved}}
-          <a class='unremove-track btn' data-segment-id='{{segmentId}}'>
-            {{text}} ({{segmentId}})
-          </a>
-        {{else}}
-          <a class='remove-track btn {{#if isMyPart segmentId}}btn-primary{{else}}btn-success{{/if}}'
-              data-segment-id='{{segmentId}}'>
-            <i class='icon-check'></i>
-            ({{segmentId}}) {{text}}
-          </a>
-        {{/if}}
-      {{/each}}
-    </div>
+  <canvas id='notes-canvas'></canvas>
 
-    <canvas id='notes-canvas'></canvas>
+  <div class='panel'>
+    {{#with song.songInfo}}
+      {{#if lyrics}}
+        <h2>Lyrics</h2>
+        <div>
+          {{{lyrics}}}
+        </div>
+      {{/if}}
+      
+      {{#if trackNames}}
+        <h2>Track Names</h2>
+        <div>
+          {{trackNames}}
+        </div>
+      {{/if}}
 
-    <div class='panel'>
-      {{#with song.songInfo}}
-        {{#if lyrics}}
-          <h2>Lyrics</h2>
-          <div>
-            {{#each join lyrics}}
-              <div class='lyrics-line'>
-                {{this}}
-              </div>
-            {{/each}}
-          </div>
-            
-        {{/if}}
-        
-        {{#if trackNames}}
-          <h2>Track Names</h2>
-          <div>
-            {{trackNames}}
-          </div>
-        {{/if}}
+      {{#if instruments}}
+        <h2>Instruments</h2>
+        <div>
+          {{instruments}}
+        </div>
+      {{/if}}
 
-        {{#if instruments}}
-          <h2>Instruments</h2>
-          <div>
-            {{instruments}}
-          </div>
-        {{/if}}
-
-        {{#if copyrightNotice}}
-          <h2>Copyright</h2>
-          <div>
-            {{copyrightNotice}}
-          </div>
-        {{/if}}
-      {{/with}}
-    </div>
+      {{#if copyrightNotice}}
+        <h2>Copyright</h2>
+        <div>
+          {{copyrightNotice}}
+        </div>
+      {{/if}}
+    {{/with}}
   </div>
-
-
-    
 
   <div class='panel'>
     {{#with song}}

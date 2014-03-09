@@ -1,5 +1,5 @@
 Template.fineControl.rendered = function() {
-  Session.set('visibleTab', 'infoTab')
+  Session.set('visibleTab', 'tracksTab')
 }
 
 Template.fineControl.events({
@@ -30,6 +30,10 @@ Template.fineControl.theoryTabSelected = function() {
   return Session.get('visibleTab') === 'theoryTab';
 }
 
+Template.fineControl.tracksTabSelected = function() {
+  return Session.get('visibleTab') === 'tracksTab';
+}
+
 Template.fineControl.tonality = function() {
   return Session.get('tonality') || 'Tonality';
 }
@@ -38,17 +42,14 @@ Template.fineControl.sampleSize = function() {
   return Session.get('sampleSize');
 }
 
-Template.fineControl.shift = function() {
-  return Session.get('shift');
-}
-
 Template.fineControl.isSynchronous = function() {
   return Session.get('isSynchronous');
 }
 
 Template.fineControl.mainInstrumentName = function() {
-  if (song.segments && song.mainTrack) {
-    return song.segments[song.mainTrack].text;
+  var song = this.song;
+  if (song.segments) {
+    return song.segments[Session.get('mainTrack')].text;
   }
 }
 
