@@ -1,0 +1,16 @@
+<template name='metronome'>
+  <div align='center' style='width: 300px;'>
+    <span>
+      Metronome Period
+    </span>
+    <div id='metronome-speed-slider'></div>    
+    <div id='metronome-indicator'></div>    
+  </div>
+
+  Beats Per Measure
+  <div id='beats-per-measure-slider'></div>
+  {{> sheet}}
+
+  <a id='save-recording' class='btn btn-success'>Save</a>
+
+</template>

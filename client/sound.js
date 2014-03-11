@@ -21,10 +21,11 @@ var files = [
   '/MIDI.js/js/MIDI/Plugin.js',
   '/MIDI.js/js/MIDI/Player.js',
   '/MIDI.js/js/Window/DOMLoader.XMLHttp.js',
-  '/MIDI.js/js/Window/DOMLoader.script.js',
   '/MIDI.js/inc/Base64.js',
   '/MIDI.js/inc/base64binary.js',
 ];
+
+NUM_FILES = files.length;
 
 loadMidiJs = function() {
   var numDone = 0;
@@ -35,35 +36,42 @@ loadMidiJs = function() {
     $.getScript(file, function() {
       numDone++;
       Session.set('loadProgress', Session.get('loadProgress') + 1);
-      if (numDone === files.length) {
+      if (numDone === NUM_FILES) {
         loadSound();
       }
     })
   });
 }
 
+DEFAULT_CHANNEL = 0;
+DRUM_CHANNEL = 1;
+
 loadSound = function() {
   Session.set('hasMidiNoteOn', false);
   MIDI.loadPlugin({
     soundfontUrl: "/MIDI.js/soundfont/",
-    instrument: "acoustic_grand_piano",
+    instruments: ["acoustic_grand_piano", "synth_drum"],
+    // instrument: "acoustic_grand_piano",
     callback: function() {
       Session.set('hasMidiNoteOn', true);
+      // MIDI.programChange(DRUM_CHANNEL, 118);
+      // MIDI.programChange(DEFAULT_CHANNEL, 0);
 
       $(window).off('keyboardDown.sound');
       $(window).on('keyboardDown.sound', function(evt, data) {
           if (typeof data.note !== 'undefined') {
-            data.channel = data.channel || 0;
-            MIDI.noteOn(data.channel, data.note, damp(data.velocity, data.note)  );
+            data.channel = data.channel || DEFAULT_CHANNEL;
+            // MIDI.noteOn(DRUM_CHANNEL, data.note, data.velocity);
+            MIDI.noteOn(DEFAULT_CHANNEL, data.note, damp(data.velocity, data.note));
           }
       });
 
-      $(window).on('keyboardUp.sound', function(evt, data) {
-          if (typeof data.note !== 'undefined') {
-            data.channel = data.channel || 0;
-            MIDI.noteOff(data.channel, data.note);
-          }
-      });
+      // $(window).on('keyboardUp.sound', function(evt, data) {
+      //     if (typeof data.note !== 'undefined') {
+      //       data.channel = data.channel || 0;
+      //       MIDI.noteOff(data.channel, data.note);
+      //     }
+      // });
       // TODO: keyboardUp.sound if without pedal
     }
 

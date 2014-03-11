@@ -18,5 +18,5 @@ Template.keyboard.events({
 
 Template.keyboard.loadProgress = function() {
   var loadProgress = Session.get('loadProgress') || 0;
-  return Math.floor(loadProgress * 100 / 12);
+  return Math.floor(loadProgress * 100 / (NUM_FILES + 1));
 }

@@ -124,9 +124,8 @@ Guitar = {
 }
 
 // ///// init
-// simpleKeyboard.connectKeyToKeyboard();
-// simpleKeyboard.connectKeyboardToDisplay();
-Guitar.connectKeyboardToGuitarDisplay();
+// this is interfering the piano
+// Guitar.connectKeyboardToGuitarDisplay();
 
 
 // ////// helpers

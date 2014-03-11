@@ -1,7 +1,7 @@
 
 
 Template.songs.gamifiedSongs = function() {
-  return Songs.find({isGamified: true});
+  return Songs.find(/*{isGamified: true}*/);
 }
 
 

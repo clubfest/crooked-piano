@@ -10,6 +10,9 @@ Router.configure({
 
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
+  this.route('metronome');
+  this.route('sheet');
+
   this.route('gamify', {
     path: '/gamify/:url',
     action: function() {
