@@ -11,7 +11,6 @@ Handlebars.registerHelper('hasSoundFiles', function() {
   return Session.get('loadProgress') === files.length;
 });
 
-
 var files = [
   '/MIDI.js/inc/jasmid/replayer.js',
   '/MIDI.js/inc/jasmid/midifile.js',

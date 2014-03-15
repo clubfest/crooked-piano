@@ -20,6 +20,8 @@ SheetDrawer = {
 
   draw: function() {
     this.clear();
+
+    // todo: make this dynamic
     var maxNote = 86;
     var minNote = 47;
     var noteHeight = this.canvas.height / (maxNote - minNote + 1);
@@ -39,6 +41,9 @@ SheetDrawer = {
 
     var firstBeat = notes[0].beat;
     var lastBeat = notes[notes.length - 1].beat;
+
+    // TODO: make this simpler, have the current beat based at the center
+    // currently, it is at the end.
     var shift = BEATS_PER_LINE - (lastBeat - firstBeat);
 
     // determine the starting vertical lines
