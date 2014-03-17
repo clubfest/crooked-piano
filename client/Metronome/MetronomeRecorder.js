@@ -24,8 +24,8 @@ MetronomeRecorder = {
       self.temporaryNotes.push({
         note: data.note,
         keyCode: data.keyCode,
-        beat: Session.get('beat'),
-        duration: 0,
+        timeInBeats: Session.get('timeInBeats'),
+        durationInBeats: 0,
       });
 
       if (self.numDownKeys === 1) {
@@ -47,8 +47,8 @@ MetronomeRecorder = {
         if (note.note === data.note) {
           self.temporaryNotes.splice(i, 1);
 
-          if (note.duration === 0) {
-            note.duration = 1;
+          if (note.durationInBeats === 0) {
+            note.durationInBeats = 1;
           }
 
           if (self.notes.length === 0) {
@@ -58,7 +58,7 @@ MetronomeRecorder = {
             for (var j = self.notes.length - 1; j >= 0; j--) {
               var stableNote = self.notes[j];
 
-              if (stableNote.beat <= note.beat) {
+              if (stableNote.timeInBeats <= note.timeInBeats) {
                 self.notes.splice(j + 1, 0, note);
                 break ;
               }
@@ -84,9 +84,9 @@ MetronomeRecorder = {
         Session.set('recordedNotes', self.notes);
         if (self.notes.length > 0) {
           var note = self.notes[self.notes.length - 1];
-          Session.set('beat', note.beat + note.duration);
+          Session.set('timeInBeats', note.timeInBeats + note.durationInBeats);
         } else {
-          Session.set('beat', 0);
+          Session.set('timeInBeats', 0);
         }
       }
     });
@@ -120,7 +120,7 @@ MetronomeRecorder = {
 
     Session.set('recordedNotes', []);
     Session.set('indicatorValue', 0);
-    Session.set('beat', 0);
+    Session.set('timeInBeats', 0);
   },
 
   incrementIndicator: function() {
@@ -144,11 +144,11 @@ MetronomeRecorder = {
 
     // var newValue = Session.get('indicatorValue');
     if (value === MIN || value === MAX) {
-      Session.set('beat', Session.get('beat') + 1);
+      Session.set('timeInBeats', Session.get('timeInBeats') + 1);
 
       for (var i = 0; i < this.temporaryNotes.length; i++) {
         var note = this.temporaryNotes[i];
-        note.duration += 1;
+        note.durationInBeats += 1;
       }
       Session.set('recordedNotes', combine(this.notes, this.temporaryNotes));
     }

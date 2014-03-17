@@ -1,22 +1,22 @@
-Schema for Song
+Schema for song
 ===============
+
+* midi is an extended midi format in json
+* it's the bare minimum needed for editting
+  * timeInBeats, durationInBeats
+  * restInBeats
+* To export it to sheet music, use dynamic generation
+
 {
-  info: {
-    ticksPerBeat: 96,
-    title:
-  },
   midi: {
-    
-    sharedEvents: [],
-    tracks: {
-      0: {
-        sharedEvents: [],
-        channel: {
-          0: [],
-          1: []
-        }
-      }
-    }
+    tracks: [
+      [
+        event11, event12, ...
+      ],
+      [
+        event21, event22, ...
+      ]
+    ]
   }
 }
 

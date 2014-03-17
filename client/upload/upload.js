@@ -1,7 +1,12 @@
-var fileName;
 // TODO: think about whether to store each segment individually
 // TODO: think about adding id to each note
+var fileName;
+
 Template.upload.rendered = function() {
+  SheetDrawer.init();
+  // SheetDrawer.setNotes(Uploader.midi.tracks[1]);
+  SheetDrawer.drawWestern();
+  
   var midiInput = document.getElementById('midi-input');
 
   midiInput.onchange = function(evt) {
@@ -62,7 +67,9 @@ var fileReader = new FileReader;
 
 fileReader.onload = function() {
   var midiFile = MidiFile(fileReader.result);
-  Converter.load(midiFile, fileName);
+  Uploader.load(midiFile, fileName);
+
+  
 
   
   // var player = MIDI.Player;

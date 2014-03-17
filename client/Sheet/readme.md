@@ -1,3 +1,10 @@
+Vex
+===
+
+* We will have all the info the the midi events, such as custom rest event
+* We will have temporary notes padded by rest
+* dynamically increase the number of voices
+
 Sheet
 =====
 
