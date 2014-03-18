@@ -5,18 +5,21 @@ SheetDrawer = {
   init: function(notes) {
     var notes = [{
       timeInBeats: 0,
-      durationInBeats: 2
+      durationInBeats: 1,
+      subtype: 'noteOn',
+    }, {
+      timeInBeats: 1,
+      durationInBeats: 1,
+      subtype: 'noteOn',
     }, {
       timeInBeats: 2,
-      durationInBeats: 2
+      durationInBeats: 2,
+      subtype: 'noteOn',
     }, {
-      timeInBeats: 4,
-      durationInBeats: 2
-    }, {
-      timeInBeats: 4,
-      durationInBeats: 4
-    }
-    ];
+      timeInBeats: 3,
+      durationInBeats: 2,
+      subtype: 'noteOn',
+    }];
 
     this.initVariables(notes);
     this.initCanvas();
@@ -34,49 +37,14 @@ SheetDrawer = {
     this.canvas.width = Math.min(700, $(this.canvas).parent().width());    
   },
 
+  // Note: use this if time signature changes
   setBeatsPerMeasure: function(numerator, denominator) {
-    // TODO: get correct info
-    numerator = numerator || 4;
-    denominator = denominator || 4;
-    this.beatsPerMeasure = 4 * numerator / denominator;
+    this.numerator = numerator || 4;
+    this.denominator = denominator || 4;
+    this.beatsPerMeasure = 4 * this.numerator / this.denominator;
   },
 
-  loadMeasures: function(numOfMeasures) {
-    numOfMeasures = 4;
-
-    var measures = [];
-    var measure = [];
-    var start = this.notes[this.cursorIndex].timeInBeats;
-
-    for (var i = this.cursorIndex; i < this.notes.length; ) {
-      var note = this.notes[i];
-
-      if (note.timeInBeats - start < this.beatsPerMeasure) {
-        measure.push(note);
-        i++;
-
-        if (i >= this.notes.length) {
-          measures.push(measure);
-        }
-      } else {
-        measures.push(measure);
-        measure = [];
-        start += this.beatsPerMeasure;
-
-        if (measures.length > numOfMeasures) {
-          break;
-        }
-      }
-    }
-
-    this.measures = measures;
-  },
-
-  loadVoices: function(measure) {
-    var voices = [];
-
-  },
-
+  
   clear: function() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
@@ -92,11 +60,191 @@ SheetDrawer = {
 
     for (var i = 0; i < this.measures.length; i++) {
       this.drawStave(i * staveWidth);
-      var measure = this.measures[i];
-      this.loadVoices(measure);
+
+      // this.drawVoices(measure);
     }
+    this.loadVoicesIntoMeasures();
+    this.addRest();
+    console.log(this.measures);
+
     // this.staveCount = 0;
     // this.drawStave(); // a stave is the same as a measure
+  },
+
+  loadVoicesIntoMeasures: function() {
+    // a voice is an intermediate representation
+    // where every spot is occupied by a note or rest note 
+    // an array of a bunch of notes with annotations:
+    // id, rest, tie, vex representation
+
+    for (var k = 0; k < this.measures.length; k++) {
+      var measure = this.measures[k];
+
+      var voices = [[]];
+      for (var i = 0; i < measure.notes.length; i++) {
+        var note = measure.notes[i];
+        var voiceFound = false;
+
+        for (var voiceIdx = 0; voiceIdx < voices.length; voiceIdx++) {
+          var voice = voices[voiceIdx];
+
+          if (voice.length === 0) {
+            voice.push(note);
+            voiceFound = true;
+            break;
+          }
+
+          var previousNote = voice[voice.length - 1];
+
+          if (note.timeInBeats === previousNote.timeInBeats
+              && note.durationInBeats === previousNote.durationInBeats) {
+            voice.push(note);
+            voiceFound = true;
+            break;
+          }
+
+          if (note.timeInBeats >= previousNote.timeInBeats + previousNote.durationInBeats) {
+            voice.push(note);
+            voiceFound = true;
+            break;
+          }
+        }
+
+        if (!voiceFound) {
+          // create a new voice
+          voices.push([note]);
+        }
+      }
+
+      measure.voices = voices;
+    }
+  },
+
+  loadStaveNoteToNote: function() {
+    // generate the Vex.StaveNote and store it inside the note in all the voices
+    // because we may need to put a tie in somewhere
+    // and put it in a container for drawing
+  },
+
+  addRest: function() {
+    for (var k = 0; k < this.measures.length; k++) {
+      var measure = this.measures[k];
+      for (var i = 0; i < measure.voices.length; i++) {
+        var voice = measure.voices[i];
+        var voiceWithRest = clone(voice);
+
+        var currentBeat = measure.startBeat;
+
+        for (var j = 0; j < voice.length; j++) {
+          var note = voice[j];
+          var gap = note.timeInBeats - currentBeat;
+          if (gap > 0) {
+            voiceWithRest.splice(j, 0, {subtype: 'rest', timeInBeats: currentBeat, durationInBeats: gap});
+          }
+          currentBeat = note.timeInBeats + note.durationInBeats;
+        }
+
+        // take care of the end
+        gap = measure.startBeat + measure.beatsPerMeasure - currentBeat;
+        if (gap > 0) {
+          voiceWithRest.splice(j, 0, {subtype: 'rest', timeInBeats: currentBeat, durationInBeats: gap});
+        }
+        measure.voices[i] = voiceWithRest;
+      }
+    }
+  },
+
+  getStartBeat: function() {
+    // todo: deal with pieces that change time signature
+    // todo: use measureInfo to store startBeat, endBeat and keySignature info
+    // need 2 measures before current 1, the first of which will cushion wrong start notes
+
+    return Math.floor(this.notes[this.cursorIndex].timeInBeats / this.beatsPerMeasure) * this.beatsPerMeasure;
+  },
+
+
+  loadMeasures: function(numOfMeasures) {
+    // measure is a sequence of ANNOTATED notes.
+    // For each note that overflows, we will add a new note
+    // in the next measure,
+    // and annotate each note's id inside the other via
+    // the attribute tiedTo and tiedFrom.
+    this.measures = [];
+    var idIndex = 0; // for creating id for each note
+    var startBeat = 0;
+    var measure = {
+      notes: [], 
+      numerator: this.numerator, // needed for creating Vex.Voice 
+      denominator: this.denominator,
+      beatsPerMeasure: 4 * this.numerator / this.denominator,
+      startBeat: startBeat,
+    };
+
+    // load unmodified notes in the right measure given usng the key signature
+    for (var i = 0; i < this.notes.length; i++) {
+      var note = this.notes[i];
+
+      if (note.subtype === 'keySignature') {
+        // TODO: obtain the keySignature events from the midi and merge it into the notes
+        // TODO: update measure's endBeat
+        // setBeatsPerMeasure
+      } else if (note.subtype === 'noteOn') {
+        note.id = idIndex++; // id annotation is needed when we draw ties later
+
+        if (note.timeInBeats >= startBeat + this.beatsPerMeasure) {
+          this.measures.push(measure);
+          startBeat += this.beatsPerMeasure;
+          measure = {
+            notes: [],
+            numerator: this.numerator,
+            denominator: this.denominator,
+            beatsPerMeasure: 4 * this.numerator / this.denominator,
+            startBeat: startBeat,
+          };
+        }
+
+        measure.notes.push(note);
+
+        if (i === this.notes.length - 1) {
+          this.measures.push(measure);
+        }
+      }
+    }
+
+    // splitting notes; this.measures.length can increase indefinitely,
+    // depending on how long the final note is
+    for (var i = 0; i < this.measures.length; i++) {
+      var measure = this.measures[i];
+
+      for (var j = 0; j < measure.notes.length; j++) {
+        var note = measure.notes[j];
+        var beatsPerMeasure = 4 * measure.numerator / measure.denominator;
+        var overBy = note.timeInBeats + note.durationInBeats - (measure.startBeat + beatsPerMeasure);
+
+        if (overBy > 0) {
+          if (i === this.measures.length - 1) {
+            this.measures.push({
+              notes: [],
+              numerator: measure.numerator,
+              denominator: measure.denominator,
+              beatsPerMeasure: 4 * measure.numerator / measure.denominator,
+              startBeat: measure.startBeat + beatsPerMeasure,
+            });
+          }
+
+          var nextMeasure = this.measures[i+1];
+          var newNote = clone(note);
+          newNote.id = idIndex++;
+          newNote.timeInBeats = startBeat + this.beatsPerMeasure;
+          newNote.durationInBeats = overBy;
+          newNote.tiedFrom = note.id;
+          nextMeasure.notes.splice(0,0, newNote);
+
+          note.durationInBeats -= overBy;
+          note.tiedTo = newNote.id;
+        }
+      }
+    }
   },
 
   drawStave: function(xOffset) {
@@ -117,37 +265,14 @@ SheetDrawer = {
     // this.drawNotesToStave();
   },
 
-  drawNotesToStave: function() {
-    this.transferNotesToVoices();
-
-    // if the stave is finished, move on to a new stave
-  },
-
-  transferNotesToVoices: function() {
-    // if notes overlap unevenly, create a new voice with and rest padding
-  },
-
-  loadVoices: function(measure) {
-    var staveNotes = [];
-    for (var i = 0; i < measure.length; i++) {
-      var note = measure[i];
-      Array.prototype.push.apply(staveNotes, notesToStaveNotes([note]));
-    }
-
-    function create_4_4_voice() {
-      return new Vex.Flow.Voice({
-        num_beats: 4,
-        beat_value: 4,
-        resolution: Vex.Flow.RESOLUTION
-      });
-    }
-
+  drawVoices: function(measure) {
     // this.loadNextStaveNotes();
 
     // Create voices and add notes to each of them.
-    var voice = create_4_4_voice().addTickables(staveNotes);
+    
+
     var formatter = new Vex.Flow.Formatter().
-      joinVoices([voice]).format([voice], staveWidth);
+      joinVoices(this.voices).format(this.voices, staveWidth);
     voice.draw(this.context, this.upperStave);
 
   },
@@ -215,6 +340,16 @@ SheetDrawer = {
       }
     }
   },
+
+  // drawNotesToStave: function() {
+  //   this.transferNotesToVoices();
+
+  //   // if the stave is finished, move on to a new stave
+  // },
+
+  // transferNotesToVoices: function() {
+  //   // if notes overlap unevenly, create a new voice with rest padding
+  // },
 
   // TODO: rename to drawAlphabet
   draw: function() {
@@ -311,6 +446,14 @@ SheetDrawer = {
     return this.notes.slice(i);
   },
 }
+
+var clone = function (o) {
+  if (typeof o != 'object') return (o);
+  if (o == null) return (o);
+  var ret = (typeof o.length == 'number') ? [] : {};
+  for (var key in o) ret[key] = clone(o[key]);
+  return ret;
+};
 
 notesToStaveNotes = function(notes) {
   /* Input a set of notes that start and end at the same time */
@@ -416,3 +559,39 @@ module.exports = SheetDrawer;
     // voice.draw(ctx, stave);
     // voice2.draw(ctx, stave);
     // // tuplet.setContext(ctx).draw();
+
+
+      // separateAndLoadVoices: function(measure) {
+  //   var staveNotesByVoice = []; // array of array of notes
+  //   var voices = [];
+
+  //   for (var i = 0; i < measure.length; ) {
+  //     var note = measure[i];
+  //     var currentTime = note.timeInBeats;
+
+  //     for (j = i + 1; ; j++) {
+  //       var nextNote = measure[j];
+  //       if (note.timeInBeats === nextNote.timeInBeats &&
+  //           note.durationInBeats === nextNote.durationInBeats) {
+  //         // same voice
+  //       } else if (nextNote.timeInBeats < note.timeInBeats + note.durationInBeats) {
+  //         // different voice; decide which voice to go in
+  //       } else {
+  //         i = j;
+  //         break ;
+  //       }
+  //       if (j >= measure.length) {
+  //         i = j;
+  //         break;
+  //       }
+  //     }
+
+  //     Array.prototype.push.apply(staveNotes, notesToStaveNotes([note]));
+  //   }
+
+  //   var voice = (new Vex.Flow.Voice({
+  //     num_beats: 4,
+  //     beat_value: 4,
+  //     resolution: Vex.Flow.RESOLUTION
+  //   })).addTickables(staveNotes);
+  // },
