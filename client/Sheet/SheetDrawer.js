@@ -5,19 +5,23 @@ SheetDrawer = {
   init: function(notes) {
     var notes = [{
       timeInBeats: 0,
+      noteNumber: 60,
       durationInBeats: 1,
       subtype: 'noteOn',
     }, {
       timeInBeats: 1,
       durationInBeats: 1,
+      noteNumber: 60,
       subtype: 'noteOn',
     }, {
       timeInBeats: 2,
       durationInBeats: 2,
+      noteNumber: 64,
       subtype: 'noteOn',
     }, {
       timeInBeats: 3,
       durationInBeats: 2,
+      noteNumber: 44,
       subtype: 'noteOn',
     }];
 
@@ -57,21 +61,110 @@ SheetDrawer = {
 
 
     this.loadMeasures();
+    // everything will be added to each measure
+    this.addNotesToVoicesToMeasures();
+    this.computeVoiceAverage();
+    this.addRestsToVoices();
+    this.translateToVex();
+    this.drawShit();
+    //  TODO: find the measures to draw and compute the offset
+    // this.drawStaveAndVoices();
 
-    for (var i = 0; i < this.measures.length; i++) {
-      this.drawStave(i * staveWidth);
+    // for (var i = 0; i < this.measures.length; i++) {
+    //   this.drawStave(i * staveWidth);
 
-      // this.drawVoices(measure);
-    }
-    this.loadVoicesIntoMeasures();
-    this.addRest();
-    console.log(this.measures);
+    //   this.drawVoices(measure);
+    // }
+    // console.log(this.measures);
 
     // this.staveCount = 0;
     // this.drawStave(); // a stave is the same as a measure
   },
 
-  loadVoicesIntoMeasures: function() {
+  computeVoiceAverage: function() {
+    for (var k = 0; k < this.measures.length; k++) {
+      var measure = this.measures[k];
+      for (var i = 0; i < measure.voices.length; i++) {
+        var voice = measure.voices[i];
+        var noteNumberTotal = 0;
+        var numNotes = 0;
+        for (var j = 0; j < voice.length; j++) {
+          var note = voice[j];
+          if (note.subtype === 'noteOn') {
+            noteNumberTotal += note.noteNumber;
+            numNotes++;
+          }
+        }
+        if (numNotes > 0) {
+          voice.averageNoteNumber = noteNumberTotal / numNotes;
+        } else {
+          voice.averageNoteNumber = 70; // todo: use neighboring voice
+        }
+      }
+    }
+
+  },
+
+  drawShit: function() {
+    for (var k = 0; k < this.measures.length; k++) {
+      var measure = this.measures[k];
+      var currentStave = this.drawStave(k * staveWidth);
+
+      var vexVoices = [];
+      for (var i = 0; i < measure.voices.length; i++) {
+        var voice = measure.voices[i];
+
+        vexVoices.push((new Vex.Flow.Voice({
+          num_beats: 4,
+          beat_value: 4,
+          resolution: Vex.Flow.RESOLUTION
+        })).addTickables(voice.staveNotes));
+      }
+      var formatter = new Vex.Flow.Formatter().joinVoices(vexVoices).format(vexVoices, staveWidth);
+      for (var i = 0; i < vexVoices.length; i++) {
+        vexVoices[i].draw(this.context, currentStave);
+      }
+    }
+
+
+  },
+
+  translateToVex: function() {
+    for (var k = 0; k < this.measures.length; k++) {
+      var measure = this.measures[k];
+      for (var i = 0; i < measure.voices.length; i++) {
+        var voice = measure.voices[i];
+        var currentBeat = measure.startBeat;
+
+        var bunches = [[]];
+
+        for (var j = 0; j < voice.length; j++) {
+          var note = voice[j];
+          var lastBunch = bunches[bunches.length - 1];
+          if (lastBunch.length === 0) {
+            lastBunch.push(note);
+          } else{
+            var previousNote = lastBunch[lastBunch.length - 1];
+            if (previousNote.timeInBeats === note.timeInBeats) {
+              // we know the durations have to be the same by definition of voice
+              bunch.push(note);
+            } else {
+              bunches.push([note]);
+            }
+          }
+        }
+
+        voice.staveNotes = [];
+        for (var j = 0; j < bunches.length; j++){
+          var bunch = bunches[j];
+          Array.prototype.push.apply(voice.staveNotes, notesToStaveNotes(bunch, voice.averageNoteNumber));
+        }
+
+      }
+    }
+  },
+
+  addNotesToVoicesToMeasures: function() {
     // a voice is an intermediate representation
     // where every spot is occupied by a note or rest note 
     // an array of a bunch of notes with annotations:
@@ -126,7 +219,7 @@ SheetDrawer = {
     // and put it in a container for drawing
   },
 
-  addRest: function() {
+  addRestsToVoices: function() {
     for (var k = 0; k < this.measures.length; k++) {
       var measure = this.measures[k];
       for (var i = 0; i < measure.voices.length; i++) {
@@ -249,179 +342,21 @@ SheetDrawer = {
 
   drawStave: function(xOffset) {
     // TODO: adjust position according to staveCount
-    this.upperStave = new Vex.Flow.Stave(xOffset, 10, staveWidth);
+    var upperStave = new Vex.Flow.Stave(xOffset, 10, staveWidth);
     // this.upperStave.addClef("treble");
-
-    // TODO: adjust and possibly remove; see if this can remove restriction
     // this.upperStave.addTimeSignature("4/4");
-    this.upperStave.setContext(this.context).draw();
+    upperStave.setContext(this.context).draw();
 
     // this is not really used except as a reference
-    this.lowerStave = new Vex.Flow.Stave(xOffset, 70, staveWidth);
+    var lowerStave = new Vex.Flow.Stave(xOffset, 70, staveWidth);
     // this.lowerStave.addClef("bass");
     // this.lowerStave.addTimeSignature("4/4");
-    this.lowerStave.setContext(this.context).draw();
+    lowerStave.setContext(this.context).draw();
 
-    // this.drawNotesToStave();
-  },
-
-  drawVoices: function(measure) {
-    // this.loadNextStaveNotes();
-
-    // Create voices and add notes to each of them.
-    
-
-    var formatter = new Vex.Flow.Formatter().
-      joinVoices(this.voices).format(this.voices, staveWidth);
-    voice.draw(this.context, this.upperStave);
-
-  },
-
-  loadNextStaveNotes: function() {
-    // take into account previously overflowed notes
-    if (!this.overflowedStaveNotes) {
-      this.staveNotes = this.overflowedStaveNotes;
-      this.overflowedStaveNotes = [];
-      this.drawTies();
-    }
-    // update drawIndex
-
-    // load overflowed notes
-  },
-
-  drawStaveNote: function() {
-
+    return upperStave;
   },
 
   drawTies: function() {
-
-  },
-
-  hi: function() {
-    var hasStave = false;
-    var leftOverNotes = []; // splitted StaveNote from previous measure
-
-    for (var i = 0; i < this.notes.length; i++) {
-      // initialize
-      if (!hasStave) {
-        var stave = new Vex.Flow.Stave(0, 120 * staveIndex, this.canvas.width - 20)
-        var beatsLeft = beatsPerMeasure;
-        var staveNotes = [];
-        hasStave = true;
-
-        stave.setContext(this.context).draw();
-      }
-
-      if (this.notes[i].subtype === 'noteOn') {
-        var currentBeat = this.notes[i].timeInBeats;
-        var notesOnSameBeat = [this.notes[i]];
-
-        // TODO: deal with notes with different durations
-        for (var j = i + 1; j < this.notes.length; j++) {
-          if (this.notes[j].subtype === 'noteOn' &&
-              this.notes[j].timeInBeats === this.notes[i].timeInBeats) {
-            notesOnSameBeat.push(this.notes[j]);
-            i++;
-            break ;
-          }
-        }
-
-        // if (note.durationInBeats <= beatsLeft) {
-        //   beatsLeft -= note.durationInBeats;
-
-        //   staveNotes.push(new Vex.Flow.StaveNote({
-        //     keys: ['c/5'],
-        //   }));
-        // }
-
-        if (beatsLeft <= 0) {
-          hasStave = false;
-        }
-      }
-    }
-  },
-
-  // drawNotesToStave: function() {
-  //   this.transferNotesToVoices();
-
-  //   // if the stave is finished, move on to a new stave
-  // },
-
-  // transferNotesToVoices: function() {
-  //   // if notes overlap unevenly, create a new voice with rest padding
-  // },
-
-  // TODO: rename to drawAlphabet
-  draw: function() {
-    this.context = this.canvas.getContext('2d');
-    this.context.fillStyle = 'rgb(0, 0, 0)'; // black
-
-    this.clear();
-
-    // todo: make this dynamic
-    var maxNote = 86;
-    var minNote = 47;
-    var noteHeight = this.canvas.height / (maxNote - minNote + 1);
-
-    // horizontal line
-    this.context.beginPath();
-    this.context.moveTo(0, (maxNote - 60) * noteHeight);
-    this.context.lineTo(this.canvas.width, (maxNote - 60) * noteHeight);
-    this.context.stroke();
-
-    notes = this.getLastNotes();
-
-    this.context.font = 'italic 18px Calibri';
-    // this.context.font = '16px';
-
-    if (notes.length === 0) return ;
-
-    for (var i = 0; i < notes.length; i++) {
-      var note = notes[i];
-      if (note.subtype === 'noteOn') {
-        var firstBeat = notes[i].timeInBeats;
-        break ;
-      }
-    }
-
-    for (var i = notes.length - 1; i >= 0; i--) {
-      var note = notes[i];
-      if (note.subtype === 'noteOff') {
-        var lastBeat = notes[i].timeInBeats;
-        break ;
-      }
-    }
-
-    // TODO: make this simpler, have the current beat based at the center
-    // currently, it is at the end.
-    var shift = BEATS_PER_LINE - (lastBeat - firstBeat);
-
-    // determine the starting vertical lines
-    for (var i = 0; i < BEATS_PER_LINE; i++) {
-      if ((i + firstBeat) % this.beatsPerMeasure === 0) {
-        break ;
-      }
-    }
-
-    for (; ; i += this.beatsPerMeasure) {
-      if (i + shift >= BEATS_PER_LINE + this.beatsPerMeasure) break ;
-
-      this.context.moveTo((i + shift) * 30, 0);
-      this.context.lineTo((i + shift) * 30, this.canvas.height);
-      this.context.stroke();
-    }
-      
-
-    for (var i = 0; i < notes.length; i++) {
-      var note = notes[i];
-      if (note.subtype === 'noteOn') {
-        this.context.fillText(
-          noteToName(note.noteNumber, true) + (note.durationInBeats * 8), // text
-          (note.timeInBeats - firstBeat) * 50, // x-coord
-          (maxNote - note.noteNumber) * noteHeight  // y-coord
-        ); 
-      }        
-    }
 
   },
 
@@ -447,71 +382,113 @@ SheetDrawer = {
   },
 }
 
-var clone = function (o) {
-  if (typeof o != 'object') return (o);
-  if (o == null) return (o);
-  var ret = (typeof o.length == 'number') ? [] : {};
-  for (var key in o) ret[key] = clone(o[key]);
-  return ret;
-};
+function notesToStaveNotes(notes, averageNoteNumber) {
+  /* 
+    Input a set of notes that start and end at the same time
+    Output an array of StaveNote, with correct keys and duration value and ties
+    Only works for duration that is a multiple of the given unit, 16
+  */
 
-notesToStaveNotes = function(notes) {
-  /* Input a set of notes that start and end at the same time */
-  // assume the beats used has been rounded to the nearest sixteenths
-  // TODO: tuplets
-  var durationInBeats = notes[0].durationInBeats;
+  var keys = []; // in Vex notation
+  var accidentals = [];
+  var isRest = false;
 
-  var ret = [];
-
-  var sixteenths = durationInBeats * 4;
-
-  if (sixteenths !== Math.floor(sixteenths)){
-    console.log('the note is not a multiple of sixteenths');
+  for (var i = 0; i < notes.length; i++) {
+    var note = notes[i];
+    if (note.subtype === 'rest') {
+      isRest = true;
+      keys.push(noteNumberToLetterWithoutAccidental(averageNoteNumber || 70)); // TODO: use previous note
+      accidentals.push(false);
+    } else {
+      keys.push(noteNumberToLetterWithoutAccidental(note.noteNumber));
+      accidentals.push(noteNumberHasAccidental(note.noteNumber));
+    }
   }
 
-  var exponent = Math.log(sixteenths) / Math.log(2); // whole -> 4, half -> 3, quarter -> 2
+  var ret = [];
+  var unit = 16; // this would work if we use a different power of 2
+  var durationInBeats = notes[0].durationInBeats;
 
+  var durationLeft = durationInBeats / 4 * unit;
 
-  var invertedDuration = Math.pow(2, Math.max(0, - Math.floor(exponent) + 4)); // 1, 2, 4, 8, 16
+  while (durationLeft > 0) {
+    // 16 (whole) -> 4, 8 -> 3, 4 -> 2, 2 -> 1, 1 -> 0. Non-integer is bad
+    var exponent = Math.log(durationLeft) / Math.log(2); 
 
-  ret.push(new Vex.Flow.StaveNote({
-    keys: ["e/5"],
-    duration: invertedDuration.toString(),
-    // stemDirection: 'inverted',
-  }));
+    // [4, infinity) -> 1, [3, 4) -> 2, [2, 3) -> 4, [1,2) ->  8, [0, 1) -> 16
+    var invertedDuration = Math.pow(2, Math.max(-4, - Math.floor(exponent))) * unit;  
+    var durationString = invertedDuration.toString();
+    if (isRest) durationString += 'r';
 
-  var remainder = sixteenths - 16 / invertedDuration;
+    var staveNote = new Vex.Flow.StaveNote({
+      keys: keys,
+      duration: durationString,
+    });
 
+    // todo: add accidentals
+    if (ret.length > 0) {
+      // todo: add ties
+    }
+
+    ret.push(staveNote);
+    durationLeft -= unit / invertedDuration;
+  } 
   return ret;
 }
 
-noteNumberToVexNote = function(noteNumbers) {
-  var accidentals = [];
-  var keys = []
-  for (var i = 0; i < noteNumbers.length; i++){
-    var noteNumber = noteNumbers[i];
-  }
-
+function noteNumberToLetterWithoutAccidental(noteNumber, isFlat) {
   var octave = Math.ceil(noteNumber / 12) - 1;
-  var roughNoteNumber = noteNumber % 12;
 
-  var conversion = {
-    0: 'C',
-    1: 'C',
-    2: 'D',
-    3: 'D',
-    4: 'E',
-    5: 'F',
-    6: 'F',
-    7: 'G',
-    8: 'G',
-    9: 'A',
-    10: 'A',
-    11: 'B',
-  };
+  if (isFlat) {
+    var conversion = {
+      0: 'c',
+      1: 'd',
+      2: 'd',
+      3: 'e',
+      4: 'e',
+      5: 'f',
+      6: 'g',
+      7: 'g',
+      8: 'a',
+      9: 'a',
+      10: 'b',
+      11: 'b',
+    };
+  } else {
+    var conversion = {
+      0: 'c',
+      1: 'c',
+      2: 'd',
+      3: 'd',
+      4: 'e',
+      5: 'f',
+      6: 'f',
+      7: 'g',
+      8: 'g',
+      9: 'a',
+      10: 'a',
+      11: 'b',
+    };
+  }
+  return conversion[noteNumber % 12] + '/' + octave;
+}
 
-  // var ret = new Vex.Flow.StaveNote({
-    // conversion[roughNoteNumber];
+function noteNumberHasAccidental(noteNumber) {
+  var accidentalNotes = {
+    0: false,
+    1: true,
+    2: false,
+    3: true,
+    4: false,
+    5: false,
+    6: true,
+    7: false,
+    8: true,
+    9: false,
+    10: true,
+    11: false,
+  }
+  return accidentalNotes[noteNumber % 12];
 }
 
 // export for testing purposes
