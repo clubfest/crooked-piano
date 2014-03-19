@@ -1,3 +1,35 @@
+Redesign of Piano
+=================
+
+* Make it look like a youtube player, with demo, youplay buttons (default on, but switches off on demo)
+* Add space bar and arrow keys if we are editing
+
+Redesign of SheetDrawer
+=======================
+
+* Only allow one voice per track by taking the minimum duration until next note arrive
+* That means things will not be displayed correctly unless you split the voices up 1 per track.
+  * I will make it easy to split a track into 2 tracks, by having you pick the note or hit space
+
+SimpleDrawer
+============
+
+* Everything will be displayed correctly
+* Use fraction and background color for duration display
+* Advanced editting capabilities
+  * key click means same position
+  * key press will progress the position
+  * right arrow at the end means extend the current note
+  * space insert rest
+  * up and down shift the octave
+  * edit mode only unless you are insert rest
+
+Lyrics input
+============
+
+* Create lyrics edit mode
+* hitting enter skip to the next note
+
 loadMeasures
 ============
 

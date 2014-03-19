@@ -338,22 +338,6 @@ SheetDrawer = {
     }
   },
 
-  drawStave: function(xOffset) {
-    // TODO: adjust position according to staveCount
-    var upperStave = new Vex.Flow.Stave(xOffset, 10, staveWidth);
-    // this.upperStave.addClef("treble");
-    // this.upperStave.addTimeSignature("4/4");
-    upperStave.setContext(this.context).draw();
-
-    // this is not really used except as a reference
-    var lowerStave = new Vex.Flow.Stave(xOffset, 70, staveWidth);
-    // this.lowerStave.addClef("bass");
-    // this.lowerStave.addTimeSignature("4/4");
-    lowerStave.setContext(this.context).draw();
-
-    return upperStave;
-  },
-
   drawTies: function() {
 
   },
@@ -377,6 +361,22 @@ SheetDrawer = {
       }
     }
     return this.notes.slice(i);
+  },
+
+  drawStave: function(xOffset) {
+    // TODO: adjust position according to staveCount
+    var upperStave = new Vex.Flow.Stave(xOffset, 10, staveWidth);
+    // this.upperStave.addClef("treble");
+    // this.upperStave.addTimeSignature("4/4");
+    upperStave.setContext(this.context).draw();
+
+    // this is not really used except as a reference
+    var lowerStave = new Vex.Flow.Stave(xOffset, 70, staveWidth);
+    // this.lowerStave.addClef("bass");
+    // this.lowerStave.addTimeSignature("4/4");
+    lowerStave.setContext(this.context).draw();
+
+    return upperStave;
   },
 }
 

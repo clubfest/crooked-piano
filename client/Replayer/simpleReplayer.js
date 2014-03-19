@@ -5,7 +5,7 @@ simpleReplayer = {
   offset: 0,
   firstNoteTime: 0,
   firstNoteStartTime: 0,
-  worker: new Worker('/replayerWorker.js'), 
+  // worker: new Worker('/replayerWorker.js'), 
 
   init: function(notes) {
     this.notes = notes;

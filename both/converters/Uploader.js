@@ -1,48 +1,20 @@
+// We will only modify each midi event:
+//   microsecondsPerBeat
+// We won't add new event types here
 
 Uploader = {
   load: function(midiFile, fileName) {
     this.midi = midiFile;
     this.fileName = fileName;
+    // TODO: get source address
 
     // Needed to approx # of beat for a note
     this.ticksPerBeat = this.midi.header.ticksPerBeat;
 
-    this.addTimeInBeats();
-    this.addDurationInBeats();
-    // TODO: decide whether to modify a track that uses multiple channels
+    this.addStartTimeInBeats();
+    this.addEndTimeInBeats();
 
-    // this.addRestEvents();
     this.addMicroSecondInfo();
-    console.log(this.midi.tracks)
-
-  },
-
-  // TODO: move it to drawAlphabet
-  addRestEvents: function() {
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var track = this.midi.tracks[trackId];
-
-      var restStart = 0; // current time and possibly start of a rest
-
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
-
-        if (event.subtype === 'noteOn') {
-          if (restStart < event.timeInBeats) {
-            var newEvent = {
-              type: 'custom',
-              subtype: 'rest',
-              timeInBeats: restStart,
-              durationInBeats: event.timeInBeats - restStart,
-            }
-
-            track.splice(i, 0, newEvent);
-          }
-          
-          restStart = Math.max(restStart, event.timeInBeats + event.durationInBeats);
-        }
-      }
-    }
   },
 
   addMicroSecondInfo: function() {
@@ -56,14 +28,15 @@ Uploader = {
 
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
-        event.timeInMicroseconds = event.timeInBeats * microsecondsPerBeat;
-        
-        if (event.durationInBeats) {
-          event.durationInMicroseconds = event.durationInBeats * microsecondsPerBeat;
+        event.startTimeInMicroseconds = event.startTimeInBeats * microsecondsPerBeat;
+
+        // only noteOn event
+        if (event.endTimeInBeats) {
+          event.endTimeInMicroseconds = event.endTimeInBeats * microsecondsPerBeat;
         }
 
-        if (tempoIndex < tempos.length &&
-            event.timeInBeats > tempos[tempoIndex].timeInBeats) {
+        if (tempoIndex < tempos.length
+            && event.startTimeInBeats > tempos[tempoIndex].startTimeInBeats) {
 
           microsecondsPerBeat = tempos[tempoIndex].microsecondsPerBeat;
           tempoIndex++;
@@ -72,17 +45,10 @@ Uploader = {
     }
   },
 
-    
-  addSheetValue: function() {
-    // TODO: dynamically round beatsFromStart
-    // TODO: adjust durationInBeats using the next noteOn event
-  },
-
-  addDurationInBeats: function() {
+  addEndTimeInBeats: function() {
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
       var track = this.midi.tracks[trackId];
-
-      var noteOnEvents = [];
+      var noteOnEvents = []; // queue up noteOn events to be matched with noteOff event
 
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
@@ -92,29 +58,31 @@ Uploader = {
         }
 
         if (event.subtype === 'noteOff') {
-          // var strange = 0;
           for (var j = 0; j < noteOnEvents.length; j++) {
             var noteOnEvent = noteOnEvents[j];
             var found = false;
             if (noteOnEvent.noteNumber  === event.noteNumber &&
                 noteOnEvent.channel === event.channel) {
-              noteOnEvent.durationInBeats = event.timeInBeats - noteOnEvent.timeInBeats;         
-              if (noteOnEvent.durationInBeats > 10) {
+              noteOnEvent.endTimeInBeats = event.startTimeInBeats;
+              var duration = noteOnEvent.endTimeInBeats - noteOnEvent.startTimeInBeats
+
+              // sanity check       
+              if (duration > 10) {
                 console.log('Unusually long note:');
                 console.log(noteOnEvent);
-              } else if (noteOnEvent.durationInBeats <= 0) {
+              } else if (duration <= 0) {
                 console.log('Unusually short note:');
                 console.log(noteOnEvent);
               }
 
               found = true;
-              noteOnEvents.splice(j, 1);
-              break ;
+              noteOnEvents.splice(j, 1); // remove matched events from queue
+              break;
             }
           }
 
           if (!found) {
-            console.log('Cannot find a match of the noteOff event:');
+            console.log('Cannot match the noteOff event with things in noteOn queue:');
             console.log(event);
           }
         }
@@ -123,27 +91,27 @@ Uploader = {
       for (var i = 0; i < noteOnEvents.length; i++) {
         var event = noteOnEvents[i];
         if (event.subtype === 'noteOn') {
-          console.log('missing duration beat: ');
+          console.log('This noteOn event did not get matched, so we will set it to 1 beat long: ');
           console.log(event);
 
-          // default beat length will be 1 / 8
-          event.durationInBeats = 1 / 8; 
+          // default noteOn duration will be 1
+          event.endTimeInBeats = event.startTimeInBeats + 1; 
         }
       }
     }
   },
 
-  addTimeInBeats: function() {
+  addStartTimeInBeats: function() {
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
       var track = this.midi.tracks[trackId];
       var timeInTicks = 0;
 
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
-        event.trackId = trackId;
+        event.note = event.noteNumber; // for backward compatibility
+        event.trackId = trackId; // TODO: figure out why we need this
         timeInTicks += event.deltaTime;
-        // event.timeInTicks = timeInTicks;
-        event.timeInBeats = timeInTicks / this.ticksPerBeat;
+        event.startTimeInBeats = timeInTicks / this.ticksPerBeat;
       }
     }
   }, 
@@ -181,6 +149,7 @@ Uploader = {
   },   
 }
 
+// we will only use this for SheetDrawer; not for AlphabetDrawer
 // todo: dynamic multipliers depending to prevent noteOn from being moved
 function roundUp(beat, multipliers) {
 
@@ -208,6 +177,35 @@ function roundUp(beat, multipliers) {
 
 }
 
+
+
+// // TODO: move it to drawAlphabet
+//   addRestEvents: function() {
+//     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
+//       var track = this.midi.tracks[trackId];
+
+//       var restStart = 0; // current time and possibly start of a rest
+
+//       for (var i = 0; i < track.length; i++) {
+//         var event = track[i];
+
+//         if (event.subtype === 'noteOn') {
+//           if (restStart < event.timeInBeats) {
+//             var newEvent = {
+//               type: 'custom',
+//               subtype: 'rest',
+//               timeInBeats: restStart,
+//               durationInBeats: event.timeInBeats - restStart,
+//             }
+
+//             track.splice(i, 0, newEvent);
+//           }
+          
+//           restStart = Math.max(restStart, event.timeInBeats + event.durationInBeats);
+//         }
+//       }
+//     }
+//   },
 
 // var clone = function (o) {
 //   if (typeof o != 'object') return (o);

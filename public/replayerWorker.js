@@ -1,30 +1,30 @@
+var timeoutId = null;
 
-// var self
-// if (typeof simpleReplayer !== 'undefined') {
-//   self = simpleReplayer;
-// }
+onmessage = function(evt){
+  var action = evt.data.action;
+  if (action === 'start') {
+    var replayerIndex = evt.data.replayerIndex;
+    var notes = evt.data.notes;
+    var note;
 
-// var currIndex = Session.get('replayerIndex');
-// var note = self.notes[currIndex];
+    postReplayerIndexAndIncrementAndPost();  
 
-// // updated note's info
-// note.isFromReplayer = true;
+    function postReplayerIndexAndIncrementAndPost() {
+      postMessage({action: 'play', replayerIndex: replayerIndex});
 
-// if (note.isKeyboardDown === true) {
-//   $(window).trigger('keyboardDown', note);
-// } else {
-//   $(window).trigger('keyboardUp', note);
-// }
+      replayerIndex++;
 
-// if (currIndex >= self.notes.length - 1) {
-//   Session.set('isReplaying', false);
-// } else {
-//   var nextNote = self.notes[currIndex + 1];
-//   var lag = ((new Date).getTime() - self.firstNoteStartTime) - (note.time - self.firstNoteTime);
+      if (replayerIndex < notes.length) {
+        var nextStartTime = notes[replayerIndex].startTimeInMicroseconds;
+        var prevStartTime = notes[replayerIndex - 1].startTimeInMicroseconds;
+        var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000; 
 
-//   self.timeout = window.setTimeout(function() {
-//     Session.set('replayerIndex', currIndex + 1);
-//     self._play();
-//   // },  (nextNote.time - note.time) / (Session.get('playSpeed') || 1));
-//   },  nextNote.time - note.time - lag);
-// }
+        timeoutId = setTimeout(postReplayerIndexAndIncrementAndPost, delayInMilliseconds);
+      } else {
+        postMessage({action: 'stop'});
+      }
+    }
+  } else if (action === 'stop') {
+    clearTimeout(timeoutId);
+  }
+};
