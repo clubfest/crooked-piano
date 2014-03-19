@@ -66,7 +66,7 @@ SheetDrawer = {
     this.computeVoiceAverage();
     this.addRestsToVoices();
     this.translateToVex();
-    this.drawShit();
+    this.drawStaveNotes();
     //  TODO: find the measures to draw and compute the offset
     // this.drawStaveAndVoices();
 
@@ -105,7 +105,7 @@ SheetDrawer = {
 
   },
 
-  drawShit: function() {
+  drawStaveNotes: function() {
     for (var k = 0; k < this.measures.length; k++) {
       var measure = this.measures[k];
       var currentStave = this.drawStave(k * staveWidth);
@@ -125,8 +125,6 @@ SheetDrawer = {
         vexVoices[i].draw(this.context, currentStave);
       }
     }
-
-
   },
 
   translateToVex: function() {
