@@ -23,7 +23,7 @@ AlphabetSheetDrawer = {
   initCanvas: function() {
     this.canvas = document.getElementById('sheet-canvas');
     this.canvas.height = 600;
-    this.canvas.width = Math.min(700, $(this.canvas).parent().width());    
+    this.canvas.width = $(this.canvas).parent().width();    
 
     this.context = this.canvas.getContext('2d');
     this.context.font = 'italic 18px Calibri';
@@ -99,9 +99,14 @@ AlphabetSheetDrawer = {
       } 
     }
 
-    // vertical lines
-    for (var beat = Math.floor(firstBeat); beat < firstBeat + BEATS_PER_LINE; beat++) {
-      if ((beat) % this.beatsPerMeasure === 0) {
+    // vertical lines; TODO: look ahead BEATS_PER_LINE to get correct time signature
+    var beatValue = 4 / MidiReplayer.timeSignature.denominator;
+    var beatsPerMeasure = MidiReplayer.timeSignature.numerator;
+    var timeSignatureBeat = MidiReplayer.timeSignature.startTimeInBeats;
+    var beat = Math.floor((firstBeat - timeSignatureBeat) / beatValue) * beatValue + timeSignatureBeat;
+
+    for (; beat < firstBeat + BEATS_PER_LINE; beat += beatValue) {
+      if ((beat - timeSignatureBeat) % beatsPerMeasure === 0) {
         this.context.beginPath();
 
         this.context.moveTo((beat - firstBeat - shiftInBeats) * xStretchFactor, 0);
@@ -143,91 +148,4 @@ AlphabetSheetDrawer = {
       }, animationInMicroseconds / 1000);
     }
   },
-}
-
-function toTwoDecimalPlaces(num) {
-  return Math.floor(num * 100)/100;
-}
-
-// this is quite buggy
-function toFraction(num) {
-  var ret = "";
-
-  if (Math.floor(num) > 0) {
-    ret += Math.floor(num);
-  }
-
-  var remainder = num - Math.floor(num);
-  var fraction = getNumeratorAndDenominator(roundUp(remainder), [1,2,3,4]);
-
-  if (fraction !== null) {
-    return ret += fractionToCodePoint(fraction);
-  } else {
-    return num;
-  }
-
-}
-
-function roundUp(beat, multipliers) { 
- var attempts = [];
-
-  var multipliers = multipliers || [3, 4]; // for finer, use [6, 8]
-  for (var i = 0; i < multipliers.length; i++) {
-    var multiplier = multipliers[i];
-    attempts.push(ceiling(multiplier * beat) / multiplier);
-  }
-
-  var minChange;
-  var minIndex;
-
-  for (var i = 0; i < attempts.length; i++) {
-    if (!minChange || attempts[i] - beat < minChange) {
-      minChange = attempts[i] - beat;
-      minIndex = i;
-    }
-  }
-
-  return attempts[minIndex];
-}
-
-function getNumeratorAndDenominator(num, multipliers) {
-  for (var i = 0; i < multipliers.length; i++) {
-    var multiplier = multipliers[i];
-    var numerator = num * multiplier;
-    if (numerator === Math.floor(numerator)) {
-      return {numerator: numerator, denominator: multiplier};
-    }
-  }
-
-  return null;
-}
-
-function ceiling(num) {
-  // Like a ceiling function but not in extreme case like 2.09
-  var remainder = num - Math.floor(num);
-  if (remainder > .1) {
-    return Math.ceil(num);
-  } else {
-    return Math.floor(num);
-  }
-}
-
-function fractionToCodePoint(fraction) {
-  if (fraction.denominator === 2 && fraction.numerator === 1) {
-    return '\u00bd';
-  } else if (fraction.denominator === 3) {
-    if (fraction.numerator === 1) {
-      return '\u2153';
-    }
-  } else if (fraction.denominator === 4) {
-    if (fraction.numerator === 1) {
-      return '\u00bc';
-    } else if (fraction.numerator === 3) {
-      return '\u00be';
-    }
-  } else if (fraction.denominator === 1 && fraction.numerator === 1) {
-    return '1';
-  } else {
-    return fraction.numerator + '\u2044' + fraction.denominator;
-  }
 }

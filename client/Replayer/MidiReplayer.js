@@ -4,7 +4,9 @@ MidiReplayer = {
   init: function(song) {
     this.microsecondsPerBeat = 500000;
     this.notes = song.notes;
-    this.tempos = song.tempos
+    this.tempos = song.tempos;
+    this.timeSignatures = song.timeSignatures;
+
     this.reset();
 
     if (Worker) {
@@ -35,9 +37,24 @@ MidiReplayer = {
     this.microsecondsPerBeat = tempo; // if no tempo event exist before current time
   },
 
+  updateTimeSignature: function() {
+    var signature = {numerator: 4, denominator: 4};
+    for (var i = 0; i < this.timeSignatures.length; i++) {
+      var event = this.timeSignatures[i];
+      if (event.startTimeInBeats <= this.notes[Session.get('replayerIndex')].startTimeInBeats) {
+        signature = event;
+      } else {
+        break;
+      }
+    }
+    this.timeSignature = signature;
+    console.log(signature)
+  },
+
   start: function() {
     Session.set('isReplaying', true);
     this.updateTempo();
+    this.updateTimeSignature();
 
     if (this.worker) {
       this.worker.postMessage({
@@ -75,6 +92,9 @@ MidiReplayer = {
   reset: function() {
     this.pause();
     Session.set('replayerIndex', 0);
+
+    this.updateTempo();
+    this.updateTimeSignature();
   },
 
   pause: function() {
@@ -105,6 +125,8 @@ MidiReplayer = {
       $(window).trigger('keyboardUp', note); // not really used except for recording
     } else if (note.subtype === 'setTempo') {
       MidiReplayer.microsecondsPerBeat = note.microsecondsPerBeat;
+    } else if (note.subtype === 'timeSignature') {
+      MidiReplayer.timeSignature = note;
     }
   }
 }
