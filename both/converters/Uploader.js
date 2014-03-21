@@ -6,46 +6,116 @@ Uploader = {
   load: function(midiFile, fileName) {
     this.midi = midiFile;
     this.fileName = fileName;
-    // TODO: get source address
-
-    // Needed to approx # of beat for a note
     this.ticksPerBeat = this.midi.header.ticksPerBeat;
+    this.idIndex = 0; // used to annotate id during addStartTimeInBeats
+    // TODO: get source address if obtained via gamify
 
-    this.addStartTimeInBeats();
-    this.addEndTimeInBeats();
+    this.loadTempoEventsAndTimeSignatures();
+    this.addStartTimeInBeats(); // as well as id and trackId
+    this.addStartTimeInMicroseconds();
+    this.addEndTime();
 
-    this.addMicroSecondInfo();
+    this.merge();
+    this.save();
   },
 
-  addMicroSecondInfo: function() {
-    // add info needed for replaying
-    var tempos = this.getTempoEvents();
+  save: function() {
+    Meteor.call('createSongFile', {
+      fileName: this.fileName, 
+      midi: this.midi, 
+      notes: this.notes,
+      tempos: this.tempos, 
+      timeSignatures: this.timeSignatures,
+    }, function(err, songId) {
+      if (err) {
+        alert(err.reason);
+      } else {
+        Router.go('songFile', {_id: songId});
+      }
+    });
+  },
 
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var track = this.midi.tracks[trackId];
-      var tempoIndex = 0;
-      var microsecondsPerBeat = 500000; // midi default
+  merge: function() {
+    this.notes = [];
+    var tracks = this.midi.tracks;
+    var currentLocations = [];
+    var numFinished = 0;
 
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
-        event.startTimeInMicroseconds = event.startTimeInBeats * microsecondsPerBeat;
+    for (var i = 0; i < tracks.length; i++) {
+      if (tracks[i].length > 0) {
+        currentLocations.push(0);
+      } else {
+        numFinished++;
+      }
+    }
 
-        // only noteOn event
-        if (event.endTimeInBeats) {
-          event.endTimeInMicroseconds = event.endTimeInBeats * microsecondsPerBeat;
+    for (;numFinished < tracks.length;) {
+      var earliestTime = null;
+      var earliestTrackId = null;
+
+      for (var i = 0; i < tracks.length; i++) {
+        var track = tracks[i];
+        var currentLocation = currentLocations[i];
+
+        if (currentLocation !== null) {
+          var note = track[currentLocation];
+
+          if (earliestTime === null || note.startTimeInBeats < earliestTime) {
+            earliestTime = note.startTimeInBeats;
+            earliestTrackId = i;
+          }
         }
+      }
 
-        if (tempoIndex < tempos.length
-            && event.startTimeInBeats > tempos[tempoIndex].startTimeInBeats) {
+      var earliestTrack = tracks[earliestTrackId];
+      this.notes.push(earliestTrack[currentLocations[earliestTrackId]]);
 
-          microsecondsPerBeat = tempos[tempoIndex].microsecondsPerBeat;
-          tempoIndex++;
-        }
+      if (currentLocations[earliestTrackId] + 1 === earliestTrack.length ) {
+        currentLocations[earliestTrackId] = null;
+        numFinished++;
+      } else {
+        currentLocations[earliestTrackId] += 1;
       }
     }
   },
 
-  addEndTimeInBeats: function() {
+  addStartTimeInMicroseconds: function() {
+    // add info needed for replaying
+    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
+      var startTime = 0;
+      var track = this.midi.tracks[trackId];
+      var tempoIndex = 0;
+      var microsecondsPerBeat = 500000; // midi default
+
+      var timeInMicroseconds = 0;
+
+      for (var i = 0; i < track.length; i++) {
+        var event = track[i];
+
+        // must change unit of deltaTime if tempo changes at the current note
+        if (tempoIndex < this.tempos.length
+            && event.startTimeInBeats >= this.tempos[tempoIndex].startTimeInBeats) {
+          var diffInTicks = (event.startTimeInBeats - this.tempos[tempoIndex].startTimeInBeats) * this.ticksPerBeat;
+
+          // before tempo change
+          timeInMicroseconds += (event.deltaTime - diffInTicks) / this.ticksPerBeat * microsecondsPerBeat;
+
+          microsecondsPerBeat = this.tempos[tempoIndex].microsecondsPerBeat;
+          tempoIndex++;
+
+          // after tempo change
+          timeInMicroseconds += diffInTicks / this.ticksPerBeat * microsecondsPerBeat;
+          
+        } else {
+          timeInMicroseconds += event.deltaTime / this.ticksPerBeat * microsecondsPerBeat;
+        }
+
+        event.startTimeInMicroseconds = timeInMicroseconds;
+      }
+    }
+  },
+
+  addEndTime: function() {
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
       var track = this.midi.tracks[trackId];
       var noteOnEvents = []; // queue up noteOn events to be matched with noteOff event
@@ -63,11 +133,18 @@ Uploader = {
             var found = false;
             if (noteOnEvent.noteNumber  === event.noteNumber &&
                 noteOnEvent.channel === event.channel) {
+
               noteOnEvent.endTimeInBeats = event.startTimeInBeats;
-              var duration = noteOnEvent.endTimeInBeats - noteOnEvent.startTimeInBeats
+              noteOnEvent.endTimeInMicroseconds = event.startTimeInMicroseconds;
+
+              // annotate with id
+              noteOnEvent.noteOffId = event.id;
+              event.noteOnId = noteOnEvent.id;
 
               // sanity check       
-              if (duration > 10) {
+              var duration = noteOnEvent.endTimeInBeats - noteOnEvent.startTimeInBeats
+
+              if (duration > 16) {
                 console.log('Unusually long note:');
                 console.log(noteOnEvent);
               } else if (duration <= 0) {
@@ -108,52 +185,41 @@ Uploader = {
 
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
+
+        event.id = this.idIndex++; // needed to update noteOn and noteOff pair
+        event.trackId = trackId; // needed to propagate song.notes changes to the track
         event.note = event.noteNumber; // for backward compatibility
-        event.trackId = trackId; // TODO: figure out why we need this
+
         timeInTicks += event.deltaTime;
         event.startTimeInBeats = timeInTicks / this.ticksPerBeat;
       }
     }
-  }, 
+  },  
 
   // The info should be in track 0, but we will be cautious and look in all tracks
-  getTempoEvents: function() {
-    var ret = [];
+  loadTempoEventsAndTimeSignatures: function() {
+    this.tempos = [];
+    this.timeSignatures = [];
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
       var track = this.midi.tracks[trackId];
 
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
         if (event.subtype === 'setTempo') {
-          ret.push(event);
+          this.tempos.push(event);
+        } else if (event.subtype === 'timeSignature') {
+          this.timeSignatures.push(event);
         }
       }
     }
-    return ret;
   },
-
-  // The info should be in track 0, but we will be cautious and look in all tracks
-  getTimeSignatures: function() {
-    var ret = [];
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var track = this.midi.tracks[trackId];
-
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
-        if (event.subtype === 'timeSignature') {
-          ret.push(event);
-        }
-      }
-    }
-    return ret;
-  },   
 }
 
-// we will only use this for SheetDrawer; not for AlphabetDrawer
-// todo: dynamic multipliers depending to prevent noteOn from being moved
-function roundUp(beat, multipliers) {
-
-  var attempts = [];
+// this is for fractional display purposes
+// we will compute the near by note duration
+// to see what the correct multiplier should be
+function roundUp(beat, multipliers) { 
+ var attempts = [];
 
   var multipliers = multipliers || [6, 8]; // for coarser, use [3, 4]
   for (var i = 0; i < multipliers.length; i++) {

@@ -1,0 +1,27 @@
+<template name='midiReplayer'>
+  <div class='playback-control'>
+    <div class='youplayer-control'>        
+      <button id='youplayer-start' 
+          class='{{#if isYouplaying}}pressed{{/if}}'>
+        <i class='icon-hand-down'></i>
+      </button>
+    </div>
+
+    <div class='replayer-control'>
+      <button id='replayer-start'
+          class='{{#if isReplaying}}pressed{{/if}}'>
+        {{#if isReplaying}}
+          <i class='icon-pause'></i>
+        {{else}}
+          <i class='icon-play'></i>
+        {{/if}}
+      </button>
+    </div>
+
+    <div class='replayer-progress'>
+      <div class='slider'></div>      
+    </div>
+  </div>
+  {{> alphabetSheetDrawer}}
+  
+</template>

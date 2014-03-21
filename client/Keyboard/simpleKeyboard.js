@@ -251,18 +251,18 @@ noteToName = function(note, alphabet) {
 
   } else {
     var conversion = {
-      0: 'Do',
-      1: 'Du',
-      2: 'Re',
-      3: 'Ru',
-      4: 'Mi',
-      5: 'Fa',
-      6: 'Fu',
-      7: 'So',
-      8: 'Su',
-      9: 'La',
-      10: 'Lu',
-      11: 'Ti',
+      0: 'DO',
+      1: 'DI',
+      2: 'RE',
+      3: 'RI',
+      4: 'MI',
+      5: 'FA',
+      6: 'FI',
+      7: 'SO',
+      8: 'SI',
+      9: 'LA',
+      10: 'LI',
+      11: 'TI',
     };
   }
 

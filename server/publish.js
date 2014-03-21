@@ -1,4 +1,8 @@
 // todo: add infinite scrolling
+Meteor.publish('songFile', function(songId) {
+  return SongFiles.find({_id: songId});
+});
+
 Meteor.publish('gameInfos', function() {
   return Songs.find({}, {
     fields: {

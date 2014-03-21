@@ -20,6 +20,59 @@ mrt
 
 ## TODO
 
+1. Get lyrics working
+2. Get note edit working
+3. Get instrument acceptable
+
+Drive
+=====
+Allow saving your stuff to google drive in midi or kar
+
+Allow midi and kar file to be opened using my app using google drive
+Figure out if phones can download file to google drive
+This will allow accessing midi file in your cell phone
+
+* Check out how files can be downloaded to drive
+
+Lyrics
+======
+First, you view an existing song
+When you get to a certain point
+You want to insert lyrics
+  You will need to click the edit tab
+  Go to the textbox, type the word and press enter
+  There will be left and right arrow buttons to navigate
+  
+Save the edit to the user's SongCustomizations
+
+Notes Editting
+==============
+
+Don't:
+
+* modify existing note
+* modify spacing unless in push mode
+* fix up improv pieces
+
+Do:
+
+* You will always be in the context of a track (new or existing)
+* navigate using a rest with the tiniest interval specified (1/4 beat)
+* insert notes and rest into the current rest
+* delete current selection (except if it is the last one, then delete the previous note)
+  * i.e. it's a delete that becomes a backspace if it's in the last position
+
+Scenario:
+
+* User wants to change something in the existing midi
+  * change to insert mode and navigate using left and right arrow (buttons)
+  * modify the notes in that track; we will update song.notes
+  * if switched track or saved, we will propagate the change to that track in song.midi
+  * switching track will move to the closest previous (next) note
+
+
+## TODO Later
+
 * Fill in the best shift
 
 * redirect non-user to sign in
