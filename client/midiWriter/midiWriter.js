@@ -1,7 +1,6 @@
 
 Template.midiWriter.events({
   'click #midi-download': function(evt, tmpl) {
-    console.log(tmpl.data.song.midi)
     var song = MidiWriter.fromJasmid(tmpl.data.song.midi)
 
     var name = $('#file-name').val();

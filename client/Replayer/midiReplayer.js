@@ -45,6 +45,8 @@ Template.midiReplayer.rendered = function() {
         } else {
           MidiReplayer.start();
         }
+
+        $(window).trigger('replayerSliderMoved');
       }
     });  
   });

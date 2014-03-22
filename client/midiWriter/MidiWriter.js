@@ -184,7 +184,6 @@ var MidiWriter = function(config) {
         // This variable will hold the whole midi stream and we will add every
         // chunk of MIDI data to it in the next lines.
         var hexMidi = HDR_CHUNKID + HDR_CHUNK_SIZE + HDR_TYPE1;
-console.log(config);
         // Appends the number of tracks expressed in 2 bytes, as the MIDI
         // standard requires.
         hexMidi += codes2Str(str2Bytes(tracksLength, 2));

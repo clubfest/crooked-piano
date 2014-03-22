@@ -1,7 +1,7 @@
 // Warning: denominator does not conform to midi's definition
 // it must be converted via Math.log(denominator || 2) / Math.log(2)
 
-var BEATS_PER_LINE = 16;
+BEATS_PER_LINE = 16; // used in LyricsDisplay
 var staveWidth = 300;
 var xStretchFactor = 60;
 var animationInMicroseconds = 100000;
@@ -69,7 +69,6 @@ AlphabetSheetDrawer = {
     }
 
     this.drawAndRedraw(firstBeat, shiftInBeats);
-    
   },
 
   drawAndRedraw: function(firstBeat, shiftInBeats) {

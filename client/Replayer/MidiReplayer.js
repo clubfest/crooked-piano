@@ -1,3 +1,10 @@
+/* 
+  Session.timeInMicroseconds is the time of the note at the instance it needs to be played
+  There may be various other actions and updates right at that point, like 
+    * stopping
+    * replayerIndex update
+
+*/
 
 MidiReplayer = {
   // todo: decide where to clean notes
@@ -7,23 +14,71 @@ MidiReplayer = {
     this.tempos = song.tempos;
     this.timeSignatures = song.timeSignatures;
 
+    this.loadReplayerIndexWorker();
     this.reset();
+  },
 
-    if (Worker) {
-      var self = this;
-      
-      this.worker = new Worker('/replayerWorker.js');
-      this.worker.onmessage = function(evt){
-        var data = evt.data;
-        self.playNoteOnMessage(data);
+  setPlayMode: function(playFunction) {
+    this.replayerIndexWorker.onmessage = function(evt) {
+      var data = evt.data;
+
+      // update before playFunction
+      data.note = MidiReplayer.notes[data.replayerIndex];
+      Session.set('timeInMicroseconds', data.note.startTimeInMicroseconds);
+      Session.set('replayerIndex', data.replayerIndex);
+
+      playFunction(data);
+    }
+  },
+
+  loadReplayerIndexWorker: function() {
+    var self = this;
+
+    this.replayerIndexWorker = new Worker('/replayerIndexWorker.js');
+    this.setPlayMode(self.normalReplay);
+
+    if (NO_WORKER) {
+      // redefine onmessage and postAndSetTimeoutToPost from replayerIndexWorker.js
+      this.replayerIndexWorker.onmessageToWorker = function(evt) {
+        var action = evt.data.action;
+
+        if (action === 'start') {
+          var replayerIndex = evt.data.replayerIndex;
+          var notes = evt.data.notes;
+          self.postAndsetTimeoutToPost(notes, replayerIndex);
+
+        } else if (action === 'stop') {
+          clearTimeout(self.timeoutId);
+        }
       }
     }
   },
 
-  playNoteOnMessage: function(data) {
+  // a recursive function that delivers 
+  postAndsetTimeoutToPost: function(notes, replayerIndex) {
+    this.replayerIndexWorker.postMessageFromWorker({
+      action: 'play', replayerIndex: replayerIndex
+    });
+
+    if (replayerIndex + 1 < notes.length) {
+      var self = this;
+      var nextStartTime = notes[replayerIndex + 1].startTimeInMicroseconds;
+      var prevStartTime = notes[replayerIndex].startTimeInMicroseconds;
+      var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000; 
+
+      this.timeoutId = setTimeout(function() {
+        self.postAndsetTimeoutToPost(notes, replayerIndex + 1);
+      }, delayInMilliseconds);
+
+    } else {
+      this.replayerIndexWorker.postMessageFromWorker({action: 'stop'});
+    }
+  },
+
+  // playFunction's context is the window, so don't use "this"; use MidiPlayer instead
+  normalReplay: function(data) {
     if (data.action === 'play') {
-      Session.set('replayerIndex', data.replayerIndex);
-      MidiReplayer.playNote(MidiReplayer.notes[data.replayerIndex]);
+      MidiReplayer.playNote(data.note);
     } else if (data.action === 'stop') {
       MidiReplayer.stop();
     }
@@ -61,31 +116,12 @@ MidiReplayer = {
     this.updateTempo();
     this.updateTimeSignature();
 
-    if (this.worker) {
-      this.worker.postMessage({
+    if (this.replayerIndexWorker) {
+      this.replayerIndexWorker.postMessage({
         action: 'start', 
         notes: this.notes,
         replayerIndex: Session.get('replayerIndex'),
       }); 
-    } else {
-      var replayerIndex = Session.get('replayerIndex');
-      playAndIncrementAndPlay();
-
-      function playAndIncrementAndPlay() {
-        var notes = MidiReplayer.notes;
-        MidiReplayer.playNote(notes[replayerIndex++]);
-        Session.set('replayerIndex', replayerIndex);
-
-        if (replayerIndex < notes.length) {
-          var nextStartTime = notes[replayerIndex].startTimeInMicroseconds;
-          var prevStartTime = notes[replayerIndex - 1].startTimeInMicroseconds;
-          var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000; 
-
-          MidiReplayer.timeoutId = setTimeout(playAndIncrementAndPlay, delayInMilliseconds);
-        } else {
-          MidiReplayer.stop();
-        }
-      }
     }
   },
 
@@ -104,13 +140,7 @@ MidiReplayer = {
 
   pause: function() {
     Session.set('isReplaying', false);
-
-    if (this.worker) {
-      this.worker.postMessage({action: 'stop'});      
-    } else {
-      window.clearTimeout(this.timeoutId);
-      this.timeoutId = null;
-    }
+    this.replayerIndexWorker.postMessage({action: 'stop'});      
   },
 
   stop: function() {
@@ -120,18 +150,21 @@ MidiReplayer = {
 
   playNote: function(note) {
     note.isFromReplayer = true; // used for filtering when recording improv
-    
+    Session.set('timeInMicroseconds', note.startTimeInMicroseconds); // TODO: move this before playNote as this will not be called in edit / youPlay mode
 
     if (note.subtype === 'noteOn') {
       note.keyCode = convertNoteToKeyCode(note.noteNumber);
       $(window).trigger('keyboardDown', note);
+
     } else if (note.subtype === 'noteOff') {
       note.keyCode = convertNoteToKeyCode(note.noteNumber);
-      $(window).trigger('keyboardUp', note); // not really used except for recording
+      $(window).trigger('keyboardUp', note);
+
     } else if (note.subtype === 'setTempo') {
       MidiReplayer.microsecondsPerBeat = note.microsecondsPerBeat;
+
     } else if (note.subtype === 'timeSignature') {
       MidiReplayer.timeSignature = note;
     }
-  }
+  },
 }
