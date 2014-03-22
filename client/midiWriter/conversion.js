@@ -1,0 +1,4 @@
+
+var noteNumberToMidiNumber = function() {
+  
+}

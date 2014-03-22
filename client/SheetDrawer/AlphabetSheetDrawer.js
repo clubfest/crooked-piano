@@ -1,7 +1,10 @@
+// Warning: denominator does not conform to midi's definition
+// it must be converted via Math.log(denominator || 2) / Math.log(2)
+
 var BEATS_PER_LINE = 16;
 var staveWidth = 300;
 var xStretchFactor = 60;
-var animationInMicroseconds = 50000;
+var animationInMicroseconds = 100000;
 
 AlphabetSheetDrawer = {
   init: function(song) {
@@ -14,10 +17,6 @@ AlphabetSheetDrawer = {
     this.notes = song.notes || [];
 
     var self = this;
-    // $(window).on('tempoChanged.alphabetDrawer', function(evt, data) {
-    //   console.log('tempoChanged')
-    //   self.microsecondsPerBeat = data.microsecondsPerBeat;
-    // });
   },
 
   initCanvas: function() {
@@ -40,6 +39,10 @@ AlphabetSheetDrawer = {
   clear: function() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
+
+  // reset: function() {
+  //   this.timeSignatureIndex = 0;
+  // },
 
   // TODO: rename to drawAlphabet
   draw: function() {
@@ -99,19 +102,40 @@ AlphabetSheetDrawer = {
       } 
     }
 
-    // vertical lines; TODO: look ahead BEATS_PER_LINE to get correct time signature
-    var beatValue = 4 / MidiReplayer.timeSignature.denominator;
-    var beatsPerMeasure = MidiReplayer.timeSignature.numerator;
-    var timeSignatureBeat = MidiReplayer.timeSignature.startTimeInBeats;
-    var beat = Math.floor((firstBeat - timeSignatureBeat) / beatValue) * beatValue + timeSignatureBeat;
+    // vertical lines; 
+    var timeSignatures = MidiReplayer.timeSignatures;
+    var timeSignature = {numerator: 4, denominator: 4, startTimeInBeats: 0};
+    var signatureIndex = null;
 
-    for (; beat < firstBeat + BEATS_PER_LINE; beat += beatValue) {
+    for (var i = 0; i < timeSignatures.length; i++) {
+      if (timeSignatures[i].startTimeInBeats > firstBeat) {
+        break;
+      } else {
+        timeSignature = timeSignatures[i];
+        signatureIndex = i;
+      }
+    }
+
+    beatValue = 4 / timeSignature.denominator;
+    beatsPerMeasure = timeSignature.numerator * beatValue;
+    timeSignatureBeat = timeSignature.startTimeInBeats;
+
+    var beat = timeSignature.startTimeInBeats;
+
+    for ( ; ; beat += beatsPerMeasure) {
+      if (beat > firstBeat) {
+        beat -= beatsPerMeasure;
+        break;
+      }
+    }
+
+    for (; beat < firstBeat + BEATS_PER_LINE; ) {
       if ((beat - timeSignatureBeat) % beatsPerMeasure === 0) {
         this.context.beginPath();
 
         this.context.moveTo((beat - firstBeat - shiftInBeats) * xStretchFactor, 0);
         this.context.lineTo((beat - firstBeat - shiftInBeats) * xStretchFactor, this.canvas.height);
-        this.context.strokeStyle = 'rgb(50, 50, 50)';
+        this.context.strokeStyle = 'rgb(50, 50, 50)'; // dark grey
         this.context.lineWidth = .8;
         this.context.stroke();
       } else {
@@ -119,9 +143,36 @@ AlphabetSheetDrawer = {
 
         this.context.moveTo((beat - firstBeat - shiftInBeats) * xStretchFactor, 0);
         this.context.lineTo((beat - firstBeat - shiftInBeats) * xStretchFactor, this.canvas.height);
-        this.context.strokeStyle = 'rgb(150, 150, 150)';
+        this.context.strokeStyle = 'rgb(150, 150, 150)'; // grey
         this.context.lineWidth = .4;
         this.context.stroke();
+      }
+
+      var changed = false;
+      if (signatureIndex === null) {
+        var i = 0;
+      } else {
+        var i = signatureIndex + 1;
+      }
+
+      for (; i < timeSignatures.length; i++) {
+        var newTimeSignature = timeSignatures[i];
+        if (newTimeSignature.startTimeInBeats > beat) {
+          break;
+        } else {
+          timeSignature = newTimeSignature;
+          signatureIndex = i;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        beatValue = 4 / timeSignature.denominator;
+        beatsPerMeasure = timeSignature.numerator * beatValue;
+        timeSignatureBeat = timeSignature.startTimeInBeats;
+        beat = timeSignatureBeat;
+      } else {
+        beat += beatValue;
       }
     }
 
@@ -140,11 +191,11 @@ AlphabetSheetDrawer = {
 
     if (Session.get('isReplaying')) {
       this.microsecondsSinceLastDrawn += animationInMicroseconds;
-      shift = this.microsecondsSinceLastDrawn / MidiReplayer.microsecondsPerBeat;
+      shiftInBeats = this.microsecondsSinceLastDrawn / MidiReplayer.microsecondsPerBeat;
 
       var self = this;
       this.redrawTimeoutId = window.setTimeout(function() {
-        self.drawAndRedraw(firstBeat, shift);
+        self.drawAndRedraw(firstBeat, shiftInBeats);
       }, animationInMicroseconds / 1000);
     }
   },

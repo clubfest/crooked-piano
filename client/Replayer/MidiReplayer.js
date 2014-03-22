@@ -10,22 +10,28 @@ MidiReplayer = {
     this.reset();
 
     if (Worker) {
+      var self = this;
+      
       this.worker = new Worker('/replayerWorker.js');
       this.worker.onmessage = function(evt){
         var data = evt.data;
-        if (data.action === 'play') {
-          Session.set('replayerIndex', data.replayerIndex);
-          MidiReplayer.playNote(MidiReplayer.notes[data.replayerIndex]);
-        } else if (data.action === 'stop') {
-          MidiReplayer.stop();
-        }
+        self.playNoteOnMessage(data);
       }
     }
   },
 
+  playNoteOnMessage: function(data) {
+    if (data.action === 'play') {
+      Session.set('replayerIndex', data.replayerIndex);
+      MidiReplayer.playNote(MidiReplayer.notes[data.replayerIndex]);
+    } else if (data.action === 'stop') {
+      MidiReplayer.stop();
+    }
+  },
+
+  // used only when the replayer is started
   updateTempo: function() { // aka microsecondsPerBeat
-    // TODO: may be add currentTime and use it here
-    var tempo = 500000
+    var tempo = 500000;
     for (var i = 0; i < this.tempos.length; i++) {
       var event = this.tempos[i];
       if (event.startTimeInBeats <= this.notes[Session.get('replayerIndex')].startTimeInBeats) {
@@ -48,7 +54,6 @@ MidiReplayer = {
       }
     }
     this.timeSignature = signature;
-    console.log(signature)
   },
 
   start: function() {

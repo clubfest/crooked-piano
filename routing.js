@@ -15,6 +15,7 @@ Router.map(function() {
     waitOn: function() {
       return this.subscribe('songFile', this.params._id);
     },
+    
     data: function() {
       var data = {};
       data.song = SongFiles.findOne(this.params._id);

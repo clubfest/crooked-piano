@@ -10,7 +10,6 @@ Template.midiReplayer.rendered = function() {
   Session.set('isYouplaying', true);
 
   var song = this.data.song;
-
   MidiReplayer.init(song);
 
   $('.slider').slider({

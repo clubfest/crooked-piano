@@ -10,6 +10,7 @@ Uploader = {
     this.idIndex = 0; // used to annotate id during addStartTimeInBeats
     // TODO: get source address if obtained via gamify
 
+    this.debug();
     this.loadTempoEventsAndTimeSignatures();
     this.addStartTimeInBeats(); // as well as id and trackId
     this.addStartTimeInMicroseconds();
@@ -19,6 +20,17 @@ Uploader = {
     this.save();
   },
 
+  debug: function() {
+    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
+      var track = this.midi.tracks[trackId];
+      for (var i = 0; i < track.length; i++) {
+        var event = track[i];
+        // if (event.type === 'meta') {
+          console.log(event);
+        // }
+      }
+    }
+  },
   save: function() {
     Meteor.call('createSongFile', {
       fileName: this.fileName, 

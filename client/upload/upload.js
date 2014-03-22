@@ -1,6 +1,28 @@
 // TODO: think about whether to store each segment individually
 // TODO: think about adding id to each note
 var fileName;
+var fileReader = new FileReader;
+fileReader.onload = function() {
+  var midiFile = MidiFile(fileReader.result);
+  Uploader.load(midiFile, fileName);
+  
+  // var player = MIDI.Player;
+
+  // try {
+  //   player.loadFile(fileReader.result);
+  // } catch (e) {
+  //   Session.set('message', 'Upload failed');
+  //   return ;
+  // }
+
+
+  // Translator.midiToNotes(player.data);
+  
+  // Translator.createTranslatedSong(function(songId) {
+  //   Router.go('editSong', {_id: songId});
+  // });
+}
+
 
 Template.upload.rendered = function() {
   // SheetDrawer.init();
@@ -14,31 +36,10 @@ Template.upload.rendered = function() {
       var file = fileList[0];
       fileName = file.name.split(/(\\|\/)/g).pop();
 
-      var fileReader = new FileReader;
       fileReader.readAsBinaryString(file);
       // fileReader.readAsText(file, 'Big5');
 
-      fileReader.onload = function() {
-      var midiFile = MidiFile(fileReader.result);
-      Uploader.load(midiFile, fileName);
-      MidiReplayer.init(Uploader.midi.tracks[1]);
       
-      // var player = MIDI.Player;
-
-      // try {
-      //   player.loadFile(fileReader.result);
-      // } catch (e) {
-      //   Session.set('message', 'Upload failed');
-      //   return ;
-      // }
-
-
-      // Translator.midiToNotes(player.data);
-      
-      // Translator.createTranslatedSong(function(songId) {
-      //   Router.go('editSong', {_id: songId});
-      // });
-    }
     }
   }
 
@@ -64,7 +65,7 @@ Template.upload.rendered = function() {
    
       if (fileList.length > 0) {
         var file = fileList[0];
-        fileReader.readAsDataURL(file);
+        fileReader.readAsBinaryString(file);
       }
   });
 
