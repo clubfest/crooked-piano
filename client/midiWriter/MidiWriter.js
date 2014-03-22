@@ -16,6 +16,7 @@ var HDR_CHUNKID     = "MThd";
 var HDR_CHUNK_SIZE  = "\x00\x00\x00\x06"; // Header size for SMF
 var HDR_TYPE0       = "\x00\x00"; // Midi Type 0 id
 var HDR_TYPE1       = "\x00\x01"; // Midi Type 1 id
+var HDR_TYPE2       = "\x00\x02"; // Midi Type 1 id
 var HDR_SPEED       = "\x00\x80"; // Defaults to 128 ticks per beat
 
 // Midi event codes
@@ -183,11 +184,15 @@ var MidiWriter = function(config) {
         // This variable will hold the whole midi stream and we will add every
         // chunk of MIDI data to it in the next lines.
         var hexMidi = HDR_CHUNKID + HDR_CHUNK_SIZE + HDR_TYPE1;
-
+console.log(config);
         // Appends the number of tracks expressed in 2 bytes, as the MIDI
         // standard requires.
         hexMidi += codes2Str(str2Bytes(tracksLength, 2));
-        hexMidi += HDR_SPEED;
+        if (config.header && config.header.ticksPerBeat) {
+            hexMidi += codes2Str(str2Bytes(config.header.ticksPerBeat.toString(16), 2));
+        } else {
+            hexMidi += HDR_SPEED;
+        }
         // Goes through the tracks appending the hex strings that compose them.
         tracks.forEach(function(trk) { 
             hexMidi += codes2Str(trk.toBytes()); 
@@ -388,6 +393,7 @@ var MetaEvent = function(params) {
     if (params) {
         this.setType(params.type);
         this.setData(params.data);
+        this.setDataLength(params.dataLength);
     }
 };
 
@@ -402,6 +408,9 @@ MetaEvent.prototype = {
     setData: function(d) {
         this.data = d;
     },
+    setDataLength: function(d) {
+        this.dataLength = d;
+    },
     toBytes: function() {
         if (!this.type || !this.data) {
             throw new Error("Type or data for meta-event not specified.");
@@ -410,11 +419,7 @@ MetaEvent.prototype = {
         var byteArray = this.time;
         byteArray.push(0xff); // code for meta event
         byteArray.push(this.type); // what type of meta event
-        // if (this.type >= META_TEXT && this.type <= META_CUE_POINT) {
-            AP.push.apply(byteArray, decimalToVariableLength(this.data.length)); // TODO: rename
-        // } else if (this.type === META_KEY_SIG) {
-            // byteArray.push(4);
-        // }
+        AP.push.apply(byteArray, this.dataLength);
 
         // If data is an array, we assume that it contains several bytes. We
         // apend them to byteArray.
@@ -427,24 +432,7 @@ MetaEvent.prototype = {
     },
 };
 
-// this matches the subtypes specified in jasmid/midifile.js
-MetaEvent.types = {
-    sequence: META_SEQUENCE,
-    text: META_TEXT,
-    copyrightNotice: META_COPYRIGHT,
-    trackName: META_TRACK_NAME,
-    instrumentName: META_INSTRUMENT,
-    lyrics: META_LYRIC,
-    marker: META_MARKER,
-    cuePoint: META_CUE_POINT,
-    midiChannelPrefix: META_CHANNEL_PREFIX,
-    endOfTrack: META_END_OF_TRACK,
-    tempo: META_TEMPO,
-    smpteOffset: META_SMPTE,
-    timeSignature: META_TIME_SIG,
-    keySignature: META_KEY_SIG,
-    sequencerSpecific: META_SEQ_EVENT,
-}
+
 
 // this works for meta events from text to cuePoint
 MetaEvent.createText = function(text, typeName, delay) {
@@ -590,13 +578,6 @@ function createNonMidiTrack () {
     noteEvents.push(MetaEvent.createKeySignature());
 
     return new MidiTrack({events: noteEvents});
-    return MidiTrack.nonMidiTrack;
-}
-
-// midi is the output from jasmid
-MidiWriter.convert = function(midi) {
-    MidiWriter.clean(midi);
-    new MidiWriter(midi); // arg provides info about num of tracks
 }
 
 window.MidiWriter = MidiWriter;
@@ -605,3 +586,187 @@ window.MetaEvent = MetaEvent;
 window.MidiTrack = MidiTrack;
 window.noteTable = noteTable;
 
+
+// midi is the output from jasmid
+MidiWriter.fromJasmid = function(jasmid) {
+    midi = {tracks: [], header: jasmid.header};
+
+    for (var i = 0; i < jasmid.tracks.length; i++) {
+        var track = jasmid.tracks[i];
+        var midiTrack = new MidiTrack;
+        for (var j = 0; j < track.length; j++) {
+            var note = track[j];
+            var midiEvent = createEventFromJasmid(note);
+            if (midiEvent !== null) {
+                midiTrack.addEvent(midiEvent);
+            } 
+        }
+        midi.tracks.push(midiTrack);
+    }
+
+    var song = new MidiWriter(midi); // arg provides info about num of tracks
+    return song;
+}
+
+// return null if a certain type is not implemented
+function createEventFromJasmid (note) {
+    if (note.type === 'channel') {
+        return createChannelEventFromJasmid(note);
+    } else if (note.type === 'meta') {
+        return createMetaEventFromJasmid(note);
+    } else {
+        // console.log('unsupported midi type:');
+        // console.log(note);
+        return null; // are there anything else?
+    }
+}
+
+function createChannelEventFromJasmid(note) {
+    var eventType = MidiEvent.types[note.subtype];
+
+    if (typeof eventType === 'undefined') {
+        // console.log('unsupported event conversion for note: ');
+        // console.log(note);
+        return null;
+    }
+
+    if (eventType === EVT_NOTE_ON || eventType === EVT_NOTE_OFF) {
+        var ret = new MidiEvent({
+            type:    eventType,
+            channel: note.channel,
+            param1:  note.noteNumber,
+            param2:  note.velocity
+        });
+
+        ret.setTime(note.deltaTime);
+        return ret;
+
+    } else if (eventType === EVT_PROGRAM_CHANGE) {
+        var ret = new MidiEvent({
+            type: EVT_PROGRAM_CHANGE,
+            channel: note.channel,
+            param1: note.subtype,
+        });
+
+        ret.setTime(note.deltaTime);
+        return ret;
+
+    } else {
+        // TODO: implement pitchBend and the rest
+        // console.log('translation not implemented:');
+        // console.log(note);
+        return null;
+    }
+}
+
+function createMetaEventFromJasmid(note) {
+    var eventType = MetaEvent.types[note.subtype];
+
+    if (typeof eventType === 'undefined') {
+        // console.log('unsupported event conversion for note: ');
+        // console.log(note);
+        return null;
+    }
+
+    if (eventType >= META_TEXT && eventType <= META_CUE_POINT) {
+        var data = asciiToCharCodes(note.text);
+    
+        var ret = new MetaEvent({
+            dataLength: decimalToVariableLength(data.length),
+            type: eventType, 
+            data: data,
+        });
+
+        ret.setTime(note.deltaTime);
+        return ret;
+
+    } else if (eventType === META_TIME_SIG) {
+        // jasmid and midi interpret denominator differently
+        var denominator = Math.log(note.denominator || 2) / Math.log(2)
+        if (Math.floor(denominator) !== denominator) {
+            console.log("denominator is not an integer: " + denominator);
+            return ;
+        }
+
+        var data = [note.numerator, denominator, note.metronome, note.thirtySeconds];
+
+        var ret = new MetaEvent({
+            dataLength: [data.length],
+            type: eventType,
+            data: data,
+        });
+
+        ret.setTime(note.deltaTime);
+        return ret;
+
+    } else if (eventType === META_KEY_SIG) {
+        var data = [note.key, note.scale];
+
+        var ret = new MetaEvent({
+            dataLength: [data.length],
+            type: eventType,
+            data: data,
+        });
+        console.log(ret);
+
+        ret.setTime(note.deltaTime);
+        return ret;
+
+    } else if (eventType === META_TEMPO) {
+        var data = str2Bytes(note.microsecondsPerBeat.toString(16), 3); // 3 bytes by midi spec
+
+        var ret = new MetaEvent({
+            dataLength: [data.length],
+            type: eventType,
+            data: data,
+        });
+
+        ret.setTime(note.deltaTime);
+        return ret;
+
+    } else if (eventType === META_END_OF_TRACK) {
+        var data = [];
+
+        var ret = new MetaEvent({
+            dataLength: [data.length],
+            type: eventType,
+            data: data,
+        });
+
+        ret.setTime(note.deltaTime);
+        return ret;
+    } else {
+        // console.log('translation not implemented:');
+        // console.log(note);
+        return null;  
+    }
+}
+
+// these match the subtypes specified in jasmid/midifile.js
+MidiEvent.types = {
+    noteOn: EVT_NOTE_ON,
+    noteOff: EVT_NOTE_OFF,
+    noteAfterTouch: EVT_AFTER_TOUCH,
+    controller: EVT_CONTROLLER,
+    programChange: EVT_PROGRAM_CHANGE,
+    channelAfterTouch: EVT_CHANNEL_AFTERTOUCH,
+    pitchBend: EVT_PITCH_BEND,
+}
+
+MetaEvent.types = {
+    sequence: META_SEQUENCE,
+    text: META_TEXT,
+    copyrightNotice: META_COPYRIGHT,
+    trackName: META_TRACK_NAME,
+    instrumentName: META_INSTRUMENT,
+    lyrics: META_LYRIC,
+    marker: META_MARKER,
+    cuePoint: META_CUE_POINT,
+    midiChannelPrefix: META_CHANNEL_PREFIX,
+    endOfTrack: META_END_OF_TRACK,
+    setTempo: META_TEMPO,
+    smpteOffset: META_SMPTE,
+    timeSignature: META_TIME_SIG,
+    keySignature: META_KEY_SIG,
+    sequencerSpecific: META_SEQ_EVENT,
+}

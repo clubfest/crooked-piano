@@ -25,9 +25,9 @@ Uploader = {
       var track = this.midi.tracks[trackId];
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
-        // if (event.type === 'meta') {
+        if (event.type === 'meta') {
           console.log(event);
-        // }
+        }
       }
     }
   },
