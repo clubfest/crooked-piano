@@ -14,7 +14,7 @@ Uploader = {
     this.addStartTimeInBeats(); // as well as id and trackId
     this.addStartTimeInMicroseconds();
     this.addEndTime();
-    // this.debug();
+    this.debug();
 
     this.merge();
     this.save();
@@ -25,14 +25,18 @@ Uploader = {
       var track = this.midi.tracks[trackId];
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
-        if (event.subtype === 'text' || event.subtype === 'lyrics') {
-          if (event.startTimeInBeats > 5) {
-            console.log(event.subtype);
-            console.log(event.text);
-            console.log(trackId)
-          }
-        }
+
+        // if (event.subtype === 'text' || event.subtype === 'lyrics') {
+          // if (event.startTimeInBeats > 5) {
+            // console.log(event.subtype);
+            // console.log(event.text);
+            // console.log(trackId)
+          // }
+        // }
       }
+        if (trackId === 0){
+         console.log(track)
+       }
     }
   },
   

@@ -1,30 +1,26 @@
-var timeoutId = null;
-var replayerIndex;
-var notes;
+var timeoutId;
 
 onmessage = function(evt){
   var action = evt.data.action;
   if (action === 'start') {
-    replayerIndex = evt.data.replayerIndex;
-    notes = evt.data.notes;
-    postReplayerIndexAndIncrementAndPost();  
+    postAndSetTimoutToPost(evt.data.notes, evt.data.replayerIndex);  
 
   } else if (action === 'stop') {
     clearTimeout(timeoutId);
   }
 };
 
-function postReplayerIndexAndIncrementAndPost() {
+function postAndSetTimoutToPost(notes, replayerIndex) {
   postMessage({action: 'play', replayerIndex: replayerIndex});
-
-  replayerIndex++; // this will be updated in Session when we play the note
-
-  if (replayerIndex < notes.length) {
-    var nextStartTime = notes[replayerIndex].startTimeInMicroseconds;
-    var prevStartTime = notes[replayerIndex - 1].startTimeInMicroseconds;
+  if (replayerIndex + 1 < notes.length) {
+    var nextStartTime = notes[replayerIndex + 1].startTimeInMicroseconds;
+    var prevStartTime = notes[replayerIndex].startTimeInMicroseconds;
     var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000; 
 
-    timeoutId = setTimeout(postReplayerIndexAndIncrementAndPost, delayInMilliseconds);
+    timeoutId = setTimeout(function() {
+      postAndsetTimeoutToPost(notes, replayerIndex + 1);
+    }, delayInMilliseconds);
+
   } else {
     postMessage({action: 'stop'});
   }

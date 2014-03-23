@@ -18,24 +18,50 @@ MidiReplayer = {
     this.reset();
   },
 
+  // for display purposes in alphabet drawer
+  setCurrentTrackId: function(id){
+    Session.set('currentTrackId', id);
+  },
+
   setPlayMode: function(playFunction) {
     this.replayerIndexWorker.onmessage = function(evt) {
       var data = evt.data;
 
       // update before playFunction
-      data.note = MidiReplayer.notes[data.replayerIndex];
-      Session.set('timeInMicroseconds', data.note.startTimeInMicroseconds);
-      Session.set('replayerIndex', data.replayerIndex);
+      if (data.action === 'play') {
+        data.note = MidiReplayer.notes[data.replayerIndex];
+        Session.set('timeInMicroseconds', data.note.startTimeInMicroseconds);
+        Session.set('replayerIndex', data.replayerIndex);
+      }
 
       playFunction(data);
     }
+  },
+
+  // playFunction's context is the window, so don't use "this"; use MidiPlayer instead
+  loadReplayMode: function() {
+    this.setPlayMode(function(data) {
+      if (data.action === 'play') {
+        MidiReplayer.playNote(data.note);
+      } else if (data.action === 'stop') {
+        MidiReplayer.stop();
+      }
+    });
+  },
+
+  // for lyrics insertion and may be simple note insertion
+  loadInsertMode: function() {
+    // move to next note when prompted
+    this.setPlayMode(function(data) {
+
+    });
   },
 
   loadReplayerIndexWorker: function() {
     var self = this;
 
     this.replayerIndexWorker = new Worker('/replayerIndexWorker.js');
-    this.setPlayMode(self.normalReplay);
+    this.loadReplayMode();
 
     if (NO_WORKER) {
       // redefine onmessage and postAndSetTimeoutToPost from replayerIndexWorker.js
@@ -43,9 +69,7 @@ MidiReplayer = {
         var action = evt.data.action;
 
         if (action === 'start') {
-          var replayerIndex = evt.data.replayerIndex;
-          var notes = evt.data.notes;
-          self.postAndsetTimeoutToPost(notes, replayerIndex);
+          self.postAndsetTimeoutToPost(evt.data.notes, evt.data.replayerIndex);
 
         } else if (action === 'stop') {
           clearTimeout(self.timeoutId);
@@ -72,15 +96,6 @@ MidiReplayer = {
 
     } else {
       this.replayerIndexWorker.postMessageFromWorker({action: 'stop'});
-    }
-  },
-
-  // playFunction's context is the window, so don't use "this"; use MidiPlayer instead
-  normalReplay: function(data) {
-    if (data.action === 'play') {
-      MidiReplayer.playNote(data.note);
-    } else if (data.action === 'stop') {
-      MidiReplayer.stop();
     }
   },
 
@@ -133,6 +148,7 @@ MidiReplayer = {
   reset: function() {
     this.pause();
     Session.set('replayerIndex', 0);
+    Session.set('timeInMicroseconds', 0);
 
     this.updateTempo();
     this.updateTimeSignature();
