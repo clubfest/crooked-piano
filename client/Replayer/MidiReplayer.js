@@ -13,6 +13,7 @@ MidiReplayer = {
     this.notes = song.notes;
     this.tempos = song.tempos;
     this.timeSignatures = song.timeSignatures;
+    this.mode = ReplayMode;
 
     this.loadReplayerIndexWorker();
     this.reset();
@@ -23,7 +24,17 @@ MidiReplayer = {
     Session.set('currentTrackId', id);
   },
 
-  setPlayMode: function(playFunction) {
+  loadPlayMode: function(mode) {
+    if (this.mode.destroy) {
+      this.mode.destroy();
+    }
+
+    if (mode.init) {
+      mode.init();
+    }
+
+    this.mode = mode;
+
     this.replayerIndexWorker.onmessage = function(evt) {
       var data = evt.data;
 
@@ -34,34 +45,20 @@ MidiReplayer = {
         Session.set('replayerIndex', data.replayerIndex);
       }
 
-      playFunction(data);
+      mode.handleData(data);
     }
   },
 
   // playFunction's context is the window, so don't use "this"; use MidiPlayer instead
-  loadReplayMode: function() {
-    this.setPlayMode(function(data) {
-      if (data.action === 'play') {
-        MidiReplayer.playNote(data.note);
-      } else if (data.action === 'stop') {
-        MidiReplayer.stop();
-      }
-    });
-  },
 
   // for lyrics insertion and may be simple note insertion
-  loadInsertMode: function() {
-    // move to next note when prompted
-    this.setPlayMode(function(data) {
-
-    });
-  },
+  
 
   loadReplayerIndexWorker: function() {
     var self = this;
 
     this.replayerIndexWorker = new Worker('/replayerIndexWorker.js');
-    this.loadReplayMode();
+    this.loadPlayMode(ReplayMode);
 
     if (NO_WORKER) {
       // redefine onmessage and postAndSetTimeoutToPost from replayerIndexWorker.js

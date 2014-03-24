@@ -1,3 +1,6 @@
+Meteor.publish('songForks', function(songId) {
+  return SongForks.find({});
+});
 // todo: add infinite scrolling
 Meteor.publish('songFile', function(songId) {
   return SongFiles.find({_id: songId});

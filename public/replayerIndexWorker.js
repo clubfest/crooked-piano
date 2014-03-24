@@ -3,14 +3,14 @@ var timeoutId;
 onmessage = function(evt){
   var action = evt.data.action;
   if (action === 'start') {
-    postAndSetTimoutToPost(evt.data.notes, evt.data.replayerIndex);  
+    postAndSetTimeoutToPost(evt.data.notes, evt.data.replayerIndex);  
 
   } else if (action === 'stop') {
     clearTimeout(timeoutId);
   }
 };
 
-function postAndSetTimoutToPost(notes, replayerIndex) {
+function postAndSetTimeoutToPost(notes, replayerIndex) {
   postMessage({action: 'play', replayerIndex: replayerIndex});
   if (replayerIndex + 1 < notes.length) {
     var nextStartTime = notes[replayerIndex + 1].startTimeInMicroseconds;
@@ -18,7 +18,7 @@ function postAndSetTimoutToPost(notes, replayerIndex) {
     var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000; 
 
     timeoutId = setTimeout(function() {
-      postAndsetTimeoutToPost(notes, replayerIndex + 1);
+      postAndSetTimeoutToPost(notes, replayerIndex + 1);
     }, delayInMilliseconds);
 
   } else {

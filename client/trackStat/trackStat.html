@@ -1,0 +1,26 @@
+<template name='trackStat'>
+<h2>Melodic</h2>
+{{#each melodicJumpFrequencies}}
+  <ul style='display: inline-block; vertical-align: top;'>
+  {{trackId}}
+  {{#each frequencies}}
+    <li>
+    {{jump}}: {{frequency}}
+    </li>
+  {{/each}}
+  </ul>
+{{/each}}
+
+<h2>Rythmic</h2>
+{{#each rythmicJumpFrequencies}}
+  <ul style='display: inline-block; vertical-align: top;'>
+  {{trackId}}
+  {{#each frequencies}}
+    <li>
+    {{jump}}: {{frequency}}
+    </li>
+  {{/each}}
+  </ul>
+{{/each}}
+
+</template>

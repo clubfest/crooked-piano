@@ -15,23 +15,22 @@ LyricsDisplay = {
     Session.set('lyricsForDisplay', []);
 
     this.initLyricsTrack(song.midi.tracks);
-    this.updateLyricsForDisplay();
 
     var self = this;
-    // $(window).on('replayerSliderMoved.lyricsDisplay', function() {
-    //   self.startIndex = 0;
-    // });
+    
+    if (this.lyrics) {
+      this.updateLyricsForDisplay();
 
-    $(window).on('keyboardDown.lyricsDisplay', function(evt, data) {
-      if (data.trackId === self.lyricsTrackId) {
-        console.log('update');
-        self.updateLyricsForDisplay();
-      }
-    });
+      $(window).on('keyboardDown.lyricsDisplay', function(evt, data) {
+        if (data.trackId === self.lyricsTrackId) {
+          self.updateLyricsForDisplay();
+        }
+      });
+    }
   },
 
   destroy: function() {
-
+    $(window).off('keyboardDown.lyricsDisplay');
   },
 
   initLyricsTrack: function(tracks) {
@@ -50,7 +49,9 @@ LyricsDisplay = {
           if (note.subtype === 'lyrics' || note.subtype === 'text') {
             // skip beginning words; TODO: find a better way
             if (note.startTimeInMicroseconds > START_TIME_FILTER) {
-              lyrics.push(note);
+              if ($.trim(note.text).length > 0) {
+                lyrics.push(note);
+              }
               if (note.subtype === 'lyrics') {
                 lyricsLength++;
               }
@@ -76,6 +77,7 @@ LyricsDisplay = {
     if (lyricsTracks.length > 0) {
       this.lyricsTrackId = lyricsTracks[0].trackId;
       this.lyrics = lyricsTracks[0].lyrics;
+      Session.set('currentTrackId', this.lyricsTrackId); // TODO: figure out where to put this
     }
   },
 

@@ -13,12 +13,13 @@ Router.map(function() {
   this.route('songFile', {
     path: '/songFile/:_id',
     waitOn: function() {
-      return this.subscribe('songFile', this.params._id);
+      return [this.subscribe('songFile', this.params._id), this.subscribe('songForks', this.params._id)];
     },
     
     data: function() {
       var data = {};
       data.song = SongFiles.findOne(this.params._id);
+
       return data;
     },
 

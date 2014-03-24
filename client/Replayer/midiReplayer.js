@@ -50,6 +50,16 @@ Template.midiReplayer.rendered = function() {
       }
     });  
   });
+
+  Deps.autorun(function() {
+    var currentTrackId = Session.get('currentTrackId');
+
+    if (currentTrackId || currentTrackId === 0) {
+      simpleKeyboard.setDisplayCondition(function(note) {
+        return note.trackId === currentTrackId;
+      });
+    }
+  })
 }
 
 Template.midiReplayer.events({

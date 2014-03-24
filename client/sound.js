@@ -58,20 +58,19 @@ loadSound = function() {
 
       $(window).off('keyboardDown.sound');
       $(window).on('keyboardDown.sound', function(evt, data) {
-          if (typeof data.note !== 'undefined') {
+          if (typeof data.noteNumber !== 'undefined') {
             data.channel = data.channel || DEFAULT_CHANNEL;
             // MIDI.noteOn(DRUM_CHANNEL, data.note, data.velocity);
-            MIDI.noteOn(DEFAULT_CHANNEL, data.note, damp(data.velocity, data.note));
+            MIDI.noteOn(DEFAULT_CHANNEL, data.noteNumber, damp(data.velocity, data.noteNumber));
           }
       });
 
       $(window).on('keyboardUp.sound', function(evt, data) {
           if (typeof data.note !== 'undefined' && !data.pedalOn) {
             data.channel = data.channel || 0;
-            MIDI.noteOff(data.channel, data.note);
+            MIDI.noteOff(data.channel, data.noteNumber);
           }
       });
-      // TODO: keyboardUp.sound 
     }
 
   });

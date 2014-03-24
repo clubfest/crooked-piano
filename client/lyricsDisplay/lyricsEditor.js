@@ -1,10 +1,12 @@
+var forkId;
 
 Template.lyricsEditor.rendered = function() {
-  MidiReplayer.loadEditMode 
+  MidiReplayer.loadPlayMode(LyricsInsertMode);
 }
 
 Template.lyricsEditor.destroyed = function() {
-  MidiReplayer.loadReplayMode
+  MidiReplayer.loadPlayMode(ReplayMode);
+  forkId = null;
 }
 
 Template.lyricsEditor.events({
@@ -14,15 +16,25 @@ Template.lyricsEditor.events({
   'click #right-shift': function() {
 
   },
-  'keydown #lyrics-input': function(evt) {
+  'keydown #lyrics-input': function(evt, tmpl) {
     if (evt.keyCode === 13) {
-      var text = $('#lyrics-input').val();
+      var $input = $('#lyrics-input');
+      var text = $input.val();
       if (text.length > 0) {
-        Meteor.call('insertLyrics', text, function(err) {
-          if (err) alert(err.reason);
+        var songId = tmpl.data.song._id;
+        var note = LyricsInsertMode.currentNote; // note before lyrics
+        Meteor.call('forkLyrics', text, note, forkId, songId, function(err, id) {
+          if (err) {
+            alert(err.reason);
+          } else {
+            $input.val('');
+            console.log('id in client -----')
+            console.log(id)
+            forkId = id;
+          }
         });
       }
+      $(window).trigger('noteInserted'); // needed to get replayer going in LyricsInsertMode
     }
-    MidiReplayer.continuePlaying
   },
 });

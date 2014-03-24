@@ -12,16 +12,17 @@ simpleKeyboard = {
     $('.key').off('mousedown.keyboard');
     $('.key').on('mousedown.keyboard', function(evt){
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
-      var note = convertKeyCodeToNote(keyCode);
+      var noteNumber = convertKeyCodeToNote(keyCode);
 
-      if (typeof note !== "undefined") {
-        note = self.adjustShift(note);
+      if (typeof noteNumber !== "undefined") {
+        noteNumber = self.adjustShift(noteNumber);
         $(window).trigger('keyboardDown', {
           time: new Date().getTime(),
           keyCode: keyCode,
-          note: note,
+          noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          userTriggered: true,
         });
       }
     });
@@ -29,16 +30,17 @@ simpleKeyboard = {
     $('.key').off('mouseup.keyboard');
     $('.key').on('mouseup.keyboard', function(evt) {
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
-      var note = convertKeyCodeToNote(keyCode);
+      var noteNumber = convertKeyCodeToNote(keyCode);
 
-      if (typeof note !== "undefined") {
-        note = self.adjustShift(note);
+      if (typeof noteNumber !== "undefined") {
+        noteNumber = self.adjustShift(noteNumber);
         $(window).trigger('keyboardUp', {
           time: new Date().getTime(),
           keyCode: keyCode,
-          note: note,
+          noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          userTriggered: true,
         });
       }
     })
@@ -50,16 +52,17 @@ simpleKeyboard = {
     $('.key').off('touchstart.keyboard');
     $('.key').on('touchstart.keyboard', function(evt){
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
-      var note = convertKeyCodeToNote(keyCode);
+      var noteNumber = convertKeyCodeToNote(keyCode);
 
-      if (typeof note !== "undefined") {
-        note = self.adjustShift(note);
+      if (typeof noteNumber !== "undefined") {
+        noteNumber = self.adjustShift(noteNumber);
         $(window).trigger('keyboardDown', {
           time: new Date().getTime(),
           keyCode: keyCode,
-          note: note,
+          noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          userTriggered: true,
         });
       }
     });
@@ -67,16 +70,17 @@ simpleKeyboard = {
     $('.key').off('touchend.keyboard');
     $('.key').on('touchend.keyboard', function(evt) {
       var keyCode = parseInt($(evt.target).closest('.key').data('keyCode'));
-      var note = convertKeyCodeToNote(keyCode);
+      var noteNumber = convertKeyCodeToNote(keyCode);
 
-      if (typeof note !== "undefined") {
-        note = self.adjustShift(note);
+      if (typeof noteNumber !== "undefined") {
+        noteNumber = self.adjustShift(noteNumber);
         $(window).trigger('keyboardUp', {
           time: new Date().getTime(),
           keyCode: keyCode,
-          note: note,
+          noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          userTriggered: true,
         });
       }
     });
@@ -103,17 +107,18 @@ simpleKeyboard = {
         downKeys[keyCode] = true;
       }
 
-      var note = convertKeyCodeToNote(keyCode);
+      var noteNumber = convertKeyCodeToNote(keyCode);
 
-      if (typeof note !== "undefined") {
-        note = self.adjustShift(note);
+      if (typeof noteNumber !== "undefined") {
+        noteNumber = self.adjustShift(noteNumber);
         
         $(window).trigger('keyboardDown', {
           time: new Date().getTime(),
           keyCode: keyCode,
-          note: note,
+          noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          userTriggered: true,
         });
 
       } else {
@@ -132,43 +137,49 @@ simpleKeyboard = {
 
       delete downKeys[keyCode];
 
-      var note = convertKeyCodeToNote(keyCode);
+      var noteNumber = convertKeyCodeToNote(keyCode);
 
-      if (typeof note !== "undefined") {
-        note = self.adjustShift(note);
+      if (typeof noteNumber !== "undefined") {
+        noteNumber = self.adjustShift(noteNumber);
 
         $(window).trigger('keyboardUp', {
           time: new Date().getTime(),
           keyCode: keyCode,
-          note: note,
+          noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          userTriggered: true,
         });
       }
     });
+  },
+
+  setDisplayCondition: function(condition) {
+    this.condition = condition; // condition(note)
   },
 
   connectKeyboardToDisplay: function() {
     var self = this;
 
     $(window).on('keyboardDown.display', function(evt, data) {
-      if (data.channel === self.channel && !data.playedByComputer) {
+      if (!self.condition || self.condition(data)  || data.userTriggered) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
-        dom.addClass('keydown').html('<span>'+noteToName(data.note, Session.get('isAlphabetNotation'))+'</span>');
+        dom.addClass('keydown').html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
       }
+      // if (data.channel === self.channel && !data.playedByComputer) {}
     });
 
     $(window).on('keyboardUp.display', function(evt, data) {
-      if (data.channel === self.channel) {
+      if (!self.condition || self.condition(data) || data.userTriggered) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
         dom.removeClass('keydown');
       }
     });
   },
 
-  adjustShift: function(note) {
-    note += this.shift;
-    return note;
+  adjustShift: function(noteNumber) {
+    noteNumber += this.shift;
+    return noteNumber;
   },
 
   adjustSettings: function(keyCode) {
@@ -208,11 +219,11 @@ function convertKeyCodeToNote(keyCode) {
   return keyCodeToNote[keyCode];
 }
 
-noteToName = function(note, alphabet) {
-  note = (note - 60) % 12;
+noteToName = function(noteNumber, alphabet) {
+  noteNumber = (noteNumber - 60) % 12;
 
-  if (note < 0) {
-    note += 12;
+  if (noteNumber < 0) {
+    noteNumber += 12;
   }
 
   if (alphabet) {
@@ -266,5 +277,5 @@ noteToName = function(note, alphabet) {
     };
   }
 
-  return conversion[note];
+  return conversion[noteNumber];
 }
