@@ -261,7 +261,7 @@ SheetDrawer = {
     // and annotate each note's id inside the other via
     // the attribute tiedTo and tiedFrom.
     this.measures = [];
-    var idIndex = 0; // for creating id for each note
+    var noteIndex = 0; // for creating id for each note
     var startBeat = 0;
     var measure = {
       notes: [], 
@@ -280,7 +280,7 @@ SheetDrawer = {
         // TODO: update measure's endBeat
         // setBeatsPerMeasure
       } else if (note.subtype === 'noteOn') {
-        note.id = idIndex++; // id annotation is needed when we draw ties later
+        note.id = noteIndex++; // id annotation is needed when we draw ties later
 
         if (note.timeInBeats >= startBeat + this.beatsPerMeasure) {
           this.measures.push(measure);
@@ -325,7 +325,7 @@ SheetDrawer = {
 
           var nextMeasure = this.measures[i+1];
           var newNote = clone(note);
-          newNote.id = idIndex++;
+          newNote.id = noteIndex++;
           newNote.timeInBeats = startBeat + this.beatsPerMeasure;
           newNote.durationInBeats = overBy;
           newNote.tiedFrom = note.id;

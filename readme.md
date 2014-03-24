@@ -24,6 +24,12 @@ mrt
 2. Get note edit working
 3. Get instrument acceptable
 
+Buttons
+=======
+
+* Remove useless finger down button
+* When demo is paused, we require player to click the next note to proceed.
+
 Drive
 =====
 Allow saving your stuff to google drive in midi or kar

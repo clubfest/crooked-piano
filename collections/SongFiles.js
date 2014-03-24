@@ -19,7 +19,7 @@ Meteor.methods({
           type: 'meta',
           subtype: 'lyrics',
           text: text,
-          id: song.idIndex++,
+          id: song.noteIndex++,
           deltaTime: 0,
           startTimeInBeats: songNote.startTimeInBeats,
           startTimeInMicroseconds: songNote.startTimeInBeats,
@@ -29,7 +29,7 @@ Meteor.methods({
           type: 'meta',
           subtype: 'lyrics',
           text: text,
-          id: song.idIndex++,
+          id: song.noteIndex++,
           deltaTime: 0,
           startTimeInBeats: songNote.startTimeInBeats,
           startTimeInMicroseconds: songNote.startTimeInBeats,
@@ -38,7 +38,7 @@ Meteor.methods({
         // SongFiles.update(songId, {
         //   $set: {
         //     notes: song.notes,
-        //     idIndex: song.idIndex,
+        //     noteIndex: song.noteIndex,
         //   }
         // });
         break ;

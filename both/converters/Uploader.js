@@ -7,19 +7,21 @@ Uploader = {
     this.midi = midiFile;
     this.fileName = fileName;
     this.ticksPerBeat = this.midi.header.ticksPerBeat;
-    this.idIndex = 0; // used to annotate id during addStartTimeInBeats
-    this.formatType = midiFile.header.formatType; // needed for adding correct trackId (use channel for type 0 midi file)
+    this.noteIndex = 0; // used to annotate id during addStartTimeInBeats
     // TODO: get source address if obtained via gamify
 
-    // TODO: merge first using ticks, then compute things and then extract
-    this.loadTempoEventsAndTimeSignatures(); // TODO: remove this once we have a better way of drawing
-    this.addStartTimeInBeats(); 
-    this.addStartTimeInMicroseconds();
+    this.addStartTimeInBeatsAndAnnotate(); // prepare for merging
+
+    if (this.midi.header.formatType < 2) {
+      this.merge(); // so that we can work with a unique array from now on
+    } else {
+      this.concat();
+    }
+
+    this.addStartTimeInMicroseconds(); // make replayer's job easy
     this.addEndTime();
 
-    this.merge(); // move annotation of id and trackId here
-    // TODO: move addStartTimeInMicroseconds 
-    this.extractTrackInfos();
+    this.extractTrackInfos(); // e.g. to understand which is the melody, harmony, bass, drum
 
     this.save();
   },
@@ -28,6 +30,8 @@ Uploader = {
   extractTrackInfos: function() {
     var trackInfos = {};
     var prevNoteByTrack = {};
+    this.tempos = [];
+    this.timeSignatures = [];
 
     // Initializing so we don't need to do it later
     for (var i = 0; i < this.midi.tracks.length; i++) {
@@ -84,6 +88,11 @@ Uploader = {
           rythmicJumpFrequencies[delta]++;
         }
         prevNoteByTrack[trackId] = note;
+
+      } else if (event.subtype === 'setTempo') { // TODO: remove this
+        this.tempos.push(event);
+      } else if (event.subtype === 'timeSignature') {
+        this.timeSignatures.push(event);
       }
     }
     this.trackInfos = trackInfos;
@@ -114,7 +123,8 @@ Uploader = {
       fileName: this.fileName, 
       midi: this.midi, 
       notes: this.notes,
-      idIndex: this.idIndex,
+      noteIndex: this.noteIndex,
+      trackIndex: this.midi.tracks.length,
       tempos: this.tempos, 
       timeSignatures: this.timeSignatures,
       trackInfos: this.trackInfos,
@@ -193,50 +203,54 @@ Uploader = {
     });
   },
 
-  addStartTimeInTicks: function() {
+  addStartTimeInBeatsAndAnnotate: function() {
+    var startTimeInBeats = 0;
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var startTime = 0;
+      if (this.midi.header.formatType < 2) {
+        startTimeInBeats = 0;
+      }
+      
       var track = this.midi.tracks[trackId];
 
       for (var i = 0; i < track.length; i++) {
         var event = track[i];
-        event.startTimeInTicks += event.deltaTime;
+
+        if (i === 0) {
+          event.startTimeInBeats = 0;
+        } else {
+          event.startTimeInBeats = track[i-1].startTimeInBeats + event.deltaTime / this.ticksPerBeat;
+        }
+
+        event.id = this.noteIndex++; // needed to update noteOn and noteOff pair
+
+        if (this.midi.header.formatType === 0 && typeof event.channel !== 'undefined') {
+          event.trackId = event.channel;
+
+        } else {
+          event.trackId = trackId; // needed to propagate song.notes changes to the track
+        }
+
+        event.note = event.noteNumber; // TODO: remove this
       }
     }
   },
 
   addStartTimeInMicroseconds: function() {
-    // add info needed for replaying
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var startTime = 0;
-      var track = this.midi.tracks[trackId];
-      var tempoIndex = 0;
-      var microsecondsPerBeat = 500000; // midi default
+    var microsecondsPerBeat = 500000; // midi default
 
-      var timeInMicroseconds = 0;
+    if (this.notes.length > 0) {
+      this.notes[0].startTimeInMicroseconds = 0;
+    }
 
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
+    for (var i = 1; i < this.notes.length; i++) {
+      var note = this.notes[i];
+      var prevNote = this.notes[i - 1];
 
-        // must change unit of deltaTime if tempo changes at the current note
-        if (tempoIndex < this.tempos.length
-            && event.startTimeInBeats >= this.tempos[tempoIndex].startTimeInBeats) {
-          var diffInTicks = (event.startTimeInBeats - this.tempos[tempoIndex].startTimeInBeats) * this.ticksPerBeat;
+      var diff = note.startTimeInBeats - prevNote.startTimeInBeats;
+      note.startTimeInMicroseconds = prevNote.startTimeInMicroseconds + diff  * microsecondsPerBeat;
 
-          // before tempo change
-          timeInMicroseconds += (event.deltaTime - diffInTicks) / this.ticksPerBeat * microsecondsPerBeat;
-
-          microsecondsPerBeat = this.tempos[tempoIndex].microsecondsPerBeat;
-          tempoIndex++;
-
-          // after tempo change
-          timeInMicroseconds += diffInTicks / this.ticksPerBeat * microsecondsPerBeat;
-          
-        } else {
-          timeInMicroseconds += event.deltaTime / this.ticksPerBeat * microsecondsPerBeat;
-        }
-
-        event.startTimeInMicroseconds = timeInMicroseconds;
+      if (note.subtype === 'setTempo') {
+        microsecondsPerBeat = note.microsecondsPerBeat;
       }
     }
   },
@@ -304,47 +318,33 @@ Uploader = {
     }
   },
 
-  addStartTimeInBeats: function() {
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var track = this.midi.tracks[trackId];
-      var timeInTicks = 0;
-
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
-
-        event.id = this.idIndex++; // needed to update noteOn and noteOff pair
-
-        if (this.formatType !== 1 && typeof event.channel !== 'undefined') {
-          event.trackId = event.channel;
-        } else {
-          event.trackId = trackId; // needed to propagate song.notes changes to the track
-        }
-
-        event.note = event.noteNumber; // TODO: remove this
-
-        timeInTicks += event.deltaTime;
-        event.startTimeInBeats = timeInTicks / this.ticksPerBeat;
-      }
+  concat: function() {
+    // TODO: test this with a MIDI 2 file
+    this.notes = [];
+    for (var i = 0; i < this.midi.tracks.length; i++) {
+       Array.prototype.push.apply(this.notes, this.midi.tracks[i]);
     }
-  },  
-
-  // The info should be in track 0, but we will be cautious and look in all tracks
-  loadTempoEventsAndTimeSignatures: function() {
-    this.tempos = [];
-    this.timeSignatures = [];
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var track = this.midi.tracks[trackId];
-
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
-        if (event.subtype === 'setTempo') {
-          this.tempos.push(event);
-        } else if (event.subtype === 'timeSignature') {
-          this.timeSignatures.push(event);
-        }
-      }
-    }
+    this.notes.sortSimultaneousNoteByNoteNumber();
   },
+
+
+  // // The info should be in track 0, but we will be cautious and look in all tracks
+  // loadTempoEventsAndTimeSignatures: function() {
+  //   this.tempos = [];
+  //   this.timeSignatures = [];
+  //   for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
+  //     var track = this.midi.tracks[trackId];
+
+  //     for (var i = 0; i < track.length; i++) {
+  //       var event = track[i];
+  //       if (event.subtype === 'setTempo') {
+  //         this.tempos.push(event);
+  //       } else if (event.subtype === 'timeSignature') {
+  //         this.timeSignatures.push(event);
+  //       }
+  //     }
+  //   }
+  // },
 }
 
 // this is for fractional display purposes

@@ -62,6 +62,10 @@ Template.midiReplayer.rendered = function() {
   })
 }
 
+Template.midiReplayer.destroyed = function() {
+  MidiReplayer.destroy();
+}
+
 Template.midiReplayer.events({
   'click #replayer-start': function() {
     if (Session.get('isReplaying')) {

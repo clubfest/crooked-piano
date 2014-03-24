@@ -19,7 +19,7 @@ Meteor.methods({
             type: 'meta',
             subtype: 'lyrics',
             text: text,
-            id: song.idIndex++,
+            id: song.noteIndex++,
             deltaTime: 0,
             startTimeInBeats: note.startTimeInBeats,
             startTimeInMicroseconds: note.startTimeInMicroseconds,

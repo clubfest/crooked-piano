@@ -19,6 +19,11 @@ MidiReplayer = {
     this.reset();
   },
 
+  destroy: function() {
+    // TODO: find out what needs to be destroyed
+    this.stop();
+  },
+
   // for display purposes in alphabet drawer
   setCurrentTrackId: function(id){
     Session.set('currentTrackId', id);
