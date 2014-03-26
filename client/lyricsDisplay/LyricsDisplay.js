@@ -1,10 +1,6 @@
 /*
-  To lyrics display, you need to call 
-    * LyricsDisplay.updateLyricsForDisplay
-    * LyricsDislplay.getLyricsForDisplay
-  You can use LyricsDisplay.lyricsTrackId to see when to update
 */
-var TIME_RANGE = 5000000;
+var TIME_RANGE = 4000000;
 var MAX_GAP = 2000000;
 var START_TIME_FILTER = 100000; // todo: use other info to filter
 var CUSHION = 1000000;
@@ -14,14 +10,15 @@ LyricsDisplay = {
     this.startIndex = 0;
     Session.set('lyricsForDisplay', []);
 
-    this.initLyricsTrack(song.midi.tracks);
+    this.initLyricsTrack(song);
 
     var self = this;
     
     if (this.lyrics) {
       this.updateLyricsForDisplay();
 
-      $(window).on('keyboardDown.lyricsDisplay', function(evt, data) {
+      // TODO: not too clean because noteProcessed means before it's played
+      $(window).on('noteProcessed.lyricsDisplay', function(evt, data) {
         if (data.trackId === self.lyricsTrackId) {
           self.updateLyricsForDisplay();
         }
@@ -30,10 +27,11 @@ LyricsDisplay = {
   },
 
   destroy: function() {
-    $(window).off('keyboardDown.lyricsDisplay');
+    $(window).off('noteProcessed.lyricsDisplay');
   },
 
-  initLyricsTrack: function(tracks) {
+  initLyricsTrack: function() {
+    var tracks = song.midi.tracks;
     var lyricsTracks = []; // possible lyrics tracks
     var MIN_WORDS = 20; // e.g. happy birthday
 
@@ -74,10 +72,39 @@ LyricsDisplay = {
       return -(a.lyrics.length + a.lyricsLength - b.lyrics.length - b.lyricsLength);
     });
 
-    if (lyricsTracks.length > 0) {
+    if (lyricsTracks.length > 0) { 
       this.lyricsTrackId = lyricsTracks[0].trackId;
       this.lyrics = lyricsTracks[0].lyrics;
-      Session.set('currentTrackId', this.lyricsTrackId); // TODO: figure out where to put this
+      
+    } else { // Load Do Re Mi from the melodicTrack instead
+      this.lyrics = [];
+      this.lyricsTrackId = song.melodicTrackId;
+
+      var track = tracks[song.melodicTrackId];
+      for (var i = 0; i < track.length; i++) {
+        var note = track[i];
+        var prevNote;
+
+        if (note.subtype === 'noteOn') {
+          var altered = $.extend({}, note);
+          var text = noteToName(note.noteNumber, false).toLowerCase();
+          if (prevNote) {
+            if (note.startTimeInBeats - prevNote.startTimeInBeats > 3) {
+              prevNote.text += '. ';
+              text = text.charAt(0).toUpperCase() + text.slice(1);
+            } else if (note.startTimeInBeats - prevNote.startTimeInBeats > 1.5) {
+              prevNote.text += ', ';
+            } else {
+              prevNote.text += ' ';
+            }
+          } else {
+            text = text.charAt(0).toUpperCase() + text.slice(1);
+          }
+          altered.text = text;
+          this.lyrics.push(altered);
+          prevNote = altered;
+        }
+      }
     }
   },
 
@@ -90,7 +117,7 @@ LyricsDisplay = {
     var time = Session.get('timeInMicroseconds');
 
     // see if you need to go lower
-    for (var i = this.startIndex; i >= 0; i--) {
+    for (var i = this.startIndex; i > 0; i--) {
       var note = this.lyrics[i];
       if (note.startTimeInMicroseconds < time) {
         this.startIndex = i;

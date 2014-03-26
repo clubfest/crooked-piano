@@ -25,7 +25,8 @@ Template.trackStat.melodicJumpFrequencies = function() {
   var rets = [];
 
   for (trackId in this.song.trackInfos) {
-    var melodicJumpFrequencies= this.song.trackInfos[trackId].melodicJumpFrequencies;
+    var trackInfo = this.song.trackInfos[trackId];
+    var melodicJumpFrequencies= trackInfo.melodicJumpFrequencies;
     var ret = [];
 
     for (jump in melodicJumpFrequencies) {
@@ -46,7 +47,12 @@ Template.trackStat.melodicJumpFrequencies = function() {
       return Math.abs(a.jump) - Math.abs(b.jump);
     });
 
-    rets.push({frequencies: ret, trackId: trackId});
+    rets.push({
+      frequencies: ret, 
+      trackId: trackId, 
+      trackName: trackInfo.trackName,
+      instrumentInfo: trackInfo.instrumentInfo,
+    });
   }
   return rets;
 }

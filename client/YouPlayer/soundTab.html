@@ -1,21 +1,87 @@
 <template name='soundTab'>
-  <div class='panel'>
-    <div class='slider-block'>
-      <div class='control-heading'>Background Volume</div>
-      <div id='background-volume-slider'></div>
-    </div>
-  </div>
 
-  <div class='panel'>
-    <div>
-      <div class='control-heading'>
-        Key: {{globalTonality}}
+  <div align='center'>
+    <div class='panel'>
+{{!-- speed --}}
+      <div class='slider-block'>
+        <i class='icon-truck'></i> Speed
+        <div id='speed-slider'></div>
+      </div>
+{{!-- volume --}}
+      <div class='slider-block'>
+        <i class='icon-volume-up'></i> Volume
+        <div id='background-volume-slider'></div>
+      </div>
+    </div>
+    <div class='panel'>
+      <div>
+        <div class='control-heading'>
+          Notation: Do Re Mi
+        </div>
+        <div>
+          <button id='switch-notation'>A B C</button>
+        </div>
       </div>
       <div>
-        <button id='shift-down'><i class='icon-minus'></i></button>
-        {{shift}}
-        <button id='shift-up'><i class='icon-plus'></i></button>  
+        <div class='control-heading'>
+          Display: 1 note
+        </div>
+        <div>
+          <button id='switch-notation'>all notes</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a><i class='icon-chevron-down'></i> More</a>
+    </div>
+{{!-- shift track --}}
+    <div class='panel'>
+      <div>
+        <div class='control-heading'>
+          Track: trackName
+        </div>
+        <div>
+          <button id='shift-down'>Switch</button>
+        </div>
+      </div>
+      
+{{!-- shift song --}}
+      <div>
+        <div class='control-heading'>
+          Shift Song: {{globalTonality}}
+        </div>
+        <div>
+          <button id='shift-down'><i class='icon-minus'></i></button>
+          {{shift}}
+          <button id='shift-up'><i class='icon-plus'></i></button>  
+        </div>
+      </div>
+  </div>
+  <div class='panel'>
+  {{!-- shift octave --}}
+      <div>
+        <div class='control-heading'>
+          Shift Octave
+        </div>
+        <div>
+          <button id='shift-down'><i class='icon-minus'></i></button>
+          {{shift}}
+          <button id='shift-up'><i class='icon-plus'></i></button>  
+        </div>
+      </div>
+  {{!-- shift tuning --}}
+      <div>
+        <div class='control-heading'>
+          Shift Tuning
+        </div>
+        <div>
+          <button id='shift-down'><i class='icon-minus'></i></button>
+          {{shift}}
+          <button id='shift-up'><i class='icon-plus'></i></button>  
+        </div>
       </div>
     </div>
   </div>
+    
 </template>

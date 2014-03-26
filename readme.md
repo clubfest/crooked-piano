@@ -24,6 +24,23 @@ mrt
 2. Get note edit working
 3. Get instrument acceptable
 
+Version Control
+===============
+
+* song.userLyrics and song.userComments consists of userId to lyrics and text meta events
+  * The user lyrics to be displayed will default to those with highest number of items 
+  * Show comments button at the end.
+  * Animated comment will not update until 4 seconds except for the uploader's comment.
+* song.userTracks will be a track that the user adds to the song with trackId given by incrementing trackIndex
+
+MVP
+===
+
+* Game page will be simple
+  *
+  * an edit button will create a songFork.
+* Editting page will also be simple.
+
 Buttons
 =======
 

@@ -13,14 +13,14 @@ MidiReplayer = {
     this.notes = song.notes;
     this.tempos = song.tempos;
     this.timeSignatures = song.timeSignatures;
-    this.mode = ReplayMode;
+    this.mode = ReplayMode; // define how processed note change the course of action
 
     this.loadReplayerIndexWorker();
     this.reset();
   },
 
   destroy: function() {
-    // TODO: find out what needs to be destroyed
+    // TODO: find out what else needs to be destroyed
     this.stop();
   },
 
@@ -31,7 +31,7 @@ MidiReplayer = {
 
   loadPlayMode: function(mode) {
     if (this.mode.destroy) {
-      this.mode.destroy();
+      this.mode.destroy(); // destroy previous mode
     }
 
     if (mode.init) {
@@ -42,22 +42,18 @@ MidiReplayer = {
 
     this.replayerIndexWorker.onmessage = function(evt) {
       var data = evt.data;
-
+      
       // update before playFunction
       if (data.action === 'play') {
         data.note = MidiReplayer.notes[data.replayerIndex];
         Session.set('timeInMicroseconds', data.note.startTimeInMicroseconds);
         Session.set('replayerIndex', data.replayerIndex);
+        $(window).trigger('noteProcessed', data.note);
       }
 
       mode.handleData(data);
     }
   },
-
-  // playFunction's context is the window, so don't use "this"; use MidiPlayer instead
-
-  // for lyrics insertion and may be simple note insertion
-  
 
   loadReplayerIndexWorker: function() {
     var self = this;
@@ -69,15 +65,18 @@ MidiReplayer = {
       // redefine onmessage and postAndSetTimeoutToPost from replayerIndexWorker.js
       this.replayerIndexWorker.onmessageToWorker = function(evt) {
         var action = evt.data.action;
-
         if (action === 'start') {
           self.postAndsetTimeoutToPost(evt.data.notes, evt.data.replayerIndex);
 
         } else if (action === 'stop') {
           clearTimeout(self.timeoutId);
-        }
+        } 
       }
     }
+
+    Deps.autorun(function() {
+      MidiReplayer.replayerIndexWorker.postMessage({action: 'changeSpeed', speed: Session.get('playSpeed')});
+    });
   },
 
   // a recursive function that delivers 
@@ -90,7 +89,7 @@ MidiReplayer = {
       var self = this;
       var nextStartTime = notes[replayerIndex + 1].startTimeInMicroseconds;
       var prevStartTime = notes[replayerIndex].startTimeInMicroseconds;
-      var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000; 
+      var delayInMilliseconds = (nextStartTime - prevStartTime) / 1000 / Session.get('playSpeed');
 
       this.timeoutId = setTimeout(function() {
         self.postAndsetTimeoutToPost(notes, replayerIndex + 1);
@@ -129,6 +128,8 @@ MidiReplayer = {
   },
 
   start: function() {
+    if (Session.get('isReplaying')) return ;
+    
     Session.set('isReplaying', true);
     this.updateTempo();
     this.updateTimeSignature();

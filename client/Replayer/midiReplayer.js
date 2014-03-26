@@ -1,18 +1,19 @@
+var displayModes = ['infoTab', 'soundTab', 'musicTab'];
+
 Template.midiReplayer.isReplaying = function() {
   return Session.get('isReplaying');
 }
 
-Template.midiReplayer.isYouplaying = function() {
-  return Session.get('isYouplaying');
-}
-
 Template.midiReplayer.rendered = function() {
-  Session.set('isYouplaying', true);
+  Session.set('displayModeId', 0);
+  Session.set('playSpeed', 1 );
+  if (!this.data || !this.data.song) return ;
 
   song = this.data.song;
   MidiReplayer.init(song);
+  Session.set('currentTrackId', song.melodicTrackId);
 
-  $('.slider').slider({
+  $('#replayer-slider').slider({
     range: "min",
     min: 0,
     max: song.notes.length - 1,
@@ -21,19 +22,19 @@ Template.midiReplayer.rendered = function() {
 
   Deps.autorun(function() {
     // update slider when replayer starts
-    $('.slider').slider({
+    $('#replayer-slider').slider({
       range: "min",
       min: 0,
       max: song.notes.length - 1,
       value: Session.get('replayerIndex'),
     });
-  })
+  });
   
   // Warning: this jquery effect causes the whole template to re-render.
   // TODO: check if it's okay to remove autorun
   Deps.autorun(function() {
     // user changing the slider
-    $('.slider').slider({
+    $('#replayer-slider').slider({
       slide: function(evt, ui) {
         Session.set('replayerIndex', ui.value);
         // simpleRecorder.clear(); // TODO: clean up
@@ -45,7 +46,8 @@ Template.midiReplayer.rendered = function() {
         } else {
           MidiReplayer.start();
         }
-
+        // needed for the trigger to work correctly
+        Session.set('timeInMicroseconds', MidiReplayer.notes[ui.value].startTimeInMicroseconds);
         $(window).trigger('replayerSliderMoved');
       }
     });  
@@ -63,7 +65,9 @@ Template.midiReplayer.rendered = function() {
 }
 
 Template.midiReplayer.destroyed = function() {
-  MidiReplayer.destroy();
+  if (Session.get('isReplaying')) {
+    MidiReplayer.stop();
+  }
 }
 
 Template.midiReplayer.events({
@@ -75,13 +79,13 @@ Template.midiReplayer.events({
     }
   },
 
-  'click #youplayer-start': function() {
-    if (Session.get('isYouplaying')) {
-      Session.set('isYouplaying', false);
-    } else {
-      MidiReplayer.pause();
-      Session.get('isReplaying', false)
-      Session.set('isYouplaying', true);
-    }
+  'click #display-mode-change': function() {
+    Session.set('displayModeId', (Session.get('displayModeId') + 1) % displayModes.length);
   }
-})
+});
+
+Handlebars.registerHelper('displayMode', function() {
+  var ret = {}
+  ret[displayModes[Session.get('displayModeId')]] = 1
+  return ret;
+});

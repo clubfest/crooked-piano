@@ -1,8 +1,14 @@
 <template name='songFile'>
-  {{> keyboard}}
+<div>Edit Artist: Edit Title</div>
+<div>Youtube link</div>
+<button>Gamify</button>
+  {{> aoeuiKeyboard}}
   {{> midiReplayer}}
-  {{> trackStat}}
-  {{> lyricsDisplay}}
+
+  {{> tempoTab}}
+    {{> lyricsDisplay}}
+    {{> lyricsEditor}}
   {{> alphabetSheetDrawer}}
+  {{> trackStat}}
   {{> midiWriter}}
 </template>

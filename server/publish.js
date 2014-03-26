@@ -1,6 +1,7 @@
-Meteor.publish('songForks', function(songId) {
-  return SongForks.find({});
+Meteor.publish('userTracks', function(songId) {
+  return UserTracks.find({songId: songId});
 });
+
 // todo: add infinite scrolling
 Meteor.publish('songFile', function(songId) {
   return SongFiles.find({_id: songId});

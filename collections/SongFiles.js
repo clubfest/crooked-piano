@@ -1,5 +1,7 @@
 
 SongFiles = new Meteor.Collection('songFiles');
+// user created
+UserTracks = new Meteor.Collection('userTracks');
 
 Meteor.methods({
   'createSongFile': function(hash) {
@@ -7,42 +9,79 @@ Meteor.methods({
     return songId;
   },
 
-  // TODO: do it in bulk later
-  insertLyrics: function(songId, text, note) {
-    // update song.notes
-    var song = SongFiles.findOne(songId);
-    for (var i = 0; i < song.notes.length; i++) {
-      var songNote = song.notes[i];
-      if (note.id === songNote.id) {
-        // insert after songNote, so that deltaTime is 0
-        song.notes.splice(i + 1, 0, {
-          type: 'meta',
-          subtype: 'lyrics',
-          text: text,
-          id: song.noteIndex++,
-          deltaTime: 0,
-          startTimeInBeats: songNote.startTimeInBeats,
-          startTimeInMicroseconds: songNote.startTimeInBeats,
-          trackId: songNote.trackId,
-        });    
-        console.log({
-          type: 'meta',
-          subtype: 'lyrics',
-          text: text,
-          id: song.noteIndex++,
-          deltaTime: 0,
-          startTimeInBeats: songNote.startTimeInBeats,
-          startTimeInMicroseconds: songNote.startTimeInBeats,
-          trackId: songNote.trackId,
-        })
-        // SongFiles.update(songId, {
-        //   $set: {
-        //     notes: song.notes,
-        //     noteIndex: song.noteIndex,
-        //   }
-        // });
-        break ;
-      }
+  findOrCreateUserTrack: function(songId, trackType, name) {
+    var userTrack = UserTracks.findOne({
+      userId: 'anonymous',
+      name: name,
+      songId: songId
+    });
+
+    if (userTrack) {
+      userTrackId = userTrack._id;
+    } else {
+      var song = SongFiles.findOne(songId);
+
+      var userTrackId = UserTracks.insert({
+        userId: 'anonymous',
+        name: name,
+        songId: songId,
+        trackId: song.trackIndex,
+        trackType: trackType,
+        notes: [],
+      });
+
+      SongFiles.update(songId, {
+        $set: {trackIndex: song.trackIndex + 1}
+      });
     }
+
+    return userTrackId;
+  },
+
+  addTextToUserTrack: function(textType, text, note, index, userTrack) {
+    var trackId = userTrack.trackId;
+    var notes = userTrack.notes;
+
+    if (index >= notes.length) {
+      if (text.length > 0) {
+        var textNote = {
+          type: 'meta',
+          subtype: textType,
+          text: text,
+          startTimeInBeats: note.startTimeInBeats,
+          startTimeInMicroseconds: note.startTimeInMicroseconds,
+          trackId: trackId,
+        }
+
+        UserTracks.update(userTrack._id, {
+          $push: {notes: textNote}
+        });
+
+        // notes.push(textNote);
+      }
+
+    } else {
+      if (text.length === 0) {
+        notes.splice(index, 1);
+
+      } else {
+        console.log(notes.length);
+        console.log(index);
+        var note = notes[index];
+        note.text = text;
+      }
+
+      UserTracks.update(userTrack._id, {
+        $set: {notes: notes}
+      });
+    }
+
+    // return notes;
+  },
+
+  incrementViewCount: function(songId) {
+    SongFiles.update(songId, {
+      $inc: {viewCount: 1}
+    });
   },
 })

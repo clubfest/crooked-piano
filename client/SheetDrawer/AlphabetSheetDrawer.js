@@ -3,7 +3,7 @@
 
 BEATS_PER_LINE = 16; // used in LyricsDisplay
 var staveWidth = 300;
-var xStretchFactor = 60;
+var xStretchFactor = 50;
 var animationInMicroseconds = 100000;
 
 AlphabetSheetDrawer = {
@@ -87,6 +87,7 @@ AlphabetSheetDrawer = {
         var startY = (this.maxNote - note.noteNumber) * this.noteHeight;
         var endX = (note.endTimeInBeats - firstBeat - shiftInBeats) * xStretchFactor;
         var noteName = noteToName(note.noteNumber, false);
+        // var noteName = noteNumberToAoeui(note.noteNumber);
 
         this.context.fillText(noteName, startX, startY);
 
@@ -190,7 +191,7 @@ AlphabetSheetDrawer = {
 
     if (Session.get('isReplaying')) {
       this.microsecondsSinceLastDrawn += animationInMicroseconds;
-      shiftInBeats = this.microsecondsSinceLastDrawn / MidiReplayer.microsecondsPerBeat;
+      shiftInBeats = this.microsecondsSinceLastDrawn / MidiReplayer.microsecondsPerBeat * Session.get('playSpeed');
 
       var self = this;
       this.redrawTimeoutId = window.setTimeout(function() {

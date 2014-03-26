@@ -7,9 +7,27 @@
     </div>
   {{/with}}
 
-  <hr/>
+  When the game finishes:
 
-  {{> leadPlayer}}
+  <div>
+    <img src='/headphoneMonkey.png' /> Looks like your tempo is a bit off in the middle part    
+  </div>
+  <div>
+    <a><i class='icon-film'></i> Watch</a>
+  </div>
+
+  {{> aoeuiKeyboard}}
+  {{> midiReplayer}}
+
+  {{#if displayMode.infoTab}}
+    {{> infoTab}}
+  {{/if}}
+  {{#if displayMode.musicTab}}
+    {{> musicTab}}
+  {{/if}}
+  {{#if displayMode.soundTab}}
+    {{> soundTab}}
+  {{/if}}
 
 </div>
 

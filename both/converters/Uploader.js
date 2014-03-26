@@ -9,34 +9,126 @@ Uploader = {
     this.ticksPerBeat = this.midi.header.ticksPerBeat;
     this.noteIndex = 0; // used to annotate id during addStartTimeInBeats
     // TODO: get source address if obtained via gamify
+    if (this.midi.header.formatType === 2) {
+      throw "Midi of format type 2 is not supported"
+    }
 
     this.addStartTimeInBeatsAndAnnotate(); // prepare for merging
 
-    if (this.midi.header.formatType < 2) {
-      this.merge(); // so that we can work with a unique array from now on
-    } else {
-      this.concat();
-    }
+
+    this.merge(); // so that we can work with a unique array from now on
 
     this.addStartTimeInMicroseconds(); // make replayer's job easy
     this.addEndTime();
 
+    if (this.midi.header.formatType === 0) {
+      this.splitTrackByChannel(); // needed to make extracting info easier
+    }
+
     this.extractTrackInfos(); // e.g. to understand which is the melody, harmony, bass, drum
+    this.guessMelodyTrackId(); // use melodicJumpFrequencies to find the most likely melody track
 
     this.save();
   },
 
+  splitTrackByChannel: function() {
+    var track = this.midi.tracks[0] // there is only 1 track for formatType 0 midi
+    var maxTrackId = 0;
+    var tracks = {};
+    for (var i = 0; i < track.length; i++) {
+      var note = track[i];
+      if (!tracks[note.trackId]) {
+        tracks[note.trackId] = [];
+        if (note.trackId > maxTrackId) {
+          maxTrackId = note.trackId;
+        }
+      }
+
+      tracks[note.trackId].push(note);
+    }
+
+    this.midi.tracks = []
+    for (var i = 0; i <= maxTrackId ; i++) {
+      if (tracks[i]) {
+        this.midi.tracks.push(tracks[i]);
+      } else {
+        this.midi.tracks.push([]);
+      }
+    }
+    console.log(this.midi.tracks)
+  },
+
+  guessMelodyTrackId: function() {
+    // the best is a even distribution among the first
+    var scores = {};
+    for (var i = 0; i < this.midi.tracks.length; i++) {
+      var score = 0;
+      var frequencies = this.trackInfos[i].melodicJumpFrequencies;
+      var numOfNotes = this.trackInfos[i].numOfNotes;
+
+      for (var k = -2; k <= 2; k++) {
+        if (frequencies[k] / numOfNotes > 0.08) {
+          score += 5;
+        }
+      }
+
+      for (var k = -4; k <= 4; k++) {
+        if (frequencies[k] / numOfNotes > 0.05) {
+          score += 2;
+        }
+      }
+
+      if (numOfNotes * this.midi.tracks.length * 4 > this.notes.length) {
+        score += 3;
+      }
+
+      if (numOfNotes * this.midi.tracks.length * 5 > this.notes.length) {
+        score += 2;
+      }
+
+      if (numOfNotes * this.midi.tracks.length * 6 > this.notes.length) {
+        score += 1;
+      }
+
+      scores[i] = score;
+    }
+
+    var maxTrackId = 0;
+    var maxScore = 0;
+    for (var i = 0; i < this.midi.tracks.length; i++) {
+      if (scores[i] > maxScore) {
+        maxScore = scores[i];
+        maxTrackId = i;
+      }
+    }
+    console.log(scores);
+    this.melodicTrackId = maxTrackId;
+
+    for (var i = 0; i < this.midi.tracks.length; i++) {
+      if (this.trackInfos[i].trackName) {
+        if (this.trackInfos[i].trackName.match(/melody/i) 
+            || this.trackInfos[i].trackName.match(/vocal/i)) {
+          this.confirmedMelodicTrackId = i;
+          if (i === this.melodicTrackId) {
+            console.log('melody confirmed');
+          } else {
+            console.log('melody disconfirmed');
+          }
+        }
+      }
+    }
+  },
   // extract and aggregate info about notes
   extractTrackInfos: function() {
     var trackInfos = {};
     var prevNoteByTrack = {};
     this.tempos = [];
     this.timeSignatures = [];
+    // this.drumSounds = [];
 
     // Initializing so we don't need to do it later
     for (var i = 0; i < this.midi.tracks.length; i++) {
       trackInfos[i] = {
-        instrumentNumbers: [],
         numOfNotes: 0,
         averageNoteNumber: 0,
         melodicJumpFrequencies: {},
@@ -44,7 +136,6 @@ Uploader = {
         durationFrequencies: {},
       };
     }
-
     for (var i = 0; i < this.notes.length; i++) {
       var note = this.notes[i];
       var trackId = note.trackId;
@@ -57,14 +148,19 @@ Uploader = {
         trackInfos[trackId].instrumentName = note.text; // usually empty.
 
       } else if (note.subtype === 'programChange') {
-        trackInfos[trackId].instrumentNumbers.push({
+        trackInfos[trackId].instrumentInfo = {
           programNumber: note.programNumber,
-          channel: note.channel
-        });
+          channel: note.channel,
+          instrumentCategory: programNumberToInstrumentCategory(note.programNumber),
+          instrumentName: programNumberToInstrumentName(note.programNumber),
+        };
 
       } else if (note.subtype === 'noteOn') {
         trackInfos[trackId].numOfNotes++;
-        trackInfos[trackId].numOfNotes += note.noteNumber;
+        trackInfos[trackId].averageNoteNumber += note.noteNumber;
+        // if (note.channel === 9) {
+        //   this.drumSounds.push(note.noteNumber)
+        // }
 
         var prevNote = prevNoteByTrack[trackId];
 
@@ -78,8 +174,10 @@ Uploader = {
           melodicJumpFrequencies[note.noteNumber - prevNote.noteNumber]++;
 
           // encoded because hash key cannot have "."
+          var FINEST_BEAT = 1 / 8;
           var rythmicJumpFrequencies = trackInfos[trackId].rythmicJumpFrequencies;
-          var delta = (note.startTimeInBeats - prevNote.startTimeInBeats).toString().replace('.', ',');
+          var delta = Math.floor((note.startTimeInBeats - prevNote.startTimeInBeats) / FINEST_BEAT) * FINEST_BEAT;
+          delta = delta.toString().replace('.', ',');
 
           if (!rythmicJumpFrequencies[delta]) {
             rythmicJumpFrequencies[delta] = 0;
@@ -89,10 +187,18 @@ Uploader = {
         }
         prevNoteByTrack[trackId] = note;
 
-      } else if (event.subtype === 'setTempo') { // TODO: remove this
-        this.tempos.push(event);
-      } else if (event.subtype === 'timeSignature') {
-        this.timeSignatures.push(event);
+      } else if (note.subtype === 'setTempo') { // TODO: remove this
+        this.tempos.push(note);
+      } else if (note.subtype === 'timeSignature') {
+        this.timeSignatures.push(note);
+      }
+    }
+    for (trackId in trackInfos) {
+      var trackInfo = trackInfos[trackId];
+      if (trackInfo.numOfNotes === 0) {
+        delete trackInfos[trackId].averageNoteNumber;
+      } else {
+        trackInfos[trackId].averageNoteNumber /= trackInfo.numOfNotes;
       }
     }
     this.trackInfos = trackInfos;
@@ -101,17 +207,9 @@ Uploader = {
   debug: function() {
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
       var track = this.midi.tracks[trackId];
-      for (var i = 0; i < track.length; i++) {
-        var event = track[i];
-
-        // if (event.subtype === 'text' || event.subtype === 'lyrics') {
-          // if (event.startTimeInBeats > 5) {
-            // console.log(event.subtype);
-            // console.log(event.text);
-            // console.log(trackId)
-          // }
-        // }
-      }
+      // for (var i = 0; i < track.length; i++) {
+      //   var event = track[i];
+      // }
         if (trackId === 0){
          console.log(track)
        }
@@ -128,6 +226,12 @@ Uploader = {
       tempos: this.tempos, 
       timeSignatures: this.timeSignatures,
       trackInfos: this.trackInfos,
+      // drumSounds: this.drumSounds,
+      melodicTrackId: this.melodicTrackId,
+      confirmedMelodicTrackId: this.confirmedMelodicTrackId,
+      userLyrics: {},
+      userComments: {},
+      userTracks: {},
     }, function(err, songId) {
       if (err) {
         alert(err.reason);
@@ -206,10 +310,8 @@ Uploader = {
   addStartTimeInBeatsAndAnnotate: function() {
     var startTimeInBeats = 0;
     for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      if (this.midi.header.formatType < 2) {
-        startTimeInBeats = 0;
-      }
-      
+      startTimeInBeats = 0;
+    
       var track = this.midi.tracks[trackId];
 
       for (var i = 0; i < track.length; i++) {
@@ -222,18 +324,18 @@ Uploader = {
         }
 
         event.id = this.noteIndex++; // needed to update noteOn and noteOff pair
-
-        if (this.midi.header.formatType === 0 && typeof event.channel !== 'undefined') {
-          event.trackId = event.channel;
-
+        if (this.midi.header.formatType === 0) {
+          if (typeof event.channel === 'undefined') {
+            event.trackId = 0; // this (0) is probably not used by channel
+          } else {
+            event.trackId = event.channel; // channel starts from 0 I think
+          }
         } else {
           event.trackId = trackId; // needed to propagate song.notes changes to the track
         }
-
-        event.note = event.noteNumber; // TODO: remove this
       }
     }
-  },
+  },  
 
   addStartTimeInMicroseconds: function() {
     var microsecondsPerBeat = 500000; // midi default

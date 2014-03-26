@@ -13,7 +13,7 @@ Router.map(function() {
   this.route('songFile', {
     path: '/songFile/:_id',
     waitOn: function() {
-      return [this.subscribe('songFile', this.params._id), this.subscribe('songForks', this.params._id)];
+      return [this.subscribe('songFile', this.params._id), this.subscribe('userTracks', this.params._id)];
     },
     
     data: function() {
@@ -149,8 +149,8 @@ Router.map(function() {
 
     waitOn: function() {
       return [
-        this.subscribe('songId', this.params._id),
-        this.subscribe('songNotes', this.params._id)
+        this.subscribe('songFile', this.params._id),
+        // this.subscribe('songNotes', this.params._id)
       ];
     },
 
@@ -164,7 +164,7 @@ Router.map(function() {
 
     data: function() {
       var data = {};
-      data.song = Songs.findOne(this.params._id);
+      data.song = SongFiles.findOne(this.params._id);
 
       return data;
     },

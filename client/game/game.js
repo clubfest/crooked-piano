@@ -1,41 +1,14 @@
-var songId;
 
-Template.game.created = function() {
-  songId = this.data.song._id;
-}
 Template.game.rendered = function() {
-  if (!this.rendered) {
-    this.rendered = true;
+  var songId = this.data.song._id;
 
-    // must be put here to prevent called indefinitely
-    Meteor.call('incrementPlayCount', songId, function(err) {
-      if (err) {
-        alert(err.reason);
-      }
-    });
+  Meteor.call('incrementViewCount', songId);
 
-    if (Meteor.userId()) {
-      Meteor.call('updateLastVisitedGame', songId, function(err){ 
-        if(err) {
-          alert(err.reason);
-        }
-      });
-    }  
-  }
-
-  $('.play-slider').slider({
-    slide: function(evt, ui) {
-      LeadPlayer.reset(ui.value);
-      LeadPlayer.updateProximateNotes();
-    },
-  });
+  if (Meteor.userId()) {
+    Meteor.call('updateLastVisitedGame', songId);
+  }  
 }
 
-Template.game.events({
-  'click #reload-sound': function() {
-    loadSound();
-  }
-});
 
 Handlebars.registerHelper('isAlphabetNotation', function() {
   return Session.get('isAlphabetNotation');

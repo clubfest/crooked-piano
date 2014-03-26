@@ -141,7 +141,6 @@ simpleKeyboard = {
 
       if (typeof noteNumber !== "undefined") {
         noteNumber = self.adjustShift(noteNumber);
-
         $(window).trigger('keyboardUp', {
           time: new Date().getTime(),
           keyCode: keyCode,
@@ -164,7 +163,9 @@ simpleKeyboard = {
     $(window).on('keyboardDown.display', function(evt, data) {
       if (!self.condition || self.condition(data)  || data.userTriggered) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
-        dom.addClass('keydown').html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
+
+        dom.addClass('keydown')
+        // dom.html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
       }
       // if (data.channel === self.channel && !data.playedByComputer) {}
     });
@@ -219,6 +220,62 @@ function convertKeyCodeToNote(keyCode) {
   return keyCodeToNote[keyCode];
 }
 
+noteNumberToAoeui = function(noteNumber) {
+    var conversion = {
+      41: 'j',  
+      42: 'k',
+      43: 'u',
+      45: '3',
+      47: '`',
+      48: '1',
+      49: '2',
+      50: "'",
+      51: ',',
+      52: 'a',
+      53: ';',
+      54: 'q',
+      55: 'o',
+      56: 'e',
+      57: '.',
+      58: 'p',
+      59: '4',
+      60: '5',
+      61: '6',
+      62: 'y',
+      63: 'f',
+      64: 'i',
+      65: 'x',
+      66: 'b',
+      67: 'i',
+      68: 'h',
+      69: 'g',
+      70: 'c',
+      71: '8',
+      72: '9',
+      73: '0',
+      74: 'r',
+      75: 'l',
+      76: 'n',
+      77: 'v',
+      78: 'z',
+      79: 's',
+      80: '-',
+      81: '/',
+      82: '=',
+      83: ']',
+      84: 'del',
+      86:  '\\',
+      88: '[',
+      89: 'm',
+      90: 'w',
+      91: 't',
+      93: '7',
+    }
+  var ret = conversion[noteNumber];
+  if (!ret) ret = noteNumber.toString();
+
+  return ret;
+}
 noteToName = function(noteNumber, alphabet) {
   noteNumber = (noteNumber - 60) % 12;
 
