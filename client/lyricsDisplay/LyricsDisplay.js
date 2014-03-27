@@ -114,12 +114,12 @@ LyricsDisplay = {
 
   updateLyricsForDisplay: function() {
     var lyricsForDisplay = [];
-    var time = Session.get('timeInMicroseconds');
+    var time = Session.get('timeInTicks');
 
     // see if you need to go lower
     for (var i = this.startIndex; i > 0; i--) {
       var note = this.lyrics[i];
-      if (note.startTimeInMicroseconds < time) {
+      if (note.startTimeInTicks < time) {
         this.startIndex = i;
         break;
       }

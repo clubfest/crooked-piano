@@ -42,11 +42,11 @@ MidiReplayer = {
 
     this.replayerIndexWorker.onmessage = function(evt) {
       var data = evt.data;
-      
+
       // update before playFunction
       if (data.action === 'play') {
         data.note = MidiReplayer.notes[data.replayerIndex];
-        Session.set('timeInMicroseconds', data.note.startTimeInMicroseconds);
+        Session.set('timeInTicks', data.note.startTimeInTicks);
         Session.set('replayerIndex', data.replayerIndex);
         $(window).trigger('noteProcessed', data.note);
       }
@@ -143,6 +143,24 @@ MidiReplayer = {
     }
   },
 
+  goBack: function(steps) {
+    var steps = steps || 1;
+    var trackId = Session.get('currentTrackId');
+    for (var i = Session.get('replayerIndex'); i >= 0; i--) {
+      var note = this.notes[i];
+      if (note.subtype === 'noteOn' && note.trackId === trackId) {
+        steps--;
+        
+        if (steps === 0) {
+          Session.set('replayerIndex', i);
+          MidiReplayer.start();
+          break ;
+        }
+          
+      }
+    }
+  },
+
   destroy: function() {
     this.stop();
     this.notes = [];
@@ -151,7 +169,7 @@ MidiReplayer = {
   reset: function() {
     this.pause();
     Session.set('replayerIndex', 0);
-    Session.set('timeInMicroseconds', 0);
+    Session.set('timeInTicks', 0);
 
     this.updateTempo();
     this.updateTimeSignature();
@@ -169,7 +187,7 @@ MidiReplayer = {
 
   playNote: function(note) {
     note.isFromReplayer = true; // used for filtering when recording improv
-    Session.set('timeInMicroseconds', note.startTimeInMicroseconds); // TODO: move this before playNote as this will not be called in edit / youPlay mode
+    Session.set('timeInTicks', note.startTimeInTicks); // TODO: move this before playNote as this will not be called in edit / youPlay mode
 
     if (note.subtype === 'noteOn') {
       note.keyCode = convertNoteToKeyCode(note.noteNumber);

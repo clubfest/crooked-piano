@@ -24,7 +24,7 @@ LyricsInsertMode = {
         Session.set('replayerIndex', data.replayerIndex + 1); // move on
       } else {
         this.noteShallPass = false;
-        data.note.velocity /= 3; // todo: adjust this else where
+        // data.note.velocity /= 3; // todo: adjust this else where
         MidiReplayer.playNote(data.note);
       }
     } else if (data.action === 'stop') {

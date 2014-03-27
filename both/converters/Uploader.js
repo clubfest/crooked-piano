@@ -90,6 +90,10 @@ Uploader = {
         score += 1;
       }
 
+      if (numOfNotes * this.midi.tracks.length * 7 < this.notes.length) {
+        score -= 20;
+      }
+
       scores[i] = score;
     }
 
@@ -319,7 +323,9 @@ Uploader = {
 
         if (i === 0) {
           event.startTimeInBeats = 0;
+          event.startTimeInTicks = 0;
         } else {
+          event.startTimeInTicks = track[i-1].startTimeInTicks + event.deltaTime;
           event.startTimeInBeats = track[i-1].startTimeInBeats + event.deltaTime / this.ticksPerBeat;
         }
 
@@ -377,6 +383,7 @@ Uploader = {
                 noteOnEvent.channel === event.channel) {
 
               noteOnEvent.endTimeInBeats = event.startTimeInBeats;
+              noteOnEvent.endTimeInTicks = event.startTimeInTicks;
               noteOnEvent.endTimeInMicroseconds = event.startTimeInMicroseconds;
 
               // annotate with id
@@ -415,6 +422,7 @@ Uploader = {
 
           // default noteOn duration will be 1
           event.endTimeInBeats = event.startTimeInBeats + 1; 
+          event.endTimeInTicks = event.startTimeInTicks + this.ticksPerBeat; 
         }
       }
     }

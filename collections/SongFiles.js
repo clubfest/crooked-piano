@@ -38,45 +38,45 @@ Meteor.methods({
     return userTrackId;
   },
 
-  addTextToUserTrack: function(textType, text, note, index, userTrack) {
+  addTextToUserTrack: function(textType, text, note, userTrack) {
     var trackId = userTrack.trackId;
     var notes = userTrack.notes;
+    var currentTime = note.startTimeInMicroseconds;
 
-    if (index >= notes.length) {
-      if (text.length > 0) {
-        var textNote = {
-          type: 'meta',
-          subtype: textType,
-          text: text,
-          startTimeInBeats: note.startTimeInBeats,
-          startTimeInMicroseconds: note.startTimeInMicroseconds,
-          trackId: trackId,
-        }
+    var newNote = {
+      type: 'meta',
+      subtype: textType,
+      text: text,
+      startTimeInBeats: note.startTimeInBeats,
+      startTimeInMicroseconds: note.startTimeInMicroseconds,
+      startTimeInTicks: note.startTimeInTicks,
+      trackId: trackId,
+    };
 
-        UserTracks.update(userTrack._id, {
-          $push: {notes: textNote}
-        });
-
-        // notes.push(textNote);
-      }
-
-    } else {
-      if (text.length === 0) {
-        notes.splice(index, 1);
-
-      } else {
-        console.log(notes.length);
-        console.log(index);
-        var note = notes[index];
-        note.text = text;
-      }
-
+    if (userTrack.notes.length === 0 
+        || currentTime > userTrack.notes[userTrack.notes.length - 1].startTimeInMicroseconds) {
       UserTracks.update(userTrack._id, {
-        $set: {notes: notes}
+        $push: {notes: newNote}
       });
     }
 
-    // return notes;
+    for (var i = 0; i < userTrack.notes.length; i++) {
+      var existingNote = userTrack.notes[i];
+
+      if (currentTime <= existingNote.startTimeInMicroseconds) {
+        if (currentTime === existingNote.startTimeInMicroseconds) {
+          existingNote.text = text;
+        } else if (text.length > 0) {
+          userTrack.notes.splice(i, 0, newNote);
+        }
+
+        UserTracks.update(userTrack._id, {
+          $set: {notes: userTrack.notes}
+        });
+
+        break ;
+      }
+    }    
   },
 
   incrementViewCount: function(songId) {
