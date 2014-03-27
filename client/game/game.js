@@ -9,6 +9,9 @@ Template.game.rendered = function() {
   }  
 }
 
+Template.game.gameFinished = function() {
+  return Session.get('gameFinished');
+}
 
 Handlebars.registerHelper('isAlphabetNotation', function() {
   return Session.get('isAlphabetNotation');

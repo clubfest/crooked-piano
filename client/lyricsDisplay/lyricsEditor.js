@@ -50,6 +50,10 @@ Template.lyricsEditor.destroyed = function() {
 }
 
 Template.lyricsEditor.events({
+  'click #left-shift': function(evt) {
+      MidiReplayer.goBack(2);  // move 2 steps because we are ahead 1 step and we want to move back 1 step
+  },
+  
   'keydown #lyrics-input': function(evt) {
     if (evt.keyCode === 13) {
       var text = $input.val();

@@ -46,8 +46,9 @@ Template.midiReplayer.rendered = function() {
         } else {
           MidiReplayer.start();
         }
-        // needed for the trigger to work correctly
+        
         Session.set('timeInTicks', MidiReplayer.notes[ui.value].startTimeInTicks);
+        // needed for the trigger to work correctly
         $(window).trigger('replayerSliderMoved');
       }
     });  

@@ -1,11 +1,39 @@
 <template name='lyricsEditor'>
 <div class='panel'>
   <div>
-    <!-- <textarea id='lyrics-input' placeholder='press enter to insert'></textarea> -->
-    <input id='lyrics-input' type='text' placeholder='press enter to insert'/>    
+    <button id='lyrics-left'><i class='icon-chevron-left'></i></button>       
+  </div>
+  <div>
+    <input id='lyrics-input' type='text' placeholder='press enter to insert lyrics'/>    
+  </div>
+  <div>
+    <button id='lyrics-right'><i class='icon-chevron-left'></i></button>       
   </div>
 </div>
-<div class='panel'>
-  {{{lyricsEntered}}}
+<div>
+  {{#if lyricsEntered}}
+    {{{lyricsEntered}}}
+  {{else}}
+    <ul>
+      Here are some pointers for inserting lyrics:
+      <li>
+        A note is usually a syllable and not a whole word, so don't feel bad entering incomplete words
+      </li>
+      <li>
+        Going from 1 word to another, add a space in between them yourself
+      </li>
+      <li>
+        Put commas and periods if you want me to space out each phrase.
+      </li>
+      <li>
+        If you screwed up, backspace inside the text box or click the left arrow.
+      </li>
+    </ul>
+  {{/if}}
 </div>
+<!--
+<div class='panel'>
+  <textarea id='comment-input' placeholder='Press enter to insert comment'></textarea>
+</div>
+-->
 </template>

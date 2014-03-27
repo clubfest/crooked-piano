@@ -165,7 +165,7 @@ simpleKeyboard = {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
 
         dom.addClass('keydown')
-        // dom.html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
+        dom.html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
       }
       // if (data.channel === self.channel && !data.playedByComputer) {}
     });
@@ -173,6 +173,7 @@ simpleKeyboard = {
     $(window).on('keyboardUp.display', function(evt, data) {
       if (!self.condition || self.condition(data) || data.userTriggered) {
         var dom = $('[data-key-code="' + data.keyCode + '"]');
+        dom.html('<span>' + dom.data('content') + '</span>')
         dom.removeClass('keydown');
       }
     });

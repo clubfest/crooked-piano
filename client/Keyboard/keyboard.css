@@ -4,14 +4,18 @@
 }
 
 .piano-keyboard .keyboard {
-  margin: 0 auto 0;
+  margin: 0 auto -20px auto;
   width: 775px;
-  height: 212px;
+  height: 240px;
   background: #99B;
   -moz-border-radius-topleft: 15px 21px;
   -moz-border-radius-topright: 15px 21px;
   border-top-left-radius: 15px 21px;
   border-top-right-radius: 15px 21px;
+  -moz-border-radius-bottomleft: 10px 15px;
+  -moz-border-radius-bottomright: 10px 15px;
+  border-bottom-left-radius: 10px 15px;
+  border-bottom-right-radius: 10px 15px;
   padding: 10px 0 0 0;
 }
 

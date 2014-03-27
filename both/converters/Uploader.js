@@ -65,6 +65,8 @@ Uploader = {
       var score = 0;
       var frequencies = this.trackInfos[i].melodicJumpFrequencies;
       var numOfNotes = this.trackInfos[i].numOfNotes;
+      var averageNoteNumber = this.trackInfos[i].averageNoteNumber;
+      var channel = this.trackInfos[i].channel;
 
       for (var k = -2; k <= 2; k++) {
         if (frequencies[k] / numOfNotes > 0.08) {
@@ -82,16 +84,28 @@ Uploader = {
         score += 3;
       }
 
-      if (numOfNotes * this.midi.tracks.length * 5 > this.notes.length) {
-        score += 2;
-      }
+      // if (numOfNotes * this.midi.tracks.length * 5 > this.notes.length) {
+      //   score += 2;
+      // }
 
-      if (numOfNotes * this.midi.tracks.length * 6 > this.notes.length) {
-        score += 1;
-      }
+      // if (numOfNotes * this.midi.tracks.length * 6 > this.notes.length) {
+      //   score += 1;
+      // }
 
-      if (numOfNotes * this.midi.tracks.length * 7 < this.notes.length) {
+      if (numOfNotes * this.midi.tracks.length * 6 < this.notes.length) {
         score -= 20;
+      }
+
+      if (channel === 9) {
+        score -= 40; // this is a drum
+      }
+
+      if (averageNoteNumber < 56) {
+        score -= 10;
+      }
+
+      if (averageNoteNumber < 60) {
+        score -= 5;
       }
 
       scores[i] = score;
@@ -158,6 +172,8 @@ Uploader = {
           instrumentCategory: programNumberToInstrumentCategory(note.programNumber),
           instrumentName: programNumberToInstrumentName(note.programNumber),
         };
+
+        trackInfos[trackId].channel = note.channel;
 
       } else if (note.subtype === 'noteOn') {
         trackInfos[trackId].numOfNotes++;

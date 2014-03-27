@@ -1,12 +1,12 @@
 /*
 */
-var TIME_RANGE = 4000000;
-var MAX_GAP = 2000000;
-var START_TIME_FILTER = 100000; // todo: use other info to filter
-var CUSHION = 1000000;
+var BEAT_RANGE = 6;
+var MAX_BEAT_GAP = 2;
+var START_BEAT_FILTER = 4; // todo: use other info to filter
 
 LyricsDisplay = {
   init: function(song) {
+    this.ticksPerBeat = song.midi.header.ticksPerBeat;
     this.startIndex = 0;
     Session.set('lyricsForDisplay', []);
 
@@ -46,7 +46,7 @@ LyricsDisplay = {
         if (note.type === 'meta') {
           if (note.subtype === 'lyrics' || note.subtype === 'text') {
             // skip beginning words; TODO: find a better way
-            if (note.startTimeInMicroseconds > START_TIME_FILTER) {
+            if (note.startTimeInTicks > START_BEAT_FILTER * this.ticksPerBeat) {
               if ($.trim(note.text).length > 0) {
                 lyrics.push(note);
               }
@@ -129,7 +129,7 @@ LyricsDisplay = {
     for (var i = this.startIndex; i < this.lyrics.length; i++) {
       var note = this.lyrics[i];
 
-      if (note.startTimeInMicroseconds > time) {
+      if (note.startTimeInTicks > time) {
         if (!firstNotePassed) {
           if (this.startIndex === i) {
             return ;
@@ -144,11 +144,11 @@ LyricsDisplay = {
           firstNotePassed = true;
         }
 
-        if (note.startTimeInMicroseconds > time + TIME_RANGE) {
+        if (note.startTimeInTicks - time > BEAT_RANGE * this.ticksPerBeat) {
           break ;
         } else if (i > this.startIndex) {
           var prevNote = this.lyrics[i - 1];
-          if (note.startTimeInMicroseconds - prevNote.startTimeInMicroseconds > MAX_GAP) {
+          if (note.startTimeInTicks - prevNote.startTimeInTicks > MAX_BEAT_GAP * this.ticksPerBeat) {
             break ;
           }
         } 
