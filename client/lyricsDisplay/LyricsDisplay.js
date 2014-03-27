@@ -78,8 +78,8 @@ LyricsDisplay = {
       
     } else { // Load Do Re Mi from the melodicTrack instead
       this.lyrics = [];
+      console.log(song)
       this.lyricsTrackId = song.melodicTrackId;
-
       var track = tracks[song.melodicTrackId];
       for (var i = 0; i < track.length; i++) {
         var note = track[i];

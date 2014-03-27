@@ -1,4 +1,4 @@
-var displayModes = ['infoTab', 'soundTab', 'musicTab'];
+var displayModes = ['infoTab', 'soundTab', 'editTab'];
 
 Template.midiReplayer.isReplaying = function() {
   return Session.get('isReplaying');

@@ -18,6 +18,16 @@ And finally run meteorite
 mrt
 ```
 
+## Change Direction
+
+
+* pause, play-pause, play, demo.
+
+* The create mode take into context the currentTrackId 
+  * lyrics/ comment editor only allows exact insertion only in the second mode 
+  * music editor's 3 modes correspond to in-place insert, press-sensitive insert and improvise
+  
+
 ## TODO
 
 1. Get lyrics working

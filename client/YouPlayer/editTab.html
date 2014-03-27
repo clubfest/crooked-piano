@@ -1,8 +1,44 @@
 <template name='editTab'>
-  <div>
-    <button>Add Lyrics</button>        
-  </div>
-  <div>
-    <button>Add Remark</button>                  
-  </div>
+  {{#if showEditor}}
+    <div align='center'>
+      <h2>Track Name</h2>
+      <div class='panel'>
+        <div>
+          <button id='lyrics-left'><i class='icon-chevron-left'></i></button>       
+        </div>
+        <div>
+          <div>
+            <input id='lyrics-input' type='text' placeholder='Lyrics: Press Enter to Insert'/>    
+          </div>
+          <div>
+            <textarea id='comment-input' placeholder='Comment: Press Enter to Insert'></textarea>
+          </div>
+        </div>
+        <div>
+          <button id='lyrics-right'><i class='icon-chevron-right'></i></button> 
+        </div>
+      </div>
+      <div>
+        Sheet
+      </div>
+    </div>
+  {{else}}
+    <div>
+      Select a new track to edit.
+    </div>
+
+    <div>
+      <a class='fork-track'>New Lyrics</a>    
+    </div>
+    <div>
+      <a id='create-track'>New Music Track</a>    
+    </div>
+    <div>
+      <a class='fork-track'>Track 1</a>    
+    </div>
+    <div>
+      <a class='fork-track'>Track 2</a>    
+    </div>
+    Clicking the button will take you to the editorTab
+  {{/if}}
 </template>

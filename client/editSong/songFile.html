@@ -1,7 +1,24 @@
 <template name='songFile'>
-<div>Edit Artist: Edit Title</div>
-<div>Youtube link</div>
-<button>Gamify</button>
+  <div align='center'>
+    {{#with song}}
+      <h2><span id='artist-editable'>{{artist}}</span> - <span id='title-editable'>{{title}}</span></h2>
+      {{#if youtubeId}}
+        <div class='panel'>
+          <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+        </div>
+      {{/if}}
+
+      <div class='panel'>
+        <div id='youtube-link-editable' data-mode='inline'>
+          {{youtubeLink}}
+        </div>
+      </div>
+    {{/with}}
+
+    <div class='panel'>
+      <a class='btn btn-success'>Gamify</a>    
+    </div>
+  </div>
   {{> aoeuiKeyboard}}
   {{> midiReplayer}}
 

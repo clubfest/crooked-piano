@@ -1,6 +1,13 @@
 var songId;
+var userTrack;
 var $input;
 var index;
+
+Editor = {
+  init: function(trackId, song) {
+    this.track = song.userTracks[trackId];
+  },
+};
 
 Template.lyricsEditor.rendered = function() {
   Session.set('lyricsEditorText', null);
@@ -8,37 +15,32 @@ Template.lyricsEditor.rendered = function() {
   $input = $('#lyrics-input');
   songId = this.data.song._id;
   
-  var self = this;
+  // Editor.init(18, this.data.song);    
+  // var self = this;
+  // Meteor.call('findOrCreateUserTrack', songId, 'lyrics', 'New Lyrics', function(err, result){
+  //   if (err) {
+  //     alert(err.reason);
+  //   } else {
+  //     Deps.autorun(function() {
+  //       Session.set('userTrack', UserTracks.findOne(result));
+  //     });
+  //     $(window).on('noteProcessed.lyricsEditor', function(evt, data) {
+  //       if (data.trackId === Session.get('currentTrackId')) {
+  //         var currentTime = Session.get('timeInTicks');
+  //         var notes = Session.get('userTrack').notes;
 
-
-
-  Meteor.call('findOrCreateUserTrack', songId, 'lyrics', 'New Lyrics', function(err, result){
-    if (err) {
-      alert(err.reason);
-    } else {
-      Deps.autorun(function() {
-        Session.set('userTrack', UserTracks.findOne(result));
-      });
-      $(window).on('noteProcessed.lyricsEditor', function(evt, data) {
-        if (data.trackId === Session.get('currentTrackId')) {
-          var currentTime = Session.get('timeInTicks');
-          var notes = Session.get('userTrack').notes;
-
-          for (var i = 0; i < notes.length; i++) {
-            if (notes[i].startTimeInTicks === data.startTimeInTicks) {
-              Session.set('lyricsEditorText', notes[i].text);
-              $input.val(notes[i].text);
-              index = i;
-              break ;
-            }
-          }
-        }
-      });
-    }
-  });
-
-
-      
+  //         for (var i = 0; i < notes.length; i++) {
+  //           if (notes[i].startTimeInTicks === data.startTimeInTicks) {
+  //             Session.set('lyricsEditorText', notes[i].text);
+  //             $input.val(notes[i].text);
+  //             index = i;
+  //             break ;
+  //           }
+  //         }
+  //       }
+  //     });
+  //   }
+  // });
 }
 
 Template.lyricsEditor.destroyed = function() {
@@ -60,9 +62,9 @@ Template.lyricsEditor.events({
       saveLyricsToUserTrack();
     }
 
-    if (evt.keyCode === 8 && $input.val().length === 0) {
-      MidiReplayer.goBack(2);  // move 2 steps because we are ahead 1 step and we want to move back 1 step
-    }
+    // if (evt.keyCode === 8 && $input.val().length === 0) {
+    //   MidiReplayer.goBack(2);  // move 2 steps because we are ahead 1 step and we want to move back 1 step
+    // }
   },
 
   'keydown textarea': function(evt) {

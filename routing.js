@@ -13,7 +13,7 @@ Router.map(function() {
   this.route('songFile', {
     path: '/songFile/:_id',
     waitOn: function() {
-      return [this.subscribe('songFile', this.params._id), this.subscribe('userTracks', this.params._id)];
+      return [this.subscribe('songFile', this.params._id)];
     },
     
     data: function() {
