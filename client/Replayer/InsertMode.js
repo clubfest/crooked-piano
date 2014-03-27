@@ -1,29 +1,33 @@
 // halted when the
 LyricsInsertMode = {
   init: function() {
-    this.noteShallPass = false;
+    // this.noteShallPass = false; // allow the user to hear the note without progressing further
     this.currentNote;
 
     var self = this;
+    
     $(window).on('noteInserted.insertMode', function(evt, data) {
       MidiReplayer.start();
-      // for (var i = 0; i < self.notesQueue.length; i++) {
-      //   MidiReplayer.playNote(self.notesQueue[i]);
-      // }
     });
+
+    MidiReplayer.start();
   },
 
   handleData: function(data) {
     if (data.action === 'play') {
-      if (data.note.subtype === 'noteOn' && !this.noteShallPass
+      if (data.note.subtype === 'noteOn' 
           && data.note.trackId === Session.get('currentTrackId')) {
-        this.noteShallPass = true;
+
+        // Play the note but pause at the next note
         MidiReplayer.pause();
-        MidiReplayer.playNote(data.note);
+        MidiReplayer.playNote(data.note); 
         this.currentNote = data.note; // used in lyricsEditor
-        Session.set('replayerIndex', data.replayerIndex + 1); // move on
+
+        // must update manually. Otherwise, we will keep playing and pausing at the same note
+        // other modes may not require update because there is no pause
+        Session.set('replayerIndex', data.replayerIndex + 1); 
       } else {
-        this.noteShallPass = false;
+        // this.noteShallPass = false;
         // data.note.velocity /= 3; // todo: adjust this else where
         MidiReplayer.playNote(data.note);
       }

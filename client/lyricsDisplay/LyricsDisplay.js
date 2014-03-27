@@ -2,7 +2,7 @@
 */
 var BEAT_RANGE = 6;
 var MAX_BEAT_GAP = 2;
-var START_BEAT_FILTER = 4; // todo: use other info to filter
+var START_BEAT_FILTER = 0; // todo: use other info to filter
 
 LyricsDisplay = {
   init: function(song) {

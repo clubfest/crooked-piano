@@ -128,7 +128,9 @@ MidiReplayer = {
   },
 
   start: function() {
-    if (Session.get('isReplaying')) return ;
+    if (Session.get('isReplaying')) {
+      MidiReplayer.pause();
+    }
     
     Session.set('isReplaying', true);
     this.updateTempo();
@@ -146,7 +148,8 @@ MidiReplayer = {
   goBack: function(steps) {
     var steps = steps || 1;
     var trackId = Session.get('currentTrackId');
-    for (var i = Session.get('replayerIndex'); i >= 0; i--) {
+
+    for (var i = Session.get('replayerIndex') - 1; i >= 0; i--) {
       var note = this.notes[i];
       if (note.subtype === 'noteOn' && note.trackId === trackId) {
         steps--;
@@ -156,7 +159,25 @@ MidiReplayer = {
           MidiReplayer.start();
           break ;
         }
-          
+      }
+    }
+  },
+
+  goForward: function(steps) {
+    var steps = steps || 1;
+    var trackId = Session.get('currentTrackId');
+
+    for (var i = Session.get('replayerIndex'); i < this.notes.length; i++) {
+      var note = this.notes[i];
+      if (note.subtype === 'noteOn' && note.trackId === trackId) {
+        console.log(note);
+        steps--;
+        
+        if (steps === 0) {
+          Session.set('replayerIndex', i);
+          MidiReplayer.start();
+          break ;
+        }
       }
     }
   },

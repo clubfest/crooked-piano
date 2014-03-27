@@ -35,8 +35,10 @@ Uploader = {
     var track = this.midi.tracks[0] // there is only 1 track for formatType 0 midi
     var maxTrackId = 0;
     var tracks = {};
+
     for (var i = 0; i < track.length; i++) {
       var note = track[i];
+
       if (!tracks[note.trackId]) {
         tracks[note.trackId] = [];
         if (note.trackId > maxTrackId) {
@@ -154,6 +156,7 @@ Uploader = {
         durationFrequencies: {},
       };
     }
+
     for (var i = 0; i < this.notes.length; i++) {
       var note = this.notes[i];
       var trackId = note.trackId;
@@ -178,9 +181,6 @@ Uploader = {
       } else if (note.subtype === 'noteOn') {
         trackInfos[trackId].numOfNotes++;
         trackInfos[trackId].averageNoteNumber += note.noteNumber;
-        // if (note.channel === 9) {
-        //   this.drumSounds.push(note.noteNumber)
-        // }
 
         var prevNote = prevNoteByTrack[trackId];
 
@@ -213,6 +213,7 @@ Uploader = {
         this.timeSignatures.push(note);
       }
     }
+
     for (trackId in trackInfos) {
       var trackInfo = trackInfos[trackId];
       if (trackInfo.numOfNotes === 0) {
@@ -304,7 +305,7 @@ Uploader = {
       }
     }
 
-    this.sortSimultaneousNoteByNoteNumber();
+    this.sortSimultaneousNoteByNoteNumber(); // be really careful
   },
 
   sortSimultaneousNoteByNoteNumber: function() {
@@ -313,12 +314,10 @@ Uploader = {
       if (aIsBigger === 0) {
         aIsBigger = a.trackId - b.trackId;
         if (aIsBigger === 0) {
-          if (!a.noteNumber) {
-            return -1;
-          } else if (!b.noteNumber) {
-            return 1;
-          } else {
+          if (a.noteNumber && b.noteNumber) {
             aIsBigger = a.noteNumber - b.noteNumber;
+          } else {
+            aIsBigger = a.id - b.id; // important for setTempo events to be in the original order
           }
         }
       } 

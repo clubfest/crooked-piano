@@ -1,9 +1,9 @@
+var lyricsString;
 
 Template.lyricsDisplay.rendered = function() {
   LyricsDisplay.init(this.data.song);
 }
 
-var lyricsString;
 Template.lyricsDisplay.currentLyrics = function() {
   var lyricsForDisplay = Session.get('lyricsForDisplay');
   if (typeof lyricsForDisplay === 'undefined') return; 
