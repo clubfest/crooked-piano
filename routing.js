@@ -5,8 +5,8 @@ Router.configure({
   loadingTemplate: 'loading',
 });
 
-// Router.before('loading');
-// Router.before('dataNotFound')
+// Router.onBeforeAction('loading');
+// Router.onBeforeAction('dataNotFound')
 
 // When the replayer is used, we put the song info in data.replayerSong (because it may conflict with data.song)
 Router.map(function() {
@@ -107,7 +107,7 @@ Router.map(function() {
   this.route('upload');
 
   this.route('feedback', {
-    before: function() {
+    onBeforeAction: function() {
       this.subscribe('allFeedbacks');
     },
 
@@ -144,7 +144,7 @@ Router.map(function() {
   this.route('game', {
     path: '/game/:_id',
 
-    before: function() {
+    onBeforeAction: function() {
     },
 
     waitOn: function() {
@@ -170,7 +170,7 @@ Router.map(function() {
     },
 
     // caching last game's songId; todo: check elsewhere, like profile, that this is defined
-    after: function() {
+    onAfterAction: function() {
       if (Session.get('songId') !== this.params._id) {
         Session.set('songId', this.params._id);
       }
@@ -178,13 +178,13 @@ Router.map(function() {
   });
 
   this.route('songs', {
-    before: function() {
+    onBeforeAction: function() {
       this.subscribe('gameInfos');
     },
   });
 
   this.route('profile', {
-    before: function() {
+    onBeforeAction: function() {
       this.subscribe('myProgressIds');
       this.subscribe('mySongIds');
     },
@@ -205,7 +205,7 @@ Router.map(function() {
   this.route('progress', {
     path: '/progress/:_id',
 
-    before: function() {
+    onBeforeAction: function() {
       this.subscribe('progress', this.params._id).wait();
     },
 
@@ -220,7 +220,7 @@ Router.map(function() {
 
   this.route('home', {
     path: '/',
-    before: function() {
+    onBeforeAction: function() {
       GAnalytics.pageview();
     },
   });

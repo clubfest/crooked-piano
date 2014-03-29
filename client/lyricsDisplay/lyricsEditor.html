@@ -5,33 +5,38 @@
     </div>
     <div>
       <div>
-        <input id='lyrics-input' type='text' placeholder='Lyrics: Press Enter to Insert'/>    
-      </div>
-      <div>
-        <textarea id='comment-input' placeholder='Comment: Press Enter to Insert'></textarea>
+        <input id='lyrics-input' type='text' placeholder='Lyrics'/>    
       </div>
     </div>
     <div>
       <button id='lyrics-right'><i class='icon-chevron-right'></i></button> 
     </div>
   </div>
-  <div class='panel'>
-    
+  <div align='center'>
+    <div>
+      <span id='lyrics-title-editable'>{{lyricsTitle}}</span>
+    </div>
+    <div>
+      <a class='btn btn-success'>Gamify</a>      
+    </div>
   </div>
   <div>
     {{#if lyricsEntered}}
       {{{lyricsEntered}}}
     {{else}}
       <ul style='width: 400px;'>
-        Here are some pointers for inserting lyrics:
+        Help:
         <li>
-          A note is usually a syllable and not a whole word, so don't feel bad entering incomplete words
+          Wait until it pauses, then type the syllable corresponding to the note right before the pause
         </li>
         <li>
-          Use commas, periods and spaces liberally.
+          Add a comma or a period if it's the end of a phrase
         </li>
         <li>
-          If you screwed up, click the left arrow to go back.
+          Add a space if it's the end of a word or phrase
+        </li>
+        <li>
+          Press Enter to insert
         </li>
       </ul>
     {{/if}}

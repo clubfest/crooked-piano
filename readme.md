@@ -18,10 +18,31 @@ And finally run meteorite
 mrt
 ```
 
+## Recap
+
+1. Go to the home page, start free-styling
+
+2. Scroll down home page to pick songs that you have not seen before
+
+Currently
+3. While playing the song, see if there is any lyrics (may be built into the song). If not, create new.
+  * based on what's the current track
+  * slow-play and normal-play will be in LyricsInsertMode
+  * Gamify it after done
+
+4. Adjust play settings, which is saved to your gameConfig immediately
+5. See what tracks are used; include and exclude to your gameConfig
+  * this will mean we need to not use song.notes
+
+6. Add or edit a track and include or exclude existing tracks
+  * demo and normal-play will just be improvised recording
+  * slow-play will progress as you type and pause will not
+  * Allow remarks to be added.
+
 ## Change Direction
 
 
-* pause, play-pause, play, demo.
+* slow-play, pause, demo, normal-play
 
 * The create mode take into context the currentTrackId 
   * lyrics/ comment editor only allows exact insertion only in the second mode 

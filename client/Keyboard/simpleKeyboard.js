@@ -277,6 +277,7 @@ noteNumberToAoeui = function(noteNumber) {
 
   return ret;
 }
+
 noteToName = function(noteNumber, alphabet) {
   noteNumber = (noteNumber - 60) % 12;
 

@@ -2,6 +2,9 @@
   <div align='center'>
     {{#with song}}
       <h2><span id='artist-editable'>{{artist}}</span> - <span id='title-editable'>{{title}}</span></h2>
+      <div id='desc-editable' data-mode='inline' data-type="wysihtml5" data-pk="1">
+        {{{desc}}}
+      </div>
       {{#if youtubeId}}
         <div class='panel'>
           <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
@@ -16,15 +19,15 @@
     {{/with}}
 
     <div class='panel'>
-      <a class='btn btn-success'>Gamify</a>    
+      <a class='btn btn-success'>Gamify</a> 
+      <a onclick="alert('Click the settings button at the lower right of the Crooked Piano and adjust to make it easy for others to play')">help</a>   
     </div>
   </div>
   {{> aoeuiKeyboard}}
   {{> midiReplayer}}
 
   {{> tempoTab}}
-    {{> lyricsDisplay}}
-    {{> lyricsEditor}}
+  {{> lyricsDisplay}}
   {{> alphabetSheetDrawer}}
   {{> trackStat}}
   {{> midiWriter}}

@@ -9,6 +9,7 @@ Uploader = {
     this.ticksPerBeat = this.midi.header.ticksPerBeat;
     this.noteIndex = 0; // used to annotate id during addStartTimeInBeats
     // TODO: get source address if obtained via gamify
+
     if (this.midi.header.formatType === 2) {
       throw "Midi of format type 2 is not supported"
     }
@@ -86,14 +87,6 @@ Uploader = {
         score += 3;
       }
 
-      // if (numOfNotes * this.midi.tracks.length * 5 > this.notes.length) {
-      //   score += 2;
-      // }
-
-      // if (numOfNotes * this.midi.tracks.length * 6 > this.notes.length) {
-      //   score += 1;
-      // }
-
       if (numOfNotes * this.midi.tracks.length * 6 < this.notes.length) {
         score -= 20;
       }
@@ -103,11 +96,11 @@ Uploader = {
       }
 
       if (averageNoteNumber < 56) {
-        score -= 10;
+        score -= 15;
       }
 
       if (averageNoteNumber < 60) {
-        score -= 5;
+        score -= 10;
       }
 
       scores[i] = score;
@@ -138,6 +131,7 @@ Uploader = {
       }
     }
   },
+
   // extract and aggregate info about notes
   extractTrackInfos: function() {
     var trackInfos = {};
@@ -146,7 +140,7 @@ Uploader = {
     this.timeSignatures = [];
     // this.drumSounds = [];
 
-    // Initializing so we don't need to do it later
+    // Initializing so we don't need to do it below
     for (var i = 0; i < this.midi.tracks.length; i++) {
       trackInfos[i] = {
         numOfNotes: 0,
@@ -224,18 +218,6 @@ Uploader = {
     }
     this.trackInfos = trackInfos;
   },
-
-  debug: function() {
-    for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
-      var track = this.midi.tracks[trackId];
-      // for (var i = 0; i < track.length; i++) {
-      //   var event = track[i];
-      // }
-        if (trackId === 0){
-         console.log(track)
-       }
-    }
-  },
   
   save: function() {
     Meteor.call('createSongFile', {
@@ -247,7 +229,6 @@ Uploader = {
       tempos: this.tempos, 
       timeSignatures: this.timeSignatures,
       trackInfos: this.trackInfos,
-      // drumSounds: this.drumSounds,
       melodicTrackId: this.melodicTrackId,
       confirmedMelodicTrackId: this.confirmedMelodicTrackId,
       userLyrics: {},
@@ -257,7 +238,8 @@ Uploader = {
       if (err) {
         alert(err.reason);
       } else {
-        Router.go('songFile', {_id: songId});
+        // Router.go('songFile', {_id: songId});
+        Router.go('game', {_id: songId});
       }
     });
   },
@@ -411,7 +393,7 @@ Uploader = {
               if (duration > 16) {
                 console.log('Unusually long note:');
                 console.log(noteOnEvent);
-              } else if (duration <= 0) {
+              } else if (duration < 0) {
                 console.log('Unusually short note:');
                 console.log(noteOnEvent);
               }
@@ -444,7 +426,7 @@ Uploader = {
   },
 
   concat: function() {
-    // TODO: test this with a MIDI 2 file
+    // TODO: test this with a MIDI file of type 2
     this.notes = [];
     for (var i = 0; i < this.midi.tracks.length; i++) {
        Array.prototype.push.apply(this.notes, this.midi.tracks[i]);
@@ -501,6 +483,15 @@ function roundUp(beat, multipliers) {
 }
 
 
+
+  // debug: function() {
+  //   for (var trackId = 0; trackId < this.midi.tracks.length; trackId++) {
+  //     var track = this.midi.tracks[trackId];
+  //       if (trackId === 0){
+  //        console.log(track)
+  //      }
+  //   }
+  // },
 
 // // TODO: move it to drawAlphabet
 //   addRestEvents: function() {

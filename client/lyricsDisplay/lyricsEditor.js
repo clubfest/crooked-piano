@@ -14,6 +14,18 @@ Template.lyricsEditor.rendered = function() {
   MidiReplayer.loadPlayMode(LyricsInsertMode);
   $input = $('#lyrics-input');
   songId = this.data.song._id;
+
+  $('#lyrics-title-editable').editable({
+    emptytext: 'Lyrics Title',
+    mode: "inline",
+    onblur: 'submit',
+    success: function(res, newValue) {
+      // Meteor.call('updateSongArtist', songId, newValue, function(err) {
+      //   if (err) alert(err.reason);
+      // });
+      alert('not implemented')
+    },
+  });
   
   // Editor.init(18, this.data.song);    
   // var self = this;

@@ -2,11 +2,7 @@
   "packages": {
     "iron-router": {
       "git": "git@github.com:EventedMind/iron-router.git",
-      "branch": "blaze-integration"
-    },
-    "blaze-layout": {
-      "git": "https://github.com/EventedMind/blaze-layout.git",
-      "branch": "devel"
+      "branch": "master"
     },
     "jquery-ui": {},
     "font-awesome": {},

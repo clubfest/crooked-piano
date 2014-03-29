@@ -42,34 +42,24 @@ loadMidiJs = function() {
   });
 }
 
-DEFAULT_CHANNEL = 0;
-DRUM_CHANNEL = 9;
+var DEFAULT_CHANNEL = 0;
+var DRUM_CHANNEL = 9;
 var SYNTH_DRUM_NUMBER = 118;
-var ELECTRIC_GUITAR_PROGRAM_NUMBER = 27;
-var BASS_PROGRAM_NUMBER = 33;
-var VIOLIN_PROGRAM_NUMBER = 40;
-// var STRING_ENSEMBLE_1_PROGRAM_NUMBER = 48;
 
 loadSound = function() {
   Session.set('hasMidiNoteOn', false);
   MIDI.loadPlugin({
     soundfontUrl: "/MIDI.js/soundfont/",
     instruments: ["acoustic_grand_piano", "synth_drum"],
-    // "electric_bass_finger", "violin"],
-    // instrument: "acoustic_grand_piano",
+
     callback: function() {
       Session.set('hasMidiNoteOn', true);
       MIDI.programChange(DRUM_CHANNEL, SYNTH_DRUM_NUMBER);
-      // MIDI.programChange(0, VIOLIN_PROGRAM_NUMBER);
-      // MIDI.programChange(2, ELECTRIC_GUITAR_PROGRAM_NUMBER);
-      // MIDI.programChange(1, BASS_PROGRAM_NUMBER);
-      // MIDI.programChange(8, ELECTRIC_GUITAR_JAZZ_NUMBER);
 
       $(window).off('keyboardDown.sound');
       $(window).on('keyboardDown.sound', function(evt, data) {
           if (typeof data.noteNumber !== 'undefined') {
             data.channel = data.channel || DEFAULT_CHANNEL;
-            // MIDI.noteOn(DRUM_CHANNEL, data.note, data.velocity);
             MIDI.noteOn(data.channel, data.noteNumber, damp(data.velocity, data.noteNumber));
           }
       });
@@ -77,7 +67,7 @@ loadSound = function() {
       $(window).off('keyboardUp.sound');
       $(window).on('keyboardUp.sound', function(evt, data) {
           if (typeof data.noteNumber !== 'undefined' /*&& !data.pedalOn*/) {
-            data.channel = data.channel || 0;
+            data.channel = data.channel || DEFAULT_CHANNEL;
             MIDI.noteOff(data.channel, data.noteNumber);
           }
       });

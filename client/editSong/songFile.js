@@ -35,4 +35,15 @@ Template.songFile.rendered = function() {
       });
     },
   }); 
+
+  $('#desc-editable').editable({
+    emptytext: 'Description',
+    mode: "inline",
+    onblur: 'submit',
+    success: function(res, newValue) {
+      Meteor.call('updateSongDesc', songId, newValue, function(err) {
+        if (err) alert(err.reason);
+      });
+    },
+  });
 }
