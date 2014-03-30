@@ -30,9 +30,13 @@ Template.soundTab.events({
 
   'click #asynchronous': function() {
     Session.set('isSynchronous', false);
-    LeadPlayer.transferProximateNotesToComputer();
+    YouPlayer.transferProximateNotesToComputer();
   },
 });
+
+Template.soundTab.isSynchronous = function() {
+  return Session.get('isSynchronous');
+}
 
 Template.soundTab.globalTonality = function() {
   return "C major";

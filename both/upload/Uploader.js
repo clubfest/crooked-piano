@@ -63,79 +63,52 @@ Uploader = {
 
   guessMelodyTrackId: function() {
     // the best is a even distribution among the first
+    var trackInfos = []
+
     var scores = [];
     for (var i = 0; i < this.midi.tracks.length; i++) {
-      var score = 0;
-      var frequencies = this.trackInfos[i].melodicJumpFrequencies;
-      var numOfNotes = this.trackInfos[i].numOfNotes;
-      var averageNoteNumber = this.trackInfos[i].averageNoteNumber;
-      var channel = this.trackInfos[i].channel;
-
-      for (var k = -2; k <= 2; k++) {
-        if (frequencies[k] / numOfNotes > 0.08) {
-          score += 5;
+      if (this.trackInfos[i].numOfNotes > 10) {
+        var tallyA = [];
+        var a = this.trackInfos[i];
+        for (var i = 0; i < 3; i++) { // 6 is arbitrary
+          if (!a.melodicJumpFrequencies[i]) {
+            tallyA.push(0);
+          } else {
+            tallyA.push(a.melodicJumpFrequencies[i]);
+          }
         }
-      }
+        a.melodicJumpVariance = average(tallyA).variance;
 
-      for (var k = -4; k <= 4; k++) {
-        if (frequencies[k] / numOfNotes > 0.05) {
-          score += 2;
-        }
+        trackInfos.push(a);
       }
-
-      var secondScore = 0
-      for (var k = 13; k <= 30; k++) {
-        if (frequencies[k]) {
-          secondScore -= frequencies[k] * k;
-        }
-        if (frequencies[-k]) {
-          secondScore -= frequencies[-k] * k;
-        }
-      }
-
-      if (numOfNotes * this.midi.tracks.length * 4 > this.notes.length) {
-        score += 3;
-      }
-
-      if (numOfNotes * this.midi.tracks.length * 6 < this.notes.length) {
-        score -= 20;
-      }
-
-      if (channel === 9) {
-        score -= 40; // this is a drum
-      }
-
-      if (averageNoteNumber < 56) {
-        score -= 15;
-      }
-
-      if (averageNoteNumber < 60) {
-        score -= 10;
-      }
-
-      scores.push({score: score, trackId: i, secondScore: secondScore});
     }
 
-    scores.sort(function(a, b) {
-      return -a.score + b.score;
+    trackInfos.sort(function(a, b) {
+      return a.melodicJumpVariance - b.melodicJumpVariance;
     });
-    console.log(scores);
-    // var topScore = scores[0].score;
-    // topScores = [];
-    // for (var i = 0; i < scores.length; i++) {
-    //   if (topScore - 8 < scores[i].score) {
-    //     topScores.push(scores[i]);
-    //   } else {
-    //     break;
-    //   }
-    // }
 
-    // topScores.sort(function(a, b) {
-    //   return -a.secondScore + b.secondScore;
-    // });
-    
+    // for debugging
+    for (var i = 0; i < trackInfos.length; i++) {
+      console.log(trackInfos[i]);
+    }
 
-    this.melodicTrackId = scores[0].trackId;
+    trackInfos.sort(function(a, b) {
+      if (a.channel === 9) {
+        return 1;
+      } else if (b.channel === 9) {
+        return -1;
+      } else {
+        return - a.numOfNotes + b.numOfNotes;
+      }
+    });
+
+    trackInfos = trackInfos.slice(0, 5); // top 5 instruments
+
+    trackInfos.sort(function(a, b) {
+      return a.melodicJumpVariance - b.melodicJumpVariance;
+    });
+
+    this.melodicTrackId = trackInfos[0].trackId;
 
     for (var i = 0; i < this.midi.tracks.length; i++) {
       if (this.trackInfos[i].trackName) {
@@ -163,6 +136,7 @@ Uploader = {
     // Initializing so we don't need to do it below
     for (var i = 0; i < this.midi.tracks.length; i++) {
       trackInfos[i] = {
+        trackId: i,
         numOfNotes: 0,
         averageNoteNumber: 0,
         melodicJumpFrequencies: {},
@@ -200,12 +174,14 @@ Uploader = {
 
         if (prevNote) {
           var melodicJumpFrequencies = trackInfos[trackId].melodicJumpFrequencies;
+          var jump = note.noteNumber - prevNote.noteNumber;
 
-          if (!melodicJumpFrequencies[note.noteNumber - prevNote.noteNumber]) {
-            melodicJumpFrequencies[note.noteNumber - prevNote.noteNumber] = 0;
+
+          if (!melodicJumpFrequencies[jump]) {
+            melodicJumpFrequencies[jump] = 0;
           }
 
-          melodicJumpFrequencies[note.noteNumber - prevNote.noteNumber]++;
+          melodicJumpFrequencies[jump]++;
 
           // encoded because hash key cannot have "."
           var FINEST_BEAT = 1 / 8;

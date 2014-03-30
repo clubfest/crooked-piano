@@ -5,6 +5,10 @@ Template.game.rendered = function() {
   Meteor.call('incrementViewCount', songId);
 }
 
+Template.game.events({
+
+});
+
 Template.game.gameFinished = function() {
   return Session.get('gameFinished');
 }

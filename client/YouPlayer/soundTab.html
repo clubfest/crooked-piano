@@ -7,10 +7,16 @@
         <i class='icon-truck'></i> Speed
         <div id='speed-slider'></div>
       </div>
-      {{!-- volume --}}
-      <div class='slider-block'>
-        <i class='icon-volume-up'></i> Volume
-        <div id='background-volume-slider'></div>
+      <div>
+        {{#if isSynchronous}}
+          <button id='asynchronous'>
+            Free Style
+          </button>
+        {{else}}
+          <button id='synchronous'>
+            Slow Style
+          </button>
+        {{/if}}
       </div>
     </div>
 
