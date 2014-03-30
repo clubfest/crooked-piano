@@ -67,6 +67,10 @@
   border-top: 1px solid #eee;
 }
 
+.piano-keyboard .keyboard .key.computer-key-down {
+  background: #AA6;
+}
+
 /*.keyboard .key :active, .keydown {
   color: #888;
   background: #ebeced;

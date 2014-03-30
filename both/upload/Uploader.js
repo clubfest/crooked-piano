@@ -63,7 +63,7 @@ Uploader = {
 
   guessMelodyTrackId: function() {
     // the best is a even distribution among the first
-    var scores = {};
+    var scores = [];
     for (var i = 0; i < this.midi.tracks.length; i++) {
       var score = 0;
       var frequencies = this.trackInfos[i].melodicJumpFrequencies;
@@ -80,6 +80,16 @@ Uploader = {
       for (var k = -4; k <= 4; k++) {
         if (frequencies[k] / numOfNotes > 0.05) {
           score += 2;
+        }
+      }
+
+      var secondScore = 0
+      for (var k = 13; k <= 30; k++) {
+        if (frequencies[k]) {
+          secondScore -= frequencies[k] * k;
+        }
+        if (frequencies[-k]) {
+          secondScore -= frequencies[-k] * k;
         }
       }
 
@@ -103,19 +113,29 @@ Uploader = {
         score -= 10;
       }
 
-      scores[i] = score;
+      scores.push({score: score, trackId: i, secondScore: secondScore});
     }
 
-    var maxTrackId = 0;
-    var maxScore = 0;
-    for (var i = 0; i < this.midi.tracks.length; i++) {
-      if (scores[i] > maxScore) {
-        maxScore = scores[i];
-        maxTrackId = i;
-      }
-    }
+    scores.sort(function(a, b) {
+      return -a.score + b.score;
+    });
     console.log(scores);
-    this.melodicTrackId = maxTrackId;
+    // var topScore = scores[0].score;
+    // topScores = [];
+    // for (var i = 0; i < scores.length; i++) {
+    //   if (topScore - 8 < scores[i].score) {
+    //     topScores.push(scores[i]);
+    //   } else {
+    //     break;
+    //   }
+    // }
+
+    // topScores.sort(function(a, b) {
+    //   return -a.secondScore + b.secondScore;
+    // });
+    
+
+    this.melodicTrackId = scores[0].trackId;
 
     for (var i = 0; i < this.midi.tracks.length; i++) {
       if (this.trackInfos[i].trackName) {

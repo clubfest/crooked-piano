@@ -1,13 +1,23 @@
 <template name='midiReplayer'>
   <div class='playback-control'>
     <div class='replayer-control'>
-      <button id='replayer-start'
-          class='{{#if isReplaying}}pressed{{/if}}'>
-        {{#if isReplaying}}
-          <i class='icon-pause'></i>
-        {{else}}
+      <button id='play-mode-change'>
+        {{#if playMode.pause}}
           <i class='icon-play'></i>
         {{/if}}
+
+        {{#if playMode.demo}}
+          <i class='icon-pencil'></i>
+        {{/if}}
+
+        {{#if playMode.improvise}}
+          <i class='icon-hand-down'></i>
+        {{/if}}
+
+        {{#if playMode.practice}}
+          <i class='icon-pause'></i>
+        {{/if}}
+
       </button>
     </div>
 
@@ -22,9 +32,6 @@
         {{/if}}
         {{#if displayMode.soundTab}}
           <i class='icon-music'></i>
-        {{/if}}
-        {{#if displayMode.musicTab}}
-          <i class='icon-font'></i>
         {{/if}}
       </button>
     </div>

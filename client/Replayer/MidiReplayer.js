@@ -29,7 +29,7 @@ MidiReplayer = {
     Session.set('currentTrackId', id);
   },
 
-  loadPlayMode: function(mode) {
+  setMode: function(mode) {
     if (this.mode.destroy) {
       this.mode.destroy(); // destroy previous mode
     }
@@ -39,6 +39,11 @@ MidiReplayer = {
     }
 
     this.mode = mode;
+  },
+
+  loadPlayMode: function(mode) {
+    var self = this;
+    this.setMode(mode);
 
     this.replayerIndexWorker.onmessage = function(evt) {
       var data = evt.data;
@@ -51,7 +56,7 @@ MidiReplayer = {
         $(window).trigger('noteProcessed', data.note);
       }
 
-      mode.handleData(data);
+      self.mode.handleData(data);
     }
   },
 
@@ -170,7 +175,6 @@ MidiReplayer = {
     for (var i = Session.get('replayerIndex'); i < this.notes.length; i++) {
       var note = this.notes[i];
       if (note.subtype === 'noteOn' && note.trackId === trackId) {
-        console.log(note);
         steps--;
         
         if (steps === 0) {
@@ -224,5 +228,16 @@ MidiReplayer = {
     } else if (note.subtype === 'timeSignature') {
       MidiReplayer.timeSignature = note;
     }
+  },
+
+  clearDisplayedNotes: function() {
+    $('.key').removeClass('keydown computer-key-down');
+  },
+
+  displayNote: function(note) {
+    var displayClass = 'my-note';
+    var keyCode = convertNoteToKeyCode(note.noteNumber)
+    var dom = $('[data-key-code='+keyCode+']');
+    dom.addClass(displayClass);
   },
 }

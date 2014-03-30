@@ -22,6 +22,7 @@ simpleKeyboard = {
           noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          pedalOn: true,
           userTriggered: true,
         });
       }
@@ -40,6 +41,7 @@ simpleKeyboard = {
           noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          pedalOn: true,
           userTriggered: true,
         });
       }
@@ -62,6 +64,7 @@ simpleKeyboard = {
           noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          pedalOn: true,
           userTriggered: true,
         });
       }
@@ -80,6 +83,7 @@ simpleKeyboard = {
           noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          pedalOn: true,
           userTriggered: true,
         });
       }
@@ -118,6 +122,7 @@ simpleKeyboard = {
           noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          pedalOn: true,
           userTriggered: true,
         });
 
@@ -147,6 +152,7 @@ simpleKeyboard = {
           noteNumber: noteNumber,
           channel: self.channel,
           velocity: self.velocity,
+          pedalOn: true,
           userTriggered: true,
         });
       }
@@ -161,21 +167,21 @@ simpleKeyboard = {
     var self = this;
 
     $(window).on('keyboardDown.display', function(evt, data) {
-      if (!self.condition || self.condition(data)  || data.userTriggered) {
-        var dom = $('[data-key-code="' + data.keyCode + '"]');
-
-        dom.addClass('keydown')
+      var dom = $('[data-key-code="' + data.keyCode + '"]');
+      if (data.channel !== DRUM_CHANNEL) {
+        if (!self.condition || self.condition(data)  || data.userTriggered) {
+          dom.addClass('keydown');
+        } else {
+          dom.addClass('computer-key-down');
+        }        
         dom.html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
       }
-      // if (data.channel === self.channel && !data.playedByComputer) {}
     });
 
     $(window).on('keyboardUp.display', function(evt, data) {
-      if (!self.condition || self.condition(data) || data.userTriggered) {
-        var dom = $('[data-key-code="' + data.keyCode + '"]');
-        dom.html('<span>' + dom.data('content') + '</span>')
-        dom.removeClass('keydown');
-      }
+      var dom = $('[data-key-code="' + data.keyCode + '"]');
+      dom.html('<span>' + dom.data('content') + '</span>')
+      dom.removeClass('keydown computer-key-down');
     });
   },
 

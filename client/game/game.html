@@ -5,22 +5,9 @@
     <div id='song-desc'>
       <h2>{{artist}} - {{title}}</h2>
     </div>
-
-    <div class='panel'>
-      <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
-    </div>
   {{/with}}
 
-  {{#if gameFinished}}
-    <div>
-      <img src='/headphoneMonkey.png' /> Looks like your tempo is a bit off in the middle part    
-    </div>
-    <div>
-      <a><i class='icon-film'></i> Watch</a>
-    </div>
-  {{/if}}
-
-  {{> aoeuiKeyboard}}
+  {{> keyboard}}
   {{> midiReplayer}}
 
   {{#if displayMode.infoTab}}
@@ -29,10 +16,15 @@
   {{#if displayMode.soundTab}}
     {{> soundTab}}
   {{/if}}
-  {{#if displayMode.editTab}}
-    {{> editTab}}
-  {{/if}}
 
+
+  {{#with song}}
+    <div class='panel' style='margin: 40px 0;'>
+      <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+    </div>
+  {{/with}}
+
+  {{> trackStat}}
 </div>
 
 </template>

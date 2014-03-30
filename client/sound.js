@@ -43,7 +43,7 @@ loadMidiJs = function() {
 }
 
 var DEFAULT_CHANNEL = 0;
-var DRUM_CHANNEL = 9;
+DRUM_CHANNEL = 9;
 var SYNTH_DRUM_NUMBER = 118;
 
 loadSound = function() {
@@ -66,7 +66,7 @@ loadSound = function() {
 
       $(window).off('keyboardUp.sound');
       $(window).on('keyboardUp.sound', function(evt, data) {
-          if (typeof data.noteNumber !== 'undefined' /*&& !data.pedalOn*/) {
+          if (typeof data.noteNumber !== 'undefined' && !data.pedalOn) {
             data.channel = data.channel || DEFAULT_CHANNEL;
             MIDI.noteOff(data.channel, data.noteNumber);
           }

@@ -12,6 +12,9 @@ Router.configure({
 Router.map(function() {
   this.route('songFile', {
     path: '/songFile/:_id',
+    onBeforeAction: function() {
+      GAnalytics.pageview();
+    },
     waitOn: function() {
       return [this.subscribe('songFile', this.params._id)];
     },
@@ -32,11 +35,14 @@ Router.map(function() {
     }
   });
 
-  this.route('metronome');
-  this.route('sheet');
+  // this.route('metronome');
+  // this.route('sheet');
 
   this.route('gamify', {
     path: '/gamify/:url',
+    onBeforeAction: function() {
+      GAnalytics.pageview();
+    },
     action: function() {
       var self = this;
 
@@ -44,12 +50,11 @@ Router.map(function() {
 
       Meteor.call('downloadMidi', this.params.url, function(err, songId) {
         if (err) {
-          alert(err.reason + '\nTry to upload the file from your computer.');
+          alert(err.reason + '\nTry uploading the file from your computer.');
           // console.log(err.reason);
           self.render('upload');
-        } else {
-          Router.go('editSong', {_id: songId});
         }
+        // else you should be routed to the song
       });
       
     }
@@ -66,43 +71,45 @@ Router.map(function() {
   });
 
   this.route('songApi', {
-    path: '/songsApi',
+    path: '/songsApi/:num',
     where: 'server',
     action: function() {
-      var songs = Songs.find({}, {
+      var songs = SongFiles.find({}, {
         fields: {
           _id: 1,
           createdAt: 1,
           title: 1,
-        }
+        },
+        limit: 20,
+        skip: parseInt(this.params.num) * 20,
       }).fetch();
       this.response.setHeader('Content-Type', 'application/json');
       this.response.write(JSON.stringify(songs));
     },
   });
 
-  this.route('editSong', {
-    path: '/editSong/:_id',
-    waitOn: function() {
-      return this.subscribe('song', this.params._id);
-    },
-    data: function() {
-      var data = {};
+  // this.route('editSong', {
+  //   path: '/editSong/:_id',
+  //   waitOn: function() {
+  //     return this.subscribe('song', this.params._id);
+  //   },
+  //   data: function() {
+  //     var data = {};
 
-      data.replayerSong = Songs.findOne(this.params._id);
-      data.song = data.replayerSong;
+  //     data.replayerSong = Songs.findOne(this.params._id);
+  //     data.song = data.replayerSong;
 
-      return data;
-    },
+  //     return data;
+  //   },
 
-    action: function() {
-      if (this.ready()) {
-        this.render('editSong');
-      } else {
-        this.render('loading');
-      }
-    }
-  });
+  //   action: function() {
+  //     if (this.ready()) {
+  //       this.render('editSong');
+  //     } else {
+  //       this.render('loading');
+  //     }
+  //   }
+  // });
 
   this.route('upload');
 
@@ -116,35 +123,36 @@ Router.map(function() {
     }
   });
 
-  this.route('editSong', {
-    path: '/editSong/:_id',
+  // this.route('editSong', {
+  //   path: '/editSong/:_id',
 
-    waitOn: function() {
-      return this.subscribe('song', this.params._id);
-    },
+  //   waitOn: function() {
+  //     return this.subscribe('song', this.params._id);
+  //   },
 
-    data: function() {
-      var data = {};
+  //   data: function() {
+  //     var data = {};
 
-      data.replayerSong = Songs.findOne(this.params._id);
-      data.song = data.replayerSong;
+  //     data.replayerSong = Songs.findOne(this.params._id);
+  //     data.song = data.replayerSong;
 
-      return data;
-    },
+  //     return data;
+  //   },
 
-    action: function() {
-      if (this.ready()) {
-        this.render('editSong');
-      } else {
-        this.render('loading');
-      }
-    }
-  });
+  //   action: function() {
+  //     if (this.ready()) {
+  //       this.render('editSong');
+  //     } else {
+  //       this.render('loading');
+  //     }
+  //   }
+  // });
 
   this.route('game', {
     path: '/game/:_id',
 
     onBeforeAction: function() {
+      GAnalytics.pageview();
     },
 
     waitOn: function() {
@@ -180,6 +188,7 @@ Router.map(function() {
   this.route('songs', {
     onBeforeAction: function() {
       this.subscribe('gameInfos');
+      GAnalytics.pageview();
     },
   });
 
@@ -187,6 +196,7 @@ Router.map(function() {
     onBeforeAction: function() {
       this.subscribe('myProgressIds');
       this.subscribe('mySongIds');
+      GAnalytics.pageview();
     },
 
     data: function() {
@@ -202,21 +212,22 @@ Router.map(function() {
     }
   });
 
-  this.route('progress', {
-    path: '/progress/:_id',
+  // this.route('progress', {
+  //   path: '/progress/:_id',
 
-    onBeforeAction: function() {
-      this.subscribe('progress', this.params._id).wait();
-    },
+  //   onBeforeAction: function() {
+  //     this.subscribe('progress', this.params._id).wait();
+  //     GAnalytics.pageview();
+  //   },
 
-    data: function() {
-      var data = {};
+  //   data: function() {
+  //     var data = {};
 
-      data.replayerSong = Progresses.findOne(this.params._id);
+  //     data.replayerSong = Progresses.findOne(this.params._id);
 
-      return data;
-    }
-  });
+  //     return data;
+  //   }
+  // });
 
   this.route('home', {
     path: '/',

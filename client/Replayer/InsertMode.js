@@ -1,16 +1,15 @@
 // halted when the
 LyricsInsertMode = {
   init: function() {
-    // this.noteShallPass = false; // allow the user to hear the note without progressing further
-    this.currentNote;
-
-    var self = this;
-    
     $(window).on('noteInserted.insertMode', function(evt, data) {
       MidiReplayer.start();
     });
 
     MidiReplayer.start();
+  },
+
+  destroy: function() {
+    $(window).off('noteInserted.insertMode')
   },
 
   handleData: function(data) {

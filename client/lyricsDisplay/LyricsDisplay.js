@@ -77,33 +77,39 @@ LyricsDisplay = {
       this.lyrics = lyricsTracks[0].lyrics;
       
     } else { // Load Do Re Mi from the melodicTrack instead
-      this.lyrics = [];
-      console.log(song)
-      this.lyricsTrackId = song.melodicTrackId;
-      var track = tracks[song.melodicTrackId];
-      for (var i = 0; i < track.length; i++) {
-        var note = track[i];
-        var prevNote;
+      this.loadDoReMi();
+    }
+  },
 
-        if (note.subtype === 'noteOn') {
-          var altered = $.extend({}, note);
-          var text = noteToName(note.noteNumber, false).toLowerCase();
-          if (prevNote) {
-            if (note.startTimeInBeats - prevNote.startTimeInBeats > 3) {
-              prevNote.text += '. ';
-              text = text.charAt(0).toUpperCase() + text.slice(1);
-            } else if (note.startTimeInBeats - prevNote.startTimeInBeats > 1.5) {
-              prevNote.text += ', ';
-            } else {
-              prevNote.text += ' ';
-            }
-          } else {
+  loadDoReMi: function() {
+    this.lyrics = [];
+    this.lyricsTrackId = Session.get('currentTrackId') || song.melodicTrackId;
+    
+    var tracks = song.midi.tracks;
+    var track = tracks[this.lyricsTrackId];
+    
+    for (var i = 0; i < track.length; i++) {
+      var note = track[i];
+      var prevNote;
+
+      if (note.subtype === 'noteOn') {
+        var altered = $.extend({}, note);
+        var text = noteToName(note.noteNumber, false).toLowerCase();
+        if (prevNote) {
+          if (note.startTimeInBeats - prevNote.startTimeInBeats > 3) {
+            prevNote.text += '. ';
             text = text.charAt(0).toUpperCase() + text.slice(1);
+          } else if (note.startTimeInBeats - prevNote.startTimeInBeats > 1.5) {
+            prevNote.text += ', ';
+          } else {
+            prevNote.text += ' ';
           }
-          altered.text = text;
-          this.lyrics.push(altered);
-          prevNote = altered;
+        } else {
+          text = text.charAt(0).toUpperCase() + text.slice(1);
         }
+        altered.text = text;
+        this.lyrics.push(altered);
+        prevNote = altered;
       }
     }
   },

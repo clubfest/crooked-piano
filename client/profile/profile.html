@@ -1,56 +1,11 @@
 <template name='profile'>
-  {{progress}}
-  <div id='body-wrapper'>
 
-      <div class='panel'>  
-        {{#if nextSongId}}  
-          <a id='next-btn' class='btn btn-primary' data-next-song-id='{{nextSongId}}'>
-            Next
-            <i class='icon-chevron-right'></i>
-          </a>
-        {{else}}
-          <a class='btn' href='/createSong'>
-            Create
-            <i class='icon-chevron-right'></i>
-          </a>
-        {{/if}}
-      </div>
-
-    <h2>Progress</h2>
-
-    {{#if hasSong}}
-      {{> replayer}}
-    {{/if}}
-
-    <div class='spaced-out'>
-      {{#unless currentUser}}
-        To keep you progress, {{> loginButtons}} before clicking next 
-      {{/unless}}  
-    </div>    
-
-    {{#if currentUser}}    
-      <ul id='progress-list' class='game-list'>     
-        {{#each progresses}}
-          <li class='progress-item cloud' data-progress-id='{{_id}}'>
-            <ul>
-              <li>
-                {{title}} 
-              </li>
-              <li data-id='{{_id}}'>
-                {{beautifyDate createdAt}}
-              </li>
-            </ul>
-            <span class='shadow'></span>
-          </li>            
-        {{/each}}
-      </ul>
-    {{/if}}
-
-    <h2>My Songs</h2>
+    <h2>Uploaded Songs</h2>
     <ul id='my-list' class='game-list'>
       {{#each mySongs}}    
         <li class='my-item cloud' data-game-id='{{_id}}'>
           <ul>
+            <li>{{fileName}}</li>
             <li>
               {{artist}}
             </li>
@@ -61,7 +16,7 @@
               {{beautifyDate createdAt}}            
             </li>
             <li>
-              {{playCount}} plays
+              {{viewCount}} plays
             </li>
           </ul>
           <span class='shadow'></span>
@@ -79,6 +34,5 @@
         <button id='submit-feedback'>Submit</button>
       </div>
     </div>
-  </div>
 
 </template>

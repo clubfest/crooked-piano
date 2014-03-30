@@ -1,10 +1,12 @@
-var displayModes = ['infoTab', 'soundTab', 'editTab'];
+var displayModes = ['infoTab', 'soundTab'];
+var playModes = ['pause', 'demo', 'improvise', 'practice'];
 
 Template.midiReplayer.isReplaying = function() {
   return Session.get('isReplaying');
 }
 
 Template.midiReplayer.rendered = function() {
+  Session.set('playModeId', 0);
   Session.set('displayModeId', 0);
   Session.set('playSpeed', 1 );
   if (!this.data || !this.data.song) return ;
@@ -36,20 +38,14 @@ Template.midiReplayer.rendered = function() {
     // user changing the slider
     $('#replayer-slider').slider({
       slide: function(evt, ui) {
-        Session.set('replayerIndex', ui.value);
-        // simpleRecorder.clear(); // TODO: clean up
-
-        // if slider is moved while we are replaying, need to restart at new position
-        if (Session.get('isReplaying') == true) {
-          MidiReplayer.pause();
-          MidiReplayer.start();
-        } else {
-          MidiReplayer.start();
-        }
+        MidiReplayer.pause();
         
+        Session.set('replayerIndex', ui.value);        
         Session.set('timeInTicks', MidiReplayer.notes[ui.value].startTimeInTicks);
+
         // needed for the trigger to work correctly
         $(window).trigger('replayerSliderMoved');
+        // simpleRecorder.clear(); // TODO: clean up
       }
     });  
   });
@@ -72,21 +68,44 @@ Template.midiReplayer.destroyed = function() {
 }
 
 Template.midiReplayer.events({
-  'click #replayer-start': function() {
-    if (Session.get('isReplaying')) {
-      MidiReplayer.pause();
-    } else {
-      MidiReplayer.start();      
-    }
-  },
-
   'click #display-mode-change': function() {
     Session.set('displayModeId', (Session.get('displayModeId') + 1) % displayModes.length);
-  }
+  },
+
+  'click #play-mode-change': function() {
+    var playModeId = Session.get('playModeId');
+    playModeId = (playModeId + 1) % playModes.length;
+    Session.set('playModeId', playModeId);
+    if (playModes[playModeId] === 'demo') {
+      MidiReplayer.pause();
+      MidiReplayer.clearDisplayedNotes();
+      MidiReplayer.setMode(ReplayMode);
+      MidiReplayer.start();
+
+    } else if (playModes[playModeId] === 'pause') {
+      MidiReplayer.pause();
+      MidiReplayer.clearDisplayedNotes();
+
+    } else if (playModes[playModeId] === 'practice') {
+      MidiReplayer.pause();
+      MidiReplayer.clearDisplayedNotes();
+      MidiReplayer.setMode(PracticeMode);
+      MidiReplayer.start();
+    }
+
+  },
 });
 
-Handlebars.registerHelper('displayMode', function() {
+Template.midiReplayer.helpers({  
+  playMode: function() {
+    var ret = {}
+    ret[playModes[Session.get('playModeId')]] = 1;
+    return ret;
+  },
+});
+
+UI.registerHelper('displayMode', function() {
   var ret = {}
-  ret[displayModes[Session.get('displayModeId')]] = 1
+  ret[displayModes[Session.get('displayModeId')]] = 1;
   return ret;
 });
