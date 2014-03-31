@@ -31,15 +31,14 @@ Template.upload.rendered = function() {
   var midiInput = document.getElementById('midi-input');
 
   midiInput.onchange = function(evt) {
+    $('#dragandrophandler').text('Uploading at full throttle.');
     var fileList = midiInput.files;
     if (fileList.length > 0) {
       var file = fileList[0];
       fileName = file.name.split(/(\\|\/)/g).pop();
 
       fileReader.readAsBinaryString(file);
-      // fileReader.readAsText(file, 'Big5');
-
-      
+      // fileReader.readAsText(file, 'Big5');      
     }
   }
 

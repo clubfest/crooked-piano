@@ -10,8 +10,7 @@ YouPlayer = {
     this.timeouts = [];
     Session.set('isSynchronous', true);
     Session.set('playSpeed', 0.8);
-
-    
+    Session.set('backgroundVolume', 0.8);    
     // this.reset();
 
 
@@ -260,14 +259,13 @@ YouPlayer = {
 
       if (notes[j].subtype === 'noteOn') {
         var computerNote = $.extend({},notes[j]);
-        // computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
+        computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
 
         if (notes.length > 4) {
           computerNote.velocity *= 3 / notes.length;
         }
 
         computerNote.pedalOn = true;
-        computerNote.velocity /= 2;
 
         this.prevNoteTime = notes[j].startTimeInMicroseconds; 
       
