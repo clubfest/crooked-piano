@@ -231,7 +231,7 @@ MidiReplayer = {
   },
 
   clearDisplayedNotes: function() {
-    $('.key').removeClass('keydown computer-key-down');
+    $('.key').removeClass('keydown computer-key-down my-note repeated-note');
   },
 
   displayNote: function(note) {

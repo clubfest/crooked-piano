@@ -3,15 +3,15 @@
     <div class='replayer-control'>
       <button id='play-mode-change'>
         {{#if playMode.pause}}
-          <i class='icon-play'></i>
-        {{/if}}
-
-        {{#if playMode.demo}}
           <i class='icon-hand-down'></i>
         {{/if}}
 
-        {{#if playMode.practice}}
+        {{#if playMode.demo}}
           <i class='icon-pause'></i>
+        {{/if}}
+
+        {{#if playMode.practice}}
+          <i class='icon-play'></i>
         {{/if}}
 
         {{#if playMode.improvise}}

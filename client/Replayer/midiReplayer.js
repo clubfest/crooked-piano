@@ -1,5 +1,5 @@
 var displayModes = ['infoTab', 'soundTab'];
-var playModes = ['practice', 'pause', 'demo'];
+var playModes = ['practice', 'demo', 'pause'];
 
 Template.midiReplayer.isReplaying = function() {
   return Session.get('isReplaying');
@@ -8,14 +8,11 @@ Template.midiReplayer.isReplaying = function() {
 Template.midiReplayer.rendered = function() {
   Session.set('playModeId', 0);
   Session.set('displayModeId', 0);
-  Session.set('playSpeed', 1 );
+  Session.set('playSpeed', 0.8);
   if (!this.data || !this.data.song) return ;
 
   song = this.data.song;
   Session.set('currentTrackId', song.melodicTrackId);
-
-  YouPlayer.init(song);
-  MidiReplayer.init(song);
 
   $('#replayer-slider').slider({
     range: "min",
@@ -23,6 +20,11 @@ Template.midiReplayer.rendered = function() {
     max: song.notes.length - 1,
     value: 0,
   });
+
+  YouPlayer.init(song);
+  YouPlayer.start(); //because that's the default mode
+
+  MidiReplayer.init(song);
 
   Deps.autorun(function() {
     // update slider when replayer starts
@@ -61,8 +63,8 @@ Template.midiReplayer.rendered = function() {
   Deps.autorun(function() {
     var currentTrackId = Session.get('currentTrackId');
 
-    if (currentTrackId || currentTrackId === 0) {
-      simpleKeyboard.setDisplayCondition(function(note) {
+    if (currentTrackId) {
+      simpleKeyboard.setGreenCondition(function(note) {
         return note.trackId === currentTrackId;
       });
     }
@@ -85,14 +87,13 @@ Template.midiReplayer.events({
     playModeId = (playModeId + 1) % playModes.length;
     Session.set('playModeId', playModeId);
     if (playModes[playModeId] === 'demo') {
-      MidiReplayer.pause();
+      YouPlayer.pause();
       MidiReplayer.clearDisplayedNotes();
       MidiReplayer.setMode(ReplayMode);
       MidiReplayer.start();
 
     } else if (playModes[playModeId] === 'pause') {
       MidiReplayer.pause();
-      YouPlayer.pause();
       MidiReplayer.clearDisplayedNotes();
 
     } else if (playModes[playModeId] === 'practice') {

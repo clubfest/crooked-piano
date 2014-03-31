@@ -31,7 +31,7 @@ LyricsDisplay = {
     $(window).off('noteProcessed.lyricsDisplay');
   },
 
-  initLyricsTrack: function() {
+  initLyricsTrack: function(song) {
     var tracks = song.midi.tracks;
     var lyricsTracks = []; // possible lyrics tracks
     var MIN_WORDS = 20; // e.g. happy birthday

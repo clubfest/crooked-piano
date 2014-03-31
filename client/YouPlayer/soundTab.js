@@ -32,6 +32,9 @@ Template.soundTab.events({
     Session.set('isSynchronous', false);
     YouPlayer.transferProximateNotesToComputer();
   },
+  'click #switch-track': function() {
+    YouPlayer.switchTrack();
+  },
 });
 
 Template.soundTab.isSynchronous = function() {

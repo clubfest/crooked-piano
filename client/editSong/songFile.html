@@ -23,8 +23,17 @@
       <a onclick="alert('Click the settings button at the lower right of the Crooked Piano and adjust to make it easy for others to play')">help</a>   
     </div>
   </div>
-  {{> aoeuiKeyboard}}
+  {{> keyboard}}
   {{> midiReplayer}}
+
+  {{> tabs}}
+
+  {{#if displayMode.infoTab}}
+    {{> infoTab}}
+  {{/if}}
+  {{#if displayMode.soundTab}}
+    {{> soundTab}}
+  {{/if}}
 
   {{> tempoTab}}
   {{> lyricsDisplay}}

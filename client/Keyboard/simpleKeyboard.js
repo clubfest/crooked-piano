@@ -159,8 +159,8 @@ simpleKeyboard = {
     });
   },
 
-  setDisplayCondition: function(condition) {
-    this.condition = condition; // condition(note)
+  setGreenCondition: function(condition) {
+    this.greenCondition = condition; // condition(note)
   },
 
   connectKeyboardToDisplay: function() {
@@ -169,8 +169,10 @@ simpleKeyboard = {
     $(window).on('keyboardDown.display', function(evt, data) {
       var dom = $('[data-key-code="' + data.keyCode + '"]');
       if (data.channel !== DRUM_CHANNEL) {
-        if (!self.condition || self.condition(data)  || data.userTriggered) {
+        if (data.userTriggered) {
           dom.addClass('keydown');
+        } else if (self.greenCondition && self.greenCondition(data)) {
+          dom.addClass('my-note keydown')
         } else {
           dom.addClass('computer-key-down');
         }        
@@ -181,7 +183,7 @@ simpleKeyboard = {
     $(window).on('keyboardUp.display', function(evt, data) {
       var dom = $('[data-key-code="' + data.keyCode + '"]');
       dom.html('<span>' + dom.data('content') + '</span>')
-      dom.removeClass('keydown computer-key-down');
+      dom.removeClass('keydown computer-key-down my-note');
     });
   },
 

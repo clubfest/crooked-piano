@@ -178,6 +178,10 @@ Uploader = {
         trackInfos[trackId].channel = note.channel;
 
       } else if (note.subtype === 'noteOn') {
+        if (!trackInfos[trackId].numOfNotes) {
+          trackInfos[trackId].trackStartInMicroseconds = note.startTimeInMicroseconds;
+        }
+        
         trackInfos[trackId].numOfNotes++;
         trackInfos[trackId].averageNoteNumber += note.noteNumber;
 
@@ -245,8 +249,8 @@ Uploader = {
       if (err) {
         alert(err.reason);
       } else {
-        // Router.go('songFile', {_id: songId});
-        Router.go('game', {_id: songId});
+        Router.go('songFile', {_id: songId});
+        // Router.go('game', {_id: songId});
       }
     });
   },

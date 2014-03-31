@@ -1,36 +1,48 @@
 <template name='soundTab'>
 
+<div class='panel'>
+      {{!-- shift track --}}
+      <div>
+        <div>
+          <button id='switch-track'>
+            <i class='icon-random'></i>
+            Switch Track
+          </button>
+        </div>
+      </div>
+
+      <div>
+        {{#if isSynchronous}}
+          <button id='asynchronous'>
+            Improvise
+            <i class='icon-play'></i>
+          </button>
+        {{else}}
+          <button id='synchronous'>
+            Practice
+            <i class='icon-step-forward'></i>
+          </button>
+        {{/if}}
+      </div>
+      
+    </div>
+
   <div align='center'>
     <div class='panel'>
       {{!-- speed --}}
       <div class='slider-block'>
-        <i class='icon-truck'></i> Speed
+        <div class='control-heading'>
+          Speed
+        </div>
         <div id='speed-slider'></div>
       </div>
-      <div>
-        {{#if isSynchronous}}
-          <button id='asynchronous'>
-            Free Style
-          </button>
-        {{else}}
-          <button id='synchronous'>
-            Slow Style
-          </button>
-        {{/if}}
-      </div>
+      
     </div>
 
+    
+
+
     <div class='panel'>
-      {{!-- shift track --}}
-      <div>
-        <div class='control-heading'>
-          Track: trackName
-        </div>
-        <div>
-          <button id='shift-down'>Switch</button>
-        </div>
-      </div>
-      
       {{!-- shift song --}}
       <div>
         <div class='control-heading'>
@@ -42,17 +54,9 @@
           <button id='shift-up'><i class='icon-plus'></i></button>  
         </div>
       </div>
-    </div>
-
-
-    <div class='panel'>
       <div>
-        <div class='control-heading'>
-          Notation: Do Re Mi
-        </div>
-        <div>
-          <button id='switch-notation'>A B C</button>
-        </div>
+        Chord: {{chord}}
+        <button id='switch-notation'>Switch Notation</button>
       </div>
     </div>
 
