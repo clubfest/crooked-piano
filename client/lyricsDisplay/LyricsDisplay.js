@@ -17,7 +17,8 @@ LyricsDisplay = {
     if (this.lyrics) {
       this.updateLyricsForDisplay();
 
-      // TODO: not too clean because noteProcessed means before it's played
+      // TODO: noteProcessed means before it's played, so I can't use keyboardDown
+      // This is to support lyrics insertion
       $(window).on('noteProcessed.lyricsDisplay', function(evt, data) {
         if (data.trackId === self.lyricsTrackId) {
           self.updateLyricsForDisplay();

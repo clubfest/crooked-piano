@@ -31,13 +31,13 @@
   }
 }
 
-.piano-keyboard .keyboard .computer-note {
+.piano-keyboard .keyboard .key.computer-note {
   font-size: 24px;
   background: #E99;
 }
 
 .piano-keyboard .keyboard .key.repeated-note {
-  background: #2F5;
+  background: #7F1;
 }
 
 .song-version {
@@ -45,11 +45,11 @@
 }
 
 .guitar-keyboard .keyboard .key.my-note {
-  background: #5F5;
+  background: #7F7;
   /*font-size: 24px;*/
 }
 
-.guitar-keyboard .keyboard .computer-note {
+.guitar-keyboard .keyboard .key.computer-note {
   font-size: 24px;
   background: #E99;
 }

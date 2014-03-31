@@ -40,10 +40,16 @@ Template.midiReplayer.rendered = function() {
     // user changing the slider
     $('#replayer-slider').slider({
       slide: function(evt, ui) {
-        MidiReplayer.pause();
+        if (playModes[Session.get('playModeId')] === "demo") {
+          MidiReplayer.pause();
+        }
         
         Session.set('replayerIndex', ui.value);        
         Session.set('timeInTicks', MidiReplayer.notes[ui.value].startTimeInTicks);
+
+        if (playModes[Session.get('playModeId')] === "demo") {
+          MidiReplayer.start();
+        }
 
         // needed for the trigger to work correctly
         $(window).trigger('replayerSliderMoved');
@@ -91,6 +97,7 @@ Template.midiReplayer.events({
 
     } else if (playModes[playModeId] === 'practice') {
       MidiReplayer.pause();
+      MidiReplayer.clearDisplayedNotes();
       YouPlayer.start();
     }
 

@@ -63,25 +63,36 @@ Uploader = {
 
   guessMelodyTrackId: function() {
     // the best is a even distribution among the first
-    var trackInfos = []
+    var trackInfos = [];
 
     var scores = [];
     for (var i = 0; i < this.midi.tracks.length; i++) {
-      if (this.trackInfos[i].numOfNotes > 10) {
+      var info = this.trackInfos[i];
+
+      if (info.numOfNotes > 1) {
         var tallyA = [];
-        var a = this.trackInfos[i];
-        for (var i = 0; i < 3; i++) { // 6 is arbitrary
-          if (!a.melodicJumpFrequencies[i]) {
+
+        for (var j = 0; j < 3; j++) { // 6 is arbitrary
+          if (!info.melodicJumpFrequencies[j]) {
             tallyA.push(0);
           } else {
-            tallyA.push(a.melodicJumpFrequencies[i]);
+            tallyA.push(info.melodicJumpFrequencies[j]);
           }
         }
-        a.melodicJumpVariance = average(tallyA).variance;
+        info.melodicJumpVariance = variance(tallyA);
 
-        trackInfos.push(a);
+        trackInfos.push(info);
       }
     }
+    // var tempTrackInfos = trackInfos;
+    // trackInfos = [];
+
+    // for (var i = 0; i < tempTrackInfos.length; i++) {
+    //   var info = tempTrackInfos[i];
+    //   if (info.numOfNotes * tempTrackInfos.length * 8 > this.notes.length) {
+    //     trackInfos.push(info);
+    //   }
+    // }
 
     trackInfos.sort(function(a, b) {
       return a.melodicJumpVariance - b.melodicJumpVariance;
@@ -174,7 +185,7 @@ Uploader = {
 
         if (prevNote) {
           var melodicJumpFrequencies = trackInfos[trackId].melodicJumpFrequencies;
-          var jump = note.noteNumber - prevNote.noteNumber;
+          var jump = Math.abs(note.noteNumber - prevNote.noteNumber);
 
 
           if (!melodicJumpFrequencies[jump]) {

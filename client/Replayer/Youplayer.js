@@ -5,26 +5,32 @@ YouPlayer = {
   init: function(song) {
     var self = this;
 
+    this.song = song;
+    this.playNotes = song.notes;
+    Session.set('isSynchronous', true);
+    Session.set('playSpeed', 0.8);
+    // this.reset();
+
+
+    // simpleRecorder.init();
+  },
+
+  destroy: function() {
+    $(window).off('keyboardDown.youPlayer');
+    this.reset();
+  },
+
+  start: function() {
+    this.reset();
+    this.paused = false;
+    var self = this;
+
     $(window).off('keyboardDown.youPlayer');
     $(window).on('keyboardDown.youPlayer', function(evt, data) {
       if (data.playedByComputer !== true) {
         self.judge(data);
       }
     });
-
-    this.song = song;
-    this.playNotes = song.notes;
-
-    simpleRecorder.init();
-  },
-
-  destroy: function() {
-    this.reset();
-    $(window).off('keyboardDown.youPlayer');
-  },
-
-  start: function() {
-    this.reset();
     this.updateProximateNotes();
   },
 
@@ -33,14 +39,7 @@ YouPlayer = {
   },
 
   reset: function() {
-    if (Session.get('hasMidiNoteOn')) { 
-      // MIDI.js also use setTimeout
-      // so we must check that we are the only program using the timeout.
-      var highestTimeoutId = setTimeout(";");
-      for (var i = 0 ; i < highestTimeoutId ; i++) {
-          clearTimeout(i); 
-      }
-    }
+    this.paused = true;   
 
     Session.set('numCorrect', 0);
     Session.set('numWrong', 0);
@@ -52,9 +51,9 @@ YouPlayer = {
       Session.set('replayerIndex', 0);
     }
 
-    simpleRecorder.stop();
-    simpleRecorder.clear();
-    simpleRecorder.start();
+    // simpleRecorder.stop();
+    // simpleRecorder.clear();
+    // simpleRecorder.start();
 
     if (this.proximateNotes && this.computerProximateNotes) {
       this.undisplayNotes();
@@ -108,7 +107,7 @@ YouPlayer = {
     for (var i = 0; i < this.proximateNotes.length; i++) {
       var note = this.proximateNotes[i];
 
-      if (data.note === note.note || data.keyCode === note.keyCode) {
+      if (data.noteNumber === note.noteNumber || data.keyCode === note.keyCode) {
         matchIdx = i;
         break ;
       }
@@ -158,21 +157,23 @@ YouPlayer = {
       var note = $.extend({}, this.playNotes[this.getReplayerIndex()]);
       this.incrementReplayerIndex(); // TODO: simplify this
 
-      if (note.subtype === 'noteOff') {
+      if (note.subtype !== 'noteOn') {
         continue;
       } 
+
+      Session.set('timeInTicks', note.startTimeInTicks); 
       
       if (Session.get('shift') !== 0 || !note.keyCode) {
-        note.note += Session.get('shift');
-        note.keyCode = convertNoteToKeyCode(note.note);
+        note.noteNumber += Session.get('shift') || 0;
+        note.keyCode = convertNoteToKeyCode(note.noteNumber);
       }
 
       if (this.isComputerNote(note)) {
         this.computerProximateNotes.push(note);
-
       } else {
+        $(window).trigger('noteProcessed', note); // for lyrics display
         if (this.proximateNotes.length > 0) {
-          if (note.note > this.proximateNotes[0].note) {
+          if (note.noteNumber > this.proximateNotes[0].noteNumber) {
             var lowerNote = this.proximateNotes[0];
             var higherNote = note;
           } else {
@@ -212,7 +213,9 @@ YouPlayer = {
 
         window.setTimeout(function() {
           self.playComputerProximateNotes();
-          self.updateProximateNotes();
+          if (!self.paused) {
+            self.updateProximateNotes();
+          }
         }, wait);
       }
     } else if (!Session.get('isSynchronous')) {
@@ -232,7 +235,9 @@ YouPlayer = {
         }
         self.undisplayNotes();
         self.proximateNotes = [];
-        self.updateProximateNotes();
+        if (!self.paused) {
+          self.updateProximateNotes();
+        }
       }, wait);
     }
   },
@@ -241,15 +246,21 @@ YouPlayer = {
     var self = this;
     var notes = this.computerProximateNotes;
     for (var j = 0; j < notes.length; j++) {
-      var computerNote = $.extend({},notes[j]);
-      computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
-
-      if (notes.length > 5) {
-        computerNote.velocity *= 4 / notes.length;
-      }
-
       // must do this first as we will change the time for recording purposes
-      if (computerNote.subtype === 'noteOn') {
+
+      if (notes[j].subtype === 'noteOn') {
+        var computerNote = $.extend({},notes[j]);
+        // computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
+
+        if (notes.length > 5) {
+          computerNote.velocity *= 4 / notes.length;
+        }
+
+        if (Session.get('isSynchronous')) {
+          computerNote.pedalOn = true;
+          computerNote.velocity /= 2;
+        }
+
         this.prevNoteTime = notes[j].startTimeInMicroseconds; 
       
         computerNote.playedByComputer = true;
@@ -259,9 +270,10 @@ YouPlayer = {
 
         self.undisplayNote(computerNote);
 
-        // window.setTimeout(function(note) {        
-        //   $(window).trigger('keyboardUp', note); // for recording purposes
-        // }, computerNote.durationInMicroseconds / 1000, computerNote);
+        var duration = (computerNote.endTimeInMicroseconds - computerNote.startTimeInMicroseconds) / 1000;
+        window.setTimeout(function(note) {        
+          $(window).trigger('keyboardUp', note); // for recording purposes
+        }, duration, computerNote);
       }
     }  
     this.computerProximateNotes = []; 
@@ -269,29 +281,25 @@ YouPlayer = {
 
   gameOver: function() {
     var self = this; 
-    if (Session.get('isDemoing')) {
-      self.reset();
-    } else {
-      // TODO: record the melodic part
-      // self.saveGame();
+    // TODO: record the melodic part
+    // self.saveGame();
 
-      window.setTimeout(function() { 
-        tallyScore();
-      }, WAIT_TIME);
-    }
+    window.setTimeout(function() { 
+      tallyScore();
+    }, WAIT_TIME);
   },
 
   saveGame: function() {
-    simpleRecorder.stop();
+    // simpleRecorder.stop();
 
-    // compute the last note for merging purposes; must be in timeout to have all the notes
-    for (var i = simpleRecorder.notes.length - 1; i >= 0; i--) {
-      var endNote = simpleRecorder.notes[i];
-      if (endNote.isKeyboardDown === true) {
-        endTime = endNote.time;
-        break;
-      }  
-    }
+    // // compute the last note for merging purposes; must be in timeout to have all the notes
+    // for (var i = simpleRecorder.notes.length - 1; i >= 0; i--) {
+    //   var endNote = simpleRecorder.notes[i];
+    //   if (endNote.isKeyboardDown === true) {
+    //     endTime = endNote.time;
+    //     break;
+    //   }  
+    // }
 
     // var version = this.getTrackId();
     // var tempLength = TempGames.incomplete.length;
@@ -322,30 +330,18 @@ YouPlayer = {
 
   coincidingNextNotes: function(note) {
     /* For seeing if any proximateNotes match with next cluster of proximateNotes */
-    var idx = this.getReplayerIndex();
+    var idx = this.getReplayerIndex() + 1;
 
-    if (idx < this.playNotes.length) {
+    while(idx < this.playNotes.length) {
       var nextNote = this.playNotes[idx];
-      while (this.isComputerNote(nextNote)){
-        idx++;
-
-        if (idx === this.playNotes.length) {
-          return false;
-        }
-
-        nextNote = this.playNotes[idx];
-      }
-
-      var nextTime = nextNote.startTimeInMicroseconds;
-
-      while ( idx < this.playNotes.length && nextNote.startTimeInMicroseconds - nextTime < CLUSTER_TIME) {
-        if (nextNote.keyCode === note.keyCode && !this.isComputerNote(nextNote)) {
+      if (nextNote.subtype === 'noteOn' && nextNote.trackId === note.trackId) {
+        if (nextNote.noteNumber + (Session.get('shift')||0) === note.noteNumber) {
           return true;
         } else {
-          idx++;
-          nextNote = this.playNotes[idx];
+          return false;
         }
       }
+      idx++;
     }
 
     return false;
@@ -359,21 +355,25 @@ YouPlayer = {
     }
 
     var dom = $('[data-key-code='+note.keyCode+']');
+
+    if (dom.hasClass('computer-key-down')) {
+      dom.removeClass('computer-key-down');
+    }
     dom.addClass(displayClass);
     dom.html('<span>'+dom.data('content')+'</span>')
   },
 
   displayComputerNote: function(note) {
     var dom = $('[data-key-code='+note.keyCode+']');
-    dom.addClass('computer-note')
     if (!dom.hasClass('my-note')) {
-      dom.html('<span>'+noteToName(note.note, Session.get('isAlphabetNotation'))+'</span>');
+      dom.addClass('computer-key-down');
+      dom.html('<span>'+noteToName(note.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
     }
 
     for (var i = 0; i < 2; i++) {
-      noteNumber = note.note + i * 12;
+      noteNumber = note.noteNumber + i * 12;
       dom = $('[data-note='+noteNumber+']');
-      dom.addClass('computer-note');
+      dom.addClass('computer-key-down');
       dom.html('<span>'+noteToName(noteNumber, Session.get('isAlphabetNotation'))+'</span>');
     }
       
@@ -402,12 +402,12 @@ YouPlayer = {
   undisplayNote: function(note) {
     // TODO: undisplay repeated notes properly
     var dom = $('[data-key-code='+note.keyCode+']');
-    dom.removeClass('my-note computer-note repeated-note');
+    dom.removeClass('my-note computer-key-down repeated-note');
 
     for (var i = 0; i < 2; i++) {
-      noteNumber = note.note + 12 * i;
+      noteNumber = note.noteNumber + 12 * i;
       dom = $('[data-note='+noteNumber+']');
-      dom.removeClass('my-note computer-note repeated-note');
+      dom.removeClass('my-note computer-key-down repeated-note');
     }
   },
 
