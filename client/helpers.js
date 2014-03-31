@@ -1,19 +1,19 @@
 
-Handlebars.registerHelper('message', function() {
+UI.registerHelper('message', function() {
   return Session.get('message');
 });
 
-Handlebars.registerHelper('youtubeId', function() {
+UI.registerHelper('youtubeId', function() {
   // this should be a song context
   return this.youtubeId;
 });
 
-Handlebars.registerHelper('absoluteUrl', function() {
+UI.registerHelper('absoluteUrl', function() {
   // this should be a song context
   return Meteor.absoluteUrl();
 });
 
-Handlebars.registerHelper('isIos', function() {
+UI.registerHelper('isIos', function() {
   return IS_IOS;
 });
 

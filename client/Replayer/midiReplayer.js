@@ -22,10 +22,10 @@ Template.midiReplayer.rendered = function() {
     value: 0,
   });
 
+  MidiReplayer.init(song);
+
   YouPlayer.init(song);
   YouPlayer.start(); //because that's the default mode
-
-  MidiReplayer.init(song);
 
   Deps.autorun(function() {
     // update slider when replayer starts

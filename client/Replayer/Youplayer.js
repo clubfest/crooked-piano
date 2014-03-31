@@ -126,9 +126,8 @@ YouPlayer = {
 
     if (matchIdx > -1) {
       this.incrementScore();
-
       if (Session.get('isSynchronous')) {
-        this.proximateNotes.splice(matchIdx, 1);
+        var res = this.proximateNotes.splice(matchIdx, 1);
         this.undisplayNote(note);
         this.prevNoteTime = note.startTimeInMicroseconds;
       }
@@ -139,7 +138,6 @@ YouPlayer = {
           this.playComputerProximateNotes();
         }
         this.updateProximateNotes();
-
       }
     } else {
       // if (data.playedByComputer !== true) {
