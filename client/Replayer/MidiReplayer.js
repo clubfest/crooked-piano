@@ -217,10 +217,12 @@ MidiReplayer = {
     if (note.subtype === 'noteOn') {
       note.keyCode = convertNoteToKeyCode(note.noteNumber);
       $(window).trigger('keyboardDown', note);
+      this.displayNote(note);
 
     } else if (note.subtype === 'noteOff') {
       note.keyCode = convertNoteToKeyCode(note.noteNumber);
       $(window).trigger('keyboardUp', note);
+      this.clearDisplayedNote(note);
 
     } else if (note.subtype === 'setTempo') {
       MidiReplayer.microsecondsPerBeat = note.microsecondsPerBeat;
@@ -231,11 +233,20 @@ MidiReplayer = {
   },
 
   clearDisplayedNotes: function() {
-    $('.key').removeClass('keydown computer-key-down my-note repeated-note');
+    $('.key').removeClass('keydown computer-note my-note');
+  },
+
+  clearDisplayedNote: function(note) {
+    var dom = $('[data-key-code='+note.keyCode+']');
+    dom.removeClass('keydown computer-note my-note')
   },
 
   displayNote: function(note) {
-    var displayClass = 'my-note';
+    if (note.trackId === Session.get('currentTrackId')) {
+      var displayClass = 'my-note';
+    } else {
+      var displayClass = 'computer-note';
+    }
     var keyCode = convertNoteToKeyCode(note.noteNumber)
     var dom = $('[data-key-code='+keyCode+']');
     dom.addClass(displayClass);

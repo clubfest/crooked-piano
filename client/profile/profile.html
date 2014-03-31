@@ -5,13 +5,10 @@
       {{#each mySongs}}    
         <li class='my-item cloud' data-game-id='{{_id}}'>
           <ul>
+            <li>
+              {{artist}} - {{title}}
+            </li>
             <li>{{fileName}}</li>
-            <li>
-              {{artist}}
-            </li>
-            <li>
-              {{title}}
-            </li>
             <li>
               {{beautifyDate createdAt}}            
             </li>
@@ -23,6 +20,16 @@
         </li>
       {{/each}}
     </ul>
+
+    {{#unless noMoreSongs}}
+      <div align='center'>
+        <a id='load-more-games' class='btn'>
+          <i class='icon-chevron-down'></i>
+          More Songs
+        </a>
+      </div>
+    {{/unless}}
+      
 
 
     <h2>Feeling Generous?</h2>

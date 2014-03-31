@@ -7,8 +7,11 @@ YouPlayer = {
 
     this.song = song;
     this.playNotes = song.notes;
+    this.timeouts = [];
     Session.set('isSynchronous', true);
     Session.set('playSpeed', 0.8);
+
+    
     // this.reset();
 
 
@@ -39,6 +42,11 @@ YouPlayer = {
   },
 
   reset: function() {
+    for (var i = 0; i < this.timeouts.length; i++) {
+      clearTimeout(this.timeouts[i]);
+    }
+
+    this.timeouts = [];
     this.paused = true;   
 
     Session.set('numCorrect', 0);
@@ -65,6 +73,8 @@ YouPlayer = {
   },
 
   switchTrack: function(newTrackId) { 
+    this.undisplayNotes();
+
     if (typeof newTrackId === "undefined") {
       for (var i = 0; i < this.computerProximateNotes.length; i++) {
         var note = this.computerProximateNotes[i];
@@ -90,6 +100,7 @@ YouPlayer = {
     }
 
     this.transferProximateNotesToComputer();
+    this.redisplayNotes();
   },
 
   transferProximateNotesToComputer: function() {
@@ -115,6 +126,7 @@ YouPlayer = {
 
     if (matchIdx > -1) {
       this.incrementScore();
+
       if (Session.get('isSynchronous')) {
         this.proximateNotes.splice(matchIdx, 1);
         this.undisplayNote(note);
@@ -153,7 +165,7 @@ YouPlayer = {
       return;
     }
 
-    while(1) {
+    while(this.getReplayerIndex() < this.playNotes.length) {
       var note = $.extend({}, this.playNotes[this.getReplayerIndex()]);
       this.incrementReplayerIndex(); // TODO: simplify this
 
@@ -211,12 +223,12 @@ YouPlayer = {
           wait = (this.computerProximateNotes[0].startTimeInMicroseconds - this.prevNoteTime) / Session.get('playSpeed') / 1000;
         }
 
-        window.setTimeout(function() {
+        this.timeouts.push(window.setTimeout(function() {
           self.playComputerProximateNotes();
           if (!self.paused) {
             self.updateProximateNotes();
           }
-        }, wait);
+        }, wait));
       }
     } else if (!Session.get('isSynchronous')) {
       var wait = 0;
@@ -229,7 +241,7 @@ YouPlayer = {
 
         
 
-      window.setTimeout(function() {
+      this.timeouts.push(window.setTimeout(function() {
         if (self.computerProximateNotes.length > 0) {          
           self.playComputerProximateNotes();
         }
@@ -238,7 +250,7 @@ YouPlayer = {
         if (!self.paused) {
           self.updateProximateNotes();
         }
-      }, wait);
+      }, wait));
     }
   },
 
@@ -252,14 +264,12 @@ YouPlayer = {
         var computerNote = $.extend({},notes[j]);
         // computerNote.velocity *= Session.get('backgroundVolume'); // make computer less loud
 
-        if (notes.length > 5) {
-          computerNote.velocity *= 4 / notes.length;
+        if (notes.length > 4) {
+          computerNote.velocity *= 3 / notes.length;
         }
 
-        if (Session.get('isSynchronous')) {
-          computerNote.pedalOn = true;
-          computerNote.velocity /= 2;
-        }
+        computerNote.pedalOn = true;
+        computerNote.velocity /= 2;
 
         this.prevNoteTime = notes[j].startTimeInMicroseconds; 
       
@@ -268,7 +278,7 @@ YouPlayer = {
 
         $(window).trigger('keyboardDown', computerNote);
 
-        self.undisplayNote(computerNote);
+        self.undisplayComputerNote(computerNote);
 
         var duration = (computerNote.endTimeInMicroseconds - computerNote.startTimeInMicroseconds) / 1000;
         window.setTimeout(function(note) {        
@@ -280,13 +290,15 @@ YouPlayer = {
   },
 
   gameOver: function() {
-    var self = this; 
+    Session.set('replayerIndex', 0);
+    YouPlayer.pause();
+    // var self = this; 
     // TODO: record the melodic part
     // self.saveGame();
 
-    window.setTimeout(function() { 
-      tallyScore();
-    }, WAIT_TIME);
+    // window.setTimeout(function() { 
+    //   tallyScore();
+    // }, WAIT_TIME);
   },
 
   saveGame: function() {
@@ -330,7 +342,7 @@ YouPlayer = {
 
   coincidingNextNotes: function(note) {
     /* For seeing if any proximateNotes match with next cluster of proximateNotes */
-    var idx = this.getReplayerIndex() + 1;
+    var idx = this.getReplayerIndex();
 
     while(idx < this.playNotes.length) {
       var nextNote = this.playNotes[idx];
@@ -349,15 +361,14 @@ YouPlayer = {
 
   displayNote: function(note) {
     var displayClass = 'my-note '
-
     if (this.coincidingNextNotes(note)) {
       displayClass += " repeated-note"
     }
 
     var dom = $('[data-key-code='+note.keyCode+']');
 
-    if (dom.hasClass('computer-key-down')) {
-      dom.removeClass('computer-key-down');
+    if (dom.hasClass('computer-note')) {
+      dom.removeClass('computer-note');
     }
     dom.addClass(displayClass);
     dom.html('<span>'+dom.data('content')+'</span>')
@@ -366,22 +377,22 @@ YouPlayer = {
   displayComputerNote: function(note) {
     var dom = $('[data-key-code='+note.keyCode+']');
     if (!dom.hasClass('my-note')) {
-      dom.addClass('computer-key-down');
+      dom.addClass('computer-note');
       dom.html('<span>'+noteToName(note.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
     }
 
-    for (var i = 0; i < 2; i++) {
-      noteNumber = note.noteNumber + i * 12;
-      dom = $('[data-note='+noteNumber+']');
-      dom.addClass('computer-key-down');
-      dom.html('<span>'+noteToName(noteNumber, Session.get('isAlphabetNotation'))+'</span>');
-    }
+    // for (var i = 0; i < 2; i++) {
+    //   noteNumber = note.noteNumber + i * 12;
+    //   dom = $('[data-note='+noteNumber+']');
+    //   dom.addClass('computer-note');
+    //   dom.html('<span>'+noteToName(noteNumber, Session.get('isAlphabetNotation'))+'</span>');
+    // }
       
   },
 
   undisplayNotes: function() {
     for (var i = 0; i < this.computerProximateNotes.length; i++) {
-      this.undisplayNote(this.computerProximateNotes[i]);
+      this.undisplayComputerNote(this.computerProximateNotes[i]);
     }
 
     for (var i = 0; i < this.proximateNotes.length; i++) {
@@ -399,16 +410,21 @@ YouPlayer = {
     }
   },
 
+  undisplayComputerNote: function(note) {
+    var dom = $('[data-key-code='+note.keyCode+']');
+    dom.removeClass('computer-note');
+  },
+
   undisplayNote: function(note) {
     // TODO: undisplay repeated notes properly
     var dom = $('[data-key-code='+note.keyCode+']');
-    dom.removeClass('my-note computer-key-down repeated-note');
+    dom.removeClass('my-note repeated-note');
 
-    for (var i = 0; i < 2; i++) {
-      noteNumber = note.noteNumber + 12 * i;
-      dom = $('[data-note='+noteNumber+']');
-      dom.removeClass('my-note computer-key-down repeated-note');
-    }
+    // for (var i = 0; i < 2; i++) {
+    //   noteNumber = note.noteNumber + 12 * i;
+    //   dom = $('[data-note='+noteNumber+']');
+    //   dom.removeClass('my-note computer-note repeated-note');
+    // }
   },
 
   incrementScore: function() {

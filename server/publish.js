@@ -1,11 +1,41 @@
+var songsPerPage = 10;
 Meteor.publish('userTracks', function(songId) {
   return UserTracks.find({songId: songId});
 });
 
 // todo: add infinite scrolling
 Meteor.publish('songFile', function(songId) {
-  return SongFiles.find({_id: songId});
+  return SongFiles.find({_id: songId, public: true});
 });
+
+Meteor.publish('mySongFile', function(songId) {
+  return SongFiles.find({_id: songId, creatorId: this.userId});
+});
+
+Meteor.publish('mySongFilesInfo', function(opts) {
+  var page = opts.page || 1;
+
+  return SongFiles.find({creatorId: this.userId}, {
+    fields: {
+      notes: 0,
+      midi: 0,
+    },
+    limit: page * songsPerPage,
+  });
+});
+
+Meteor.publish('songFilesInfo', function(opts) {
+  var page = opts.page || 1;
+
+  return SongFiles.find({public: true}, {
+    fields: {
+      notes: 0,
+      midi: 0,
+    }, 
+    limit: page * songsPerPage,
+  });
+});
+
 
 Meteor.publish('gameInfos', function() {
   return Songs.find({}, {

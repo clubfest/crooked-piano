@@ -9,7 +9,6 @@ LyricsDisplay = {
     this.ticksPerBeat = song.midi.header.ticksPerBeat;
     this.startIndex = 0;
     Session.set('lyricsForDisplay', []);
-
     this.initLyricsTrack(song);
 
     var self = this;
@@ -29,6 +28,7 @@ LyricsDisplay = {
 
   destroy: function() {
     $(window).off('noteProcessed.lyricsDisplay');
+    Session.set('lyricsForDisplay', []);
   },
 
   initLyricsTrack: function(song) {
@@ -78,17 +78,17 @@ LyricsDisplay = {
       this.lyrics = lyricsTracks[0].lyrics;
       
     } else { // Load Do Re Mi from the melodicTrack instead
-      this.loadDoReMi();
+      this.loadDoReMi(song);
     }
   },
 
-  loadDoReMi: function() {
+  loadDoReMi: function(song) {
     this.lyrics = [];
     this.lyricsTrackId = Session.get('currentTrackId') || song.melodicTrackId;
     
     var tracks = song.midi.tracks;
     var track = tracks[this.lyricsTrackId];
-    
+
     for (var i = 0; i < track.length; i++) {
       var note = track[i];
       var prevNote;

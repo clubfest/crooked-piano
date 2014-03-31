@@ -113,7 +113,7 @@ Uploader = {
       }
     });
 
-    trackInfos = trackInfos.slice(0, 5); // top 5 instruments
+    trackInfos = trackInfos.slice(0, 4); // top 5 instruments
 
     trackInfos.sort(function(a, b) {
       return a.melodicJumpVariance - b.melodicJumpVariance;

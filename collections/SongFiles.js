@@ -3,8 +3,30 @@ SongFiles = new Meteor.Collection('songFiles');
 
 Meteor.methods({
   createSongFile: function(hash) {
+    var user = Meteor.user();
+    if (!user) {
+      throw new Meteor.Error(413, 'Need to sign in before creating a song');
+    }
+
+    hash.public = false;
+    hash.creatorId = user._id;
+    hash.createdAt = new Date;
+
     var songId = SongFiles.insert(hash);
     return songId;
+  },
+
+  gamify: function(songId) {
+    var user = Meteor.user();
+    if (!user) {
+      throw new Meteor.Error(413, 'Need to sign in before creating a song');
+    }
+
+    SongFiles.update(songId, {
+      $set: {
+        public: true,
+      }
+    });
   },
 
   createTrack: function(songId, trackName) {

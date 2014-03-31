@@ -169,21 +169,18 @@ simpleKeyboard = {
     $(window).on('keyboardDown.display', function(evt, data) {
       var dom = $('[data-key-code="' + data.keyCode + '"]');
       if (data.channel !== DRUM_CHANNEL) {
-        if (data.userTriggered) {
+        if (data.userTriggered){
           dom.addClass('keydown');
-        } else if (self.greenCondition && self.greenCondition(data)) {
-          dom.addClass('my-note keydown')
-        } else {
-          dom.addClass('computer-key-down');
-        }        
+        }
         dom.html('<span>'+noteToName(data.noteNumber, Session.get('isAlphabetNotation'))+'</span>');
       }
     });
 
     $(window).on('keyboardUp.display', function(evt, data) {
       var dom = $('[data-key-code="' + data.keyCode + '"]');
-      dom.html('<span>' + dom.data('content') + '</span>')
-      dom.removeClass('keydown computer-key-down my-note');
+      dom.html('<span>' + dom.data('content') + '</span>');
+      
+      dom.removeClass('keydown');
     });
   },
 

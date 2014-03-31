@@ -71,6 +71,10 @@
   background: #AA6;
 }
 
+.piano-keyboard .keyboard .key.computer-note {
+  background: #AA6;
+}
+
 /*.keyboard .key :active, .keydown {
   color: #888;
   background: #ebeced;

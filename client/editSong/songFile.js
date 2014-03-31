@@ -1,7 +1,8 @@
 
-Template.songFile.rendered = function() {
-  var songId = this.data.song._id;
+var songId;
 
+Template.songFile.rendered = function() {
+  songId = this.data.song._id;
 
   $('#title-editable').editable({
     emptytext: 'Title',
@@ -47,3 +48,19 @@ Template.songFile.rendered = function() {
     },
   });
 }
+
+Template.songFile.events({
+  'click #gamify-btn': function(evt, tmpl) {
+    if (!tmpl.data.song.youtubeId || !tmpl.data.song.title) {
+      alert('Please provide a youtube link and title before gamifying');
+      return;
+    }
+    Meteor.call('gamify', songId, function(err) {
+      if (err) {
+        alert(err.reason)
+      } else {
+        Router.go('game', {_id: songId});
+      }
+    });
+  },
+})

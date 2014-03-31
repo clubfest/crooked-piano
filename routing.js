@@ -16,7 +16,7 @@ Router.map(function() {
       GAnalytics.pageview();
     },
     waitOn: function() {
-      return [this.subscribe('songFile', this.params._id)];
+      return [this.subscribe('mySongFile', this.params._id)];
     },
     
     data: function() {
@@ -45,18 +45,21 @@ Router.map(function() {
     },
     action: function() {
       var self = this;
+      if (!Meteor.userId()) {
+        alert('You are need to sign in to upload songs.');
+        self.render('upload');
+      } else {
+        self.render('loading');
 
-      self.render('loading');
-
-      Meteor.call('downloadMidi', this.params.url, function(err, songId) {
-        if (err) {
-          alert(err.reason + '\nTry uploading the file from your computer.');
-          // console.log(err.reason);
-          self.render('upload');
-        }
-        // else you should be routed to the song
-      });
-      
+        Meteor.call('downloadMidi', this.params.url, function(err, songId) {
+          if (err) {
+            alert(err.reason + '\nTry uploading the file from your computer.');
+            // console.log(err.reason);
+            self.render('upload');
+          }
+          // else you should be routed to the song
+        });
+      }
     }
   });
 
@@ -64,7 +67,7 @@ Router.map(function() {
     path: '/songApi/:_id',
     where: 'server',
     action: function() {
-      var song = Songs.findOne(this.params._id);
+      var song = SongFiles.findOne(this.params._id);
       this.response.setHeader('Content-Type', 'application/json');
       this.response.write(JSON.stringify(song));
     },
@@ -88,29 +91,6 @@ Router.map(function() {
     },
   });
 
-  // this.route('editSong', {
-  //   path: '/editSong/:_id',
-  //   waitOn: function() {
-  //     return this.subscribe('song', this.params._id);
-  //   },
-  //   data: function() {
-  //     var data = {};
-
-  //     data.replayerSong = Songs.findOne(this.params._id);
-  //     data.song = data.replayerSong;
-
-  //     return data;
-  //   },
-
-  //   action: function() {
-  //     if (this.ready()) {
-  //       this.render('editSong');
-  //     } else {
-  //       this.render('loading');
-  //     }
-  //   }
-  // });
-
   this.route('upload');
 
   this.route('feedback', {
@@ -122,31 +102,6 @@ Router.map(function() {
       return Feedbacks.find({}, {sort: {createdAt: -1}});
     }
   });
-
-  // this.route('editSong', {
-  //   path: '/editSong/:_id',
-
-  //   waitOn: function() {
-  //     return this.subscribe('song', this.params._id);
-  //   },
-
-  //   data: function() {
-  //     var data = {};
-
-  //     data.replayerSong = Songs.findOne(this.params._id);
-  //     data.song = data.replayerSong;
-
-  //     return data;
-  //   },
-
-  //   action: function() {
-  //     if (this.ready()) {
-  //       this.render('editSong');
-  //     } else {
-  //       this.render('loading');
-  //     }
-  //   }
-  // });
 
   this.route('game', {
     path: '/game/:_id',
@@ -176,37 +131,47 @@ Router.map(function() {
 
       return data;
     },
-
-    // caching last game's songId; todo: check elsewhere, like profile, that this is defined
-    onAfterAction: function() {
-      if (Session.get('songId') !== this.params._id) {
-        Session.set('songId', this.params._id);
-      }
-    }
   });
 
   this.route('songs', {
     onBeforeAction: function() {
-      this.subscribe('gameInfos');
+      Session.set('page', 1);
       GAnalytics.pageview();
+    },
+
+    waitOn: function() {
+      return [this.subscribe('songFilesInfo', {page: Session.get('page')})];
+    },
+
+    data: function() {
+      data = {};
+      data.songs = SongFiles.find({}, {sort: {createdAt: 1}});
+
+      return data;
     },
   });
 
   this.route('profile', {
     onBeforeAction: function() {
-      this.subscribe('myProgressIds');
-      this.subscribe('mySongIds');
+      // this.subscribe('myProgressIds');
+      // this.subscribe('mySongIds');
+      Session.set('page', 1);
       GAnalytics.pageview();
     },
 
+    waitOn: function() {
+      return [this.subscribe('mySongFilesInfo', {page: Session.get('page')})];
+    },
+    
     data: function() {
       data = {};
+      data.songs = SongFiles.find({}, {sort: {createdAt: -1}});
 
-      if (TempGames.complete) {
-        data.replayerSong = TempGames.complete;
-      }
+      // if (TempGames.complete) {
+      //   data.replayerSong = TempGames.complete;
+      // }
 
-      data.song = Songs.findOne(Session.get('songId'), {});
+      // data.song = Songs.findOne(Session.get('songId'), {});
 
       return data;
     }

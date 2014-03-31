@@ -6,24 +6,29 @@
       {{#each gamifiedSongs}}
         <li class='gamified-item game-item' data-game-id='{{_id}}'>
           <ul>
+            <li class='big-font'>
+              {{artist}} - {{title}}
+            </li>
             {{#if youtubeId}}
               <li>
                 <img src="http://img.youtube.com/vi/{{youtubeId}}/default.jpg" width='200'/>
               </li>
             {{/if}}
-            <li class='big-font'>
-              {{artist}}
-            </li>
             <li>
-              {{title}}
-            </li>              
-            <li>
-              {{playCount}} views
+              {{viewCount}} plays
             </li>
           </ul>
         </li>
       {{/each}}
     </ul>
   </div>
+  {{#unless noMoreSongs}}
+    <div align='center'>
+      <a id='load-more-games' class='btn'>
+        <i class='icon-chevron-down'></i>
+        More Songs
+      </a>
+    </div>
+  {{/unless}}
 </div>
 </template>

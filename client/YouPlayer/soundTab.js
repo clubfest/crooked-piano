@@ -25,12 +25,15 @@ Template.soundTab.rendered = function() {
 
 Template.soundTab.events({
   'click #synchronous': function() {
+    YouPlayer.undisplayNotes();
     Session.set('isSynchronous', true);
   },
 
   'click #asynchronous': function() {
     Session.set('isSynchronous', false);
+    YouPlayer.undisplayNotes();
     YouPlayer.transferProximateNotesToComputer();
+    YouPlayer.displayNotes();
   },
   'click #switch-track': function() {
     YouPlayer.switchTrack();

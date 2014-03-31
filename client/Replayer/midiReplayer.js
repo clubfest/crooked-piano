@@ -5,15 +5,16 @@ Template.midiReplayer.isReplaying = function() {
   return Session.get('isReplaying');
 }
 
-Template.midiReplayer.rendered = function() {
+Template.midiReplayer.created = function() {
   Session.set('playModeId', 0);
   Session.set('displayModeId', 0);
   Session.set('playSpeed', 0.8);
-  if (!this.data || !this.data.song) return ;
 
   song = this.data.song;
   Session.set('currentTrackId', song.melodicTrackId);
+}
 
+Template.midiReplayer.rendered = function() {
   $('#replayer-slider').slider({
     range: "min",
     min: 0,
@@ -44,6 +45,8 @@ Template.midiReplayer.rendered = function() {
       slide: function(evt, ui) {
         if (playModes[Session.get('playModeId')] === "demo") {
           MidiReplayer.pause();
+        } else if (playModes[Session.get('playModeId')] === "practice") {
+          YouPlayer.pause();
         }
         
         Session.set('replayerIndex', ui.value);        
@@ -51,6 +54,8 @@ Template.midiReplayer.rendered = function() {
 
         if (playModes[Session.get('playModeId')] === "demo") {
           MidiReplayer.start();
+        } else if (playModes[Session.get('playModeId')] === "practice") {
+          YouPlayer.start();
         }
 
         // needed for the trigger to work correctly
@@ -72,9 +77,8 @@ Template.midiReplayer.rendered = function() {
 }
 
 Template.midiReplayer.destroyed = function() {
-  if (Session.get('isReplaying')) {
-    MidiReplayer.stop();
-  }
+  MidiReplayer.stop();
+  YouPlayer.destroy();
 }
 
 Template.midiReplayer.events({
