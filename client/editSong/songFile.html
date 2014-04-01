@@ -15,17 +15,10 @@
 
     <div class='panel'>
       <a id='gamify-btn' class='btn btn-success'>Gamify</a> 
-      <a onclick="alert('Gamify will make this song public so others can play it as well.')">help</a>   
+      <a onclick="alert('Gamify will make this song public so others can play it as well.\nAdjust the track, speed and background volume to make it easy for others to play.')">help</a>   
     </div>
   </div>
   {{> keyboard}}
   {{> midiReplayer}}
 
-  {{#with song}}
-    {{#if youtubeId}}
-      <div class='panel'>
-        <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
-      </div>
-    {{/if}}
-  {{/with}}
 </template>

@@ -16,7 +16,7 @@ Meteor.methods({
     return songId;
   },
 
-  gamify: function(songId) {
+  gamify: function(songId, trackId) {
     var user = Meteor.user();
     if (!user) {
       throw new Meteor.Error(413, 'Need to sign in before creating a song');
@@ -25,6 +25,7 @@ Meteor.methods({
     SongFiles.update(songId, {
       $set: {
         public: true,
+        melodicTrackId: trackId,
       }
     });
   },

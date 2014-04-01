@@ -33,10 +33,11 @@ Template.soundTab.events({
     Session.set('isSynchronous', false);
     YouPlayer.undisplayNotes();
     YouPlayer.transferProximateNotesToComputer();
-    YouPlayer.displayNotes();
+    YouPlayer.redisplayNotes();
   },
   'click #switch-track': function() {
     YouPlayer.switchTrack();
+    LyricsDisplay.loadDoReMi();
   },
 });
 

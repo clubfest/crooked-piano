@@ -4,7 +4,12 @@ var songs;
 
 Template.songs.created = function() {
   Session.set('noMoreSongs', false);
-  songs = this.data.songs;
+  Deps.autorun(function() {
+    songs = SongFiles.find({}, {
+      sort: {createdAt: -1},
+      limit: Session.get('page') * 4,
+    });
+  });;
 }
 
 Template.songs.gamifiedSongs = function() {
@@ -30,6 +35,6 @@ Template.songs.events({
 
 });
 
-UI.registerHelper('noMoreSongs', function() {
-  return Session.get('noMoreSongs');
-})
+Template.songs.noMoreSongs = function() {
+  return SongFiles.find().count() <= Session.get('page') * 4;
+};

@@ -12,27 +12,21 @@ Meteor.publish('mySongFile', function(songId) {
   return SongFiles.find({_id: songId, creatorId: this.userId});
 });
 
-Meteor.publish('mySongFilesInfo', function(opts) {
-  var page = opts.page || 1;
-
+Meteor.publish('mySongFilesInfo', function() {
   return SongFiles.find({creatorId: this.userId}, {
     fields: {
       notes: 0,
       midi: 0,
     },
-    limit: page * songsPerPage,
   });
 });
 
-Meteor.publish('songFilesInfo', function(opts) {
-  var page = opts.page || 1;
-
+Meteor.publish('songFilesInfo', function() {
   return SongFiles.find({public: true}, {
     fields: {
       notes: 0,
       midi: 0,
     }, 
-    limit: page * songsPerPage,
   });
 });
 

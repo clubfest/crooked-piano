@@ -1,10 +1,18 @@
 var oldCount = 0;
 var newCount = 0;
 var songs;
+var songsHandle;
 
 Template.profile.created = function() {
   Session.set('noMoreSongs', false);
-  songs = this.data.songs;
+  // songs = this.data.songs;
+  Deps.autorun(function() {
+    songs = SongFiles.find({}, {
+      sort: {createdAt: -1},
+      limit: Session.get('page') * 10,
+    });
+  });
+    
 }
 
 Template.profile.events({
@@ -26,16 +34,15 @@ Template.profile.events({
   },
 
   'click #load-more-games': function(evt) {
-    newCount = SongFiles.find().count();  
-    if (oldCount === newCount) {
-      Session.set('noMoreSongs', true);
-    } else {
-      oldCount = newCount;
-    }
     Session.set('page', Session.get('page') + 1);
   },
 });
 
+
+
+Template.profile.noMoreSongs = function() {
+  return SongFiles.find().count() <= Session.get('page') * 10;
+};
 
 Template.profile.mySongs = function() {
   return songs;

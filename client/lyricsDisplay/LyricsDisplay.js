@@ -6,6 +6,7 @@ var START_BEAT_FILTER = 0; // todo: use other info to filter
 
 LyricsDisplay = {
   init: function(song) {
+    this.song = song;
     this.ticksPerBeat = song.midi.header.ticksPerBeat;
     this.startIndex = 0;
     Session.set('lyricsForDisplay', []);
@@ -19,7 +20,7 @@ LyricsDisplay = {
       // TODO: noteProcessed means before it's played, so I can't use keyboardDown
       // This is to support lyrics insertion
       $(window).on('noteProcessed.lyricsDisplay', function(evt, data) {
-        if (data.trackId === self.lyricsTrackId) {
+        if (data.trackId === self.lyricsTrackId || Session.get('currentTrackId') === data.trackId) {
           self.updateLyricsForDisplay();
         }
       });
@@ -31,8 +32,8 @@ LyricsDisplay = {
     Session.set('lyricsForDisplay', []);
   },
 
-  initLyricsTrack: function(song) {
-    var tracks = song.midi.tracks;
+  initLyricsTrack: function() {
+    var tracks = this.song.midi.tracks;
     var lyricsTracks = []; // possible lyrics tracks
     var MIN_WORDS = 20; // e.g. happy birthday
 
@@ -78,15 +79,17 @@ LyricsDisplay = {
       this.lyrics = lyricsTracks[0].lyrics;
       
     } else { // Load Do Re Mi from the melodicTrack instead
-      this.loadDoReMi(song);
+      this.loadDoReMi();
     }
   },
 
-  loadDoReMi: function(song) {
+  loadDoReMi: function() {
     this.lyrics = [];
-    this.lyricsTrackId = Session.get('currentTrackId') || song.melodicTrackId;
+    this.startIndex = 0;
     
-    var tracks = song.midi.tracks;
+    this.lyricsTrackId = Session.get('currentTrackId') || this.song.melodicTrackId;
+    
+    var tracks = this.song.midi.tracks;
     var track = tracks[this.lyricsTrackId];
 
     for (var i = 0; i < track.length; i++) {

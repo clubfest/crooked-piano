@@ -55,7 +55,7 @@ Template.songFile.events({
       alert('Please provide a youtube link and title before gamifying');
       return;
     }
-    Meteor.call('gamify', songId, function(err) {
+    Meteor.call('gamify', songId, Session.get('currentTrackId'), function(err) {
       if (err) {
         alert(err.reason)
       } else {

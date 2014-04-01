@@ -140,15 +140,18 @@ Router.map(function() {
     },
 
     waitOn: function() {
-      return [this.subscribe('songFilesInfo', {page: Session.get('page')})];
+      return [this.subscribe('songFilesInfo')];
     },
 
-    data: function() {
-      data = {};
-      data.songs = SongFiles.find({}, {sort: {createdAt: 1}});
+    // data: function() {
+    //   data = {};
+    //   data.songs = SongFiles.find({}, {
+    //     sort: {createdAt: 1},
+    //     limit: Session.get('page') * 10,
+    //   });
 
-      return data;
-    },
+    //   return data;
+    // },
   });
 
   this.route('profile', {
@@ -160,21 +163,24 @@ Router.map(function() {
     },
 
     waitOn: function() {
-      return [this.subscribe('mySongFilesInfo', {page: Session.get('page')})];
+      return [this.subscribe('mySongFilesInfo')];
     },
     
-    data: function() {
-      data = {};
-      data.songs = SongFiles.find({}, {sort: {createdAt: -1}});
+    // data: function() {
+    //   data = {};
+    //   data.songs = SongFiles.find({}, {
+    //     sort: {createdAt: -1},
+    //     limit: Session.get('page') * 10,
+    //   });
 
-      // if (TempGames.complete) {
-      //   data.replayerSong = TempGames.complete;
-      // }
+    //   // if (TempGames.complete) {
+    //   //   data.replayerSong = TempGames.complete;
+    //   // }
 
-      // data.song = Songs.findOne(Session.get('songId'), {});
+    //   // data.song = Songs.findOne(Session.get('songId'), {});
 
-      return data;
-    }
+    //   return data;
+    // }
   });
 
   // this.route('progress', {

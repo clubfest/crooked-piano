@@ -1,8 +1,21 @@
 <template name='tabs'>
-  {{#if displayMode.infoTab}}
-    {{> infoTab}}
-  {{/if}}
+  <div align='left'>
+    {{> lyricsDisplay}}        
+  </div>
   {{#if displayMode.soundTab}}
     {{> soundTab}}
   {{/if}}
+  <div align='center'>
+    <div style='margin: 20px 0;'>
+      {{{desc}}}
+    </div>
+  </div>
+  {{#with song}}
+    {{#if youtubeId}}
+      <div class='panel'>
+        <iframe src="http://www.youtube.com/embed/{{youtubeId}}" width="398" height="224"></iframe>
+      </div>
+    {{/if}}
+  {{/with}}
+
 </template>
