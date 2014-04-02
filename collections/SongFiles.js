@@ -16,6 +16,20 @@ Meteor.methods({
     return songId;
   },
 
+  removeSongFile: function(songId) {
+    var userId = Meteor.userId();
+    if (!userId) {
+      throw new Meteor.Error(413, 'Need to sign in before creating a song');
+    }
+
+    var songFile = SongFiles.findOne(songId);
+    if (songFile.creatorId !== userId) {
+      throw new Meteor.Error(413, 'You need to be the creator to delete the song');
+    }
+
+    SongFiles.remove(songId);
+  },
+
   gamify: function(songId, trackId) {
     var user = Meteor.user();
     if (!user) {

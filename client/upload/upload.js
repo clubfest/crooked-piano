@@ -31,7 +31,7 @@ Template.upload.rendered = function() {
   var midiInput = document.getElementById('midi-input');
 
   midiInput.onchange = function(evt) {
-    $('#dragandrophandler').text('Uploading at full throttle.');
+    $('#dragandrophandler').html(loading);
     var fileList = midiInput.files;
     if (fileList.length > 0) {
       var file = fileList[0];
@@ -59,6 +59,7 @@ Template.upload.rendered = function() {
   {
    
       $(this).css('border', '2px dotted #0B85A1');
+      $(this).html(loading);
       e.preventDefault();
       var fileList = e.originalEvent.dataTransfer.files;
    
@@ -85,6 +86,12 @@ Template.upload.rendered = function() {
       e.preventDefault();
   });
 }
+
+var loading = '<div class="spinner">\
+  <div class="bounce1"></div>\
+  <div class="bounce2"></div>\
+  <div class="bounce3"></div>\
+</div>'
 
 
     

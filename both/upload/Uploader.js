@@ -84,15 +84,15 @@ Uploader = {
         trackInfos.push(info);
       }
     }
-    // var tempTrackInfos = trackInfos;
-    // trackInfos = [];
+    var tempTrackInfos = trackInfos;
+    trackInfos = [];
 
-    // for (var i = 0; i < tempTrackInfos.length; i++) {
-    //   var info = tempTrackInfos[i];
-    //   if (info.numOfNotes * tempTrackInfos.length * 8 > this.notes.length) {
-    //     trackInfos.push(info);
-    //   }
-    // }
+    for (var i = 0; i < tempTrackInfos.length; i++) {
+      var info = tempTrackInfos[i];
+      if (info.trackStartInMicroseconds < 30000000) {
+        trackInfos.push(info);
+      }
+    }
 
     trackInfos.sort(function(a, b) {
       return a.melodicJumpVariance - b.melodicJumpVariance;

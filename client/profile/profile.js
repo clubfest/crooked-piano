@@ -36,6 +36,12 @@ Template.profile.events({
   'click #load-more-games': function(evt) {
     Session.set('page', Session.get('page') + 1);
   },
+
+  'click .remove-song': function(evt) {
+    Meteor.call('removeSongFile', evt.currentTarget.dataset.id, function(err) {
+      if (err) alert(err.reason);
+    });
+  }
 });
 
 

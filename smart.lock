@@ -16,7 +16,7 @@
       "iron-router": {
         "git": "git@github.com:EventedMind/iron-router.git",
         "branch": "master",
-        "commit": "05f34bc48c4cad9fdaa366c1ddcabe6980232ece"
+        "commit": "8ed629e1732f2ff286e25b4f5b7e74d2630c257b"
       },
       "jquery-ui": {
         "git": "https://github.com/TimHeckel/meteor-jquery-ui.git",
